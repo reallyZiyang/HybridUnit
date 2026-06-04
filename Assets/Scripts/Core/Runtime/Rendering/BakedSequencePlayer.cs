@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEditorInternal;
 #endif
 using UnityEngine;
-using UnityEngine.Rendering;
 
 [ExecuteAlways]
 [DisallowMultipleComponent]
@@ -17,10 +16,6 @@ public sealed class BakedSequencePlayer : MonoBehaviour
     private static readonly int FrameTransformId = Shader.PropertyToID("_FrameTransform");
     private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
     private static Mesh sharedQuadMesh;
-    private static readonly Matrix4x4[] MatrixBuffer = new Matrix4x4[1];
-    private static readonly Vector4[] UVRectBuffer = new Vector4[1];
-    private static readonly Vector4[] FrameTransformBuffer = new Vector4[1];
-    private static readonly Vector4[] ColorBuffer = new Vector4[1];
 
     [SerializeField] private Texture2D atlas;
     [SerializeField] private TextAsset metadataJson;
@@ -38,8 +33,6 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 
     private MeshRenderer meshRenderer;
     private MaterialPropertyBlock propertyBlock;
-    private Material materialInstance;
-    private Material sourceMaterial;
     private BakedSequenceMetadata metadata;
     private float time;
     private int currentFrame = -1;
@@ -78,7 +71,6 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 #if UNITY_EDITOR
         EditorApplication.update -= EditorUpdate;
 #endif
-        DestroyMaterialInstance();
     }
 
     private void OnValidate()
@@ -103,7 +95,6 @@ public sealed class BakedSequencePlayer : MonoBehaviour
         }
 
         Tick(Time.deltaTime);
-        DrawCurrentFrame();
     }
 
 #if UNITY_EDITOR
@@ -123,14 +114,12 @@ public sealed class BakedSequencePlayer : MonoBehaviour
         if (playing)
         {
             Tick(deltaTime);
-            DrawCurrentFrame();
             SceneView.RepaintAll();
             InternalEditorUtility.RepaintAllViews();
         }
         else
         {
             ApplyFrame(previewFrame);
-            DrawCurrentFrame();
         }
     }
 #endif
@@ -223,13 +212,15 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 
         bool visible = rect.uvWidth > 0f && rect.uvHeight > 0f && rect.quadWidth > 0f && rect.quadHeight > 0f;
         currentFrameVisible = visible;
-        meshRenderer.enabled = false;
+        meshRenderer.enabled = visible;
         if (!visible)
         {
+            meshRenderer.SetPropertyBlock(null);
             return;
         }
 
         meshRenderer.GetPropertyBlock(propertyBlock);
+        propertyBlock.Clear();
 
         float uvX = flipU ? rect.uvX + rect.uvWidth : rect.uvX;
         float uvY = flipV ? rect.uvY + rect.uvHeight : rect.uvY;
@@ -242,20 +233,11 @@ public sealed class BakedSequencePlayer : MonoBehaviour
             rect.quadOffsetY * safeDisplayScale,
             rect.quadWidth * safeDisplayScale,
             rect.quadHeight * safeDisplayScale);
-        MatrixBuffer[0] = transform.localToWorldMatrix;
-        UVRectBuffer[0] = uvRect;
-        FrameTransformBuffer[0] = frameTransform;
-        ColorBuffer[0] = color;
         propertyBlock.SetVector(FrameUVRectId, uvRect);
         propertyBlock.SetVector(FrameTransformId, frameTransform);
         propertyBlock.SetColor(InstanceColorId, color);
-        propertyBlock.SetVectorArray(FrameUVRectId, UVRectBuffer);
-        propertyBlock.SetVectorArray(FrameTransformId, FrameTransformBuffer);
-        propertyBlock.SetVectorArray(InstanceColorId, ColorBuffer);
-        if (atlas != null)
-        {
-            propertyBlock.SetTexture(MainTexId, atlas);
-        }
+
+        meshRenderer.SetPropertyBlock(propertyBlock);
     }
 
     private void EnsureComponents()
@@ -273,53 +255,29 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 
         if (material == null)
         {
-            DestroyMaterialInstance();
-        }
-        else if (materialInstance == null || sourceMaterial != material)
-        {
-            DestroyMaterialInstance();
-            materialInstance = new Material(material)
+            if (meshRenderer != null)
             {
-                name = material.name + " (BakedSequencePlayer Instance)",
-                hideFlags = HideFlags.DontSave
-            };
-            materialInstance.enableInstancing = true;
-            sourceMaterial = material;
+                meshRenderer.sharedMaterial = null;
+            }
         }
-
-        if (materialInstance != null && meshRenderer.sharedMaterial != materialInstance)
+        else
         {
-            meshRenderer.sharedMaterial = materialInstance;
-        }
+            material.enableInstancing = true;
+            if (atlas != null && material.HasProperty(MainTexId) && material.GetTexture(MainTexId) != atlas)
+            {
+                material.SetTexture(MainTexId, atlas);
+            }
 
-        meshRenderer.enabled = false;
+            if (meshRenderer.sharedMaterial != material)
+            {
+                meshRenderer.sharedMaterial = material;
+            }
+        }
 
         if (propertyBlock == null)
         {
             propertyBlock = new MaterialPropertyBlock();
         }
-    }
-
-    private void DrawCurrentFrame()
-    {
-        if (!currentFrameVisible || materialInstance == null || propertyBlock == null)
-        {
-            return;
-        }
-
-        MatrixBuffer[0] = transform.localToWorldMatrix;
-        Graphics.DrawMeshInstanced(
-            GetQuadMesh(),
-            0,
-            materialInstance,
-            MatrixBuffer,
-            1,
-            propertyBlock,
-            ShadowCastingMode.Off,
-            false,
-            gameObject.layer,
-            null,
-            LightProbeUsage.Off);
     }
 
     private int FindNextVisibleFrame(int startFrame)
@@ -341,26 +299,6 @@ public sealed class BakedSequencePlayer : MonoBehaviour
         }
 
         return safeStart;
-    }
-
-    private void DestroyMaterialInstance()
-    {
-        if (materialInstance == null)
-        {
-            return;
-        }
-
-        if (Application.isPlaying)
-        {
-            Destroy(materialInstance);
-        }
-        else
-        {
-            DestroyImmediate(materialInstance);
-        }
-
-        materialInstance = null;
-        sourceMaterial = null;
     }
 
     private static Mesh GetQuadMesh()
@@ -389,7 +327,7 @@ public sealed class BakedSequencePlayer : MonoBehaviour
             },
             triangles = new[] { 0, 2, 1, 0, 3, 2 }
         };
-        sharedQuadMesh.bounds = new Bounds(Vector3.zero, Vector3.one);
+        sharedQuadMesh.bounds = new Bounds(Vector3.zero, new Vector3(100f, 100f, 1f));
         sharedQuadMesh.RecalculateNormals();
         return sharedQuadMesh;
     }
