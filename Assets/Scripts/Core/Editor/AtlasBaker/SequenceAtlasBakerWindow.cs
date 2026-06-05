@@ -46,6 +46,7 @@ public sealed class SequenceAtlasBakerWindow : EditorWindow
     {
         EditorGUILayout.LabelField("Source", EditorStyles.boldLabel);
         settings.Prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", settings.Prefab, typeof(GameObject), false);
+        settings.RendererNameFilter = EditorGUILayout.TextField(new GUIContent("Renderer Filter", "Debug only. Leave empty to bake all ParticleSystemRenderers. Fill part of a renderer GameObject name such as Fire or bg to isolate one renderer."), settings.RendererNameFilter);
     }
 
     private void DrawBakeSettings()
@@ -168,6 +169,7 @@ public sealed class SequenceAtlasBakerWindow : EditorWindow
             settings.FieldOfView = EditorGUILayout.FloatField("Field Of View", settings.FieldOfView);
         }
         settings.AutoFrameCamera = EditorGUILayout.Toggle(new GUIContent("Auto Frame Camera", "Simulates the effect once and frames all particle renderer bounds before baking."), settings.AutoFrameCamera);
+        settings.BakeLayer = EditorGUILayout.IntSlider(new GUIContent("Bake Layer", "Temporary layer used by the bake instance and camera culling mask. Choose a layer not used by visible scene objects."), settings.BakeLayer, 0, 31);
         settings.CameraPosition = EditorGUILayout.Vector3Field("Camera Position", settings.CameraPosition);
         settings.CameraEulerAngles = EditorGUILayout.Vector3Field("Camera Rotation", settings.CameraEulerAngles);
         settings.AddDirectionalLight = EditorGUILayout.Toggle("Add Directional Light", settings.AddDirectionalLight);

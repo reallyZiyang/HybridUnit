@@ -76,6 +76,9 @@ public static class ParticleAtlasBaker
 
             GameObject instance = CreatePrefabInstance(settings, bakeScene);
             ApplyPrefabTransform(instance, settings);
+            ApplyBakeLayer(instance, settings);
+            ApplyRendererFilter(instance, settings);
+            PrepareParticleRenderersForBake(instance);
             if (settings.UseBakeParticleMaterial)
             {
                 ParticleAtlasBakeMaterialUtility.ApplyBakeParticleMaterials(instance);
@@ -84,7 +87,7 @@ public static class ParticleAtlasBaker
             bakeCamera = CreateCamera(settings, bakeScene);
             if (settings.AddDirectionalLight)
             {
-                CreateLight(bakeScene);
+                CreateLight(bakeScene, settings);
             }
 
             renderTexture = CreateRenderTexture(settings);
@@ -503,6 +506,7 @@ public static class ParticleAtlasBaker
         ParticleAtlasMetadata metadata = new ParticleAtlasMetadata
         {
             prefab = AssetDatabase.GetAssetPath(settings.Prefab),
+            rendererNameFilter = settings.RendererNameFilter,
             loop = settings.Loop,
             loopBlend = settings.Loop && settings.LoopBlend,
             loopBlendFrames = settings.Loop && settings.LoopBlend ? Mathf.Clamp(settings.LoopBlendFrames, 0, outputFrameCount / 2) : 0,
@@ -537,6 +541,7 @@ public static class ParticleAtlasBaker
             firstVisibleFrame = frames.FirstVisibleFrame,
             lastVisibleFrame = frames.LastVisibleFrame,
             autoFrameCamera = settings.AutoFrameCamera,
+            bakeLayer = Mathf.Clamp(settings.BakeLayer, 0, 31),
             forceRandomSeed = settings.ForceRandomSeed,
             randomSeed = settings.RandomSeed,
             frameRects = CreateFrameMetadata(settings, layout, frames.FrameRects, packing.AtlasRects, outputStartFrame, outputFrameCount)
@@ -592,6 +597,64 @@ public static class ParticleAtlasBaker
         return instance;
     }
 
+    private static void ApplyBakeLayer(GameObject instance, ParticleAtlasBakeSettings settings)
+    {
+        int bakeLayer = Mathf.Clamp(settings.BakeLayer, 0, 31);
+        Transform[] transforms = instance.GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            transforms[i].gameObject.layer = bakeLayer;
+        }
+    }
+
+    private static void ApplyRendererFilter(GameObject instance, ParticleAtlasBakeSettings settings)
+    {
+        if (string.IsNullOrWhiteSpace(settings.RendererNameFilter))
+        {
+            return;
+        }
+
+        string filter = settings.RendererNameFilter.Trim();
+        ParticleSystemRenderer[] renderers = instance.GetComponentsInChildren<ParticleSystemRenderer>(true);
+        int matchedCount = 0;
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            ParticleSystemRenderer particleRenderer = renderers[i];
+            if (particleRenderer == null)
+            {
+                continue;
+            }
+
+            bool matched = particleRenderer.gameObject.name.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
+            particleRenderer.enabled = particleRenderer.enabled && matched;
+            if (matched)
+            {
+                matchedCount++;
+            }
+        }
+
+        if (matchedCount == 0)
+        {
+            throw new InvalidOperationException("Renderer Filter did not match any ParticleSystemRenderer GameObject: " + filter);
+        }
+    }
+
+    private static void PrepareParticleRenderersForBake(GameObject instance)
+    {
+        ParticleSystemRenderer[] renderers = instance.GetComponentsInChildren<ParticleSystemRenderer>(true);
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            ParticleSystemRenderer particleRenderer = renderers[i];
+            if (particleRenderer == null)
+            {
+                continue;
+            }
+
+            // 离屏逐帧烘培需要确定性的 CPU 粒子网格路径，避免 GPU 粒子 instancing 缓冲把旧帧数据带进当前帧。
+            particleRenderer.enableGPUInstancing = false;
+        }
+    }
+
     private static void ApplyPrefabTransform(GameObject instance, ParticleAtlasBakeSettings settings)
     {
         instance.transform.position = settings.PrefabPosition;
@@ -608,6 +671,7 @@ public static class ParticleAtlasBaker
 
         Camera camera = cameraObject.AddComponent<Camera>();
         camera.enabled = false;
+        camera.cullingMask = 1 << Mathf.Clamp(settings.BakeLayer, 0, 31);
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = settings.TransparentBackground ? new Color(0f, 0f, 0f, 0f) : settings.BackgroundColor;
         camera.orthographic = settings.Orthographic;
@@ -620,15 +684,17 @@ public static class ParticleAtlasBaker
         return camera;
     }
 
-    private static void CreateLight(Scene bakeScene)
+    private static void CreateLight(Scene bakeScene, ParticleAtlasBakeSettings settings)
     {
         GameObject lightObject = new GameObject("ParticleAtlasBakeLight");
         SceneManager.MoveGameObjectToScene(lightObject, bakeScene);
+        lightObject.layer = Mathf.Clamp(settings.BakeLayer, 0, 31);
         lightObject.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
 
         Light light = lightObject.AddComponent<Light>();
         light.type = LightType.Directional;
         light.intensity = 1f;
+        light.cullingMask = 1 << Mathf.Clamp(settings.BakeLayer, 0, 31);
     }
 
     private static RenderTexture CreateRenderTexture(ParticleAtlasBakeSettings settings)
@@ -672,8 +738,10 @@ public static class ParticleAtlasBaker
         RenderTexture previous = RenderTexture.active;
         try
         {
-            camera.Render();
             RenderTexture.active = renderTexture;
+            // 每帧显式清空 RT，避免 additive 粒子把上一帧内容累积进当前帧。
+            GL.Clear(true, true, camera.backgroundColor);
+            camera.Render();
             frameTexture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0, false);
             frameTexture.Apply(false, false);
         }

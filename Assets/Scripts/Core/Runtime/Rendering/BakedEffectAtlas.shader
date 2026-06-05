@@ -5,6 +5,7 @@ Shader "Hybrid/Baked Effect Atlas"
         _MainTex ("Atlas", 2D) = "white" {}
         _Tint ("Tint", Color) = (1, 1, 1, 1)
         _FrameUVRect ("Frame UV Rect", Vector) = (0, 0, 1, 1)
+        _FrameUVClamp ("Frame UV Clamp", Vector) = (0, 0, 1, 1)
         _FrameTransform ("Frame Transform", Vector) = (0, 0, 1, 1)
         _InstanceColor ("Instance Color", Color) = (1, 1, 1, 1)
     }
@@ -44,6 +45,7 @@ Shader "Hybrid/Baked Effect Atlas"
 
             UNITY_INSTANCING_BUFFER_START(Props)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _FrameUVRect)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _FrameUVClamp)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _FrameTransform)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _InstanceColor)
             UNITY_INSTANCING_BUFFER_END(Props)
@@ -75,7 +77,8 @@ Shader "Hybrid/Baked Effect Atlas"
                 positionOS.xy = positionOS.xy * frameTransform.zw + frameTransform.xy;
 
                 float4 frameUVRect = UNITY_ACCESS_INSTANCED_PROP(Props, _FrameUVRect);
-                output.uv = frameUVRect.xy + input.uv * frameUVRect.zw;
+                float4 frameUVClamp = UNITY_ACCESS_INSTANCED_PROP(Props, _FrameUVClamp);
+                output.uv = clamp(frameUVRect.xy + input.uv * frameUVRect.zw, frameUVClamp.xy, frameUVClamp.zw);
                 output.positionCS = TransformObjectToHClip(positionOS);
                 output.color = input.color * _Tint * UNITY_ACCESS_INSTANCED_PROP(Props, _InstanceColor);
                 return output;

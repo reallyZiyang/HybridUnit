@@ -8,6 +8,7 @@ public sealed class ParticleAtlasBakeSettings
     public const string DefaultOutputFolder = "Assets/BakedSequences";
 
     public GameObject Prefab;
+    public string RendererNameFilter = string.Empty;
 
     public ParticleAtlasBakeResolutionPreset ResolutionPreset = ParticleAtlasBakeResolutionPreset.Medium;
     public ParticleAtlasBakeFrameRatePreset FrameRatePreset = ParticleAtlasBakeFrameRatePreset.Medium;
@@ -42,6 +43,7 @@ public sealed class ParticleAtlasBakeSettings
 
     public bool AddDirectionalLight;
     public int AntiAliasing = 1;
+    public int BakeLayer = 31;
 
     public bool Orthographic = true;
     public bool AutoFrameCamera = true;

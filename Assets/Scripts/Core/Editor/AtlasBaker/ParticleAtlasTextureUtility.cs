@@ -115,7 +115,9 @@ public static class ParticleAtlasTextureUtility
         {
             Color32 pixel = pixels[i];
             int colorAlpha = Math.Max(pixel.r, Math.Max(pixel.g, pixel.b));
-            pixel.a = (byte)Math.Max(pixel.a, colorAlpha);
+            // Additive 粒子常见写法是黑底贴图 + 加法混合，原始 alpha 可能覆盖整张 quad。
+            // 烘培成普通透明序列图时应以 RGB 亮度重建 alpha，否则黑色区域会以非零 alpha 形成黑块。
+            pixel.a = (byte)colorAlpha;
             pixels[i] = pixel;
         }
     }

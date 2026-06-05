@@ -5,6 +5,7 @@ using System;
 public sealed class ParticleAtlasMetadata
 {
     public string prefab;
+    public string rendererNameFilter;
     public bool loop;
     public bool loopBlend;
     public int loopBlendFrames;
@@ -39,6 +40,7 @@ public sealed class ParticleAtlasMetadata
     public int firstVisibleFrame;
     public int lastVisibleFrame;
     public bool autoFrameCamera;
+    public int bakeLayer;
     public bool forceRandomSeed;
     public uint randomSeed;
     public ParticleAtlasFrameRect[] frameRects;

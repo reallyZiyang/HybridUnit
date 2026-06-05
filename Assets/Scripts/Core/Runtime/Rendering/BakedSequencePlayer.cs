@@ -13,6 +13,7 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 {
     private static readonly int MainTexId = Shader.PropertyToID("_MainTex");
     private static readonly int FrameUVRectId = Shader.PropertyToID("_FrameUVRect");
+    private static readonly int FrameUVClampId = Shader.PropertyToID("_FrameUVClamp");
     private static readonly int FrameTransformId = Shader.PropertyToID("_FrameTransform");
     private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
     private static Mesh sharedQuadMesh;
@@ -227,6 +228,7 @@ public sealed class BakedSequencePlayer : MonoBehaviour
         float uvWidth = flipU ? -rect.uvWidth : rect.uvWidth;
         float uvHeight = flipV ? -rect.uvHeight : rect.uvHeight;
         Vector4 uvRect = new Vector4(uvX, uvY, uvWidth, uvHeight);
+        Vector4 uvClamp = CalculateUvClamp(uvX, uvY, uvWidth, uvHeight);
         float safeDisplayScale = Mathf.Max(0.0001f, displayScale);
         Vector4 frameTransform = new Vector4(
             rect.quadOffsetX * safeDisplayScale,
@@ -234,10 +236,37 @@ public sealed class BakedSequencePlayer : MonoBehaviour
             rect.quadWidth * safeDisplayScale,
             rect.quadHeight * safeDisplayScale);
         propertyBlock.SetVector(FrameUVRectId, uvRect);
+        propertyBlock.SetVector(FrameUVClampId, uvClamp);
         propertyBlock.SetVector(FrameTransformId, frameTransform);
         propertyBlock.SetColor(InstanceColorId, color);
+        if (atlas != null)
+        {
+            propertyBlock.SetTexture(MainTexId, atlas);
+        }
 
         meshRenderer.SetPropertyBlock(propertyBlock);
+    }
+
+    private Vector4 CalculateUvClamp(float uvX, float uvY, float uvWidth, float uvHeight)
+    {
+        float minX = Mathf.Min(uvX, uvX + uvWidth);
+        float maxX = Mathf.Max(uvX, uvX + uvWidth);
+        float minY = Mathf.Min(uvY, uvY + uvHeight);
+        float maxY = Mathf.Max(uvY, uvY + uvHeight);
+
+        if (atlas == null)
+        {
+            return new Vector4(minX, minY, maxX, maxY);
+        }
+
+        // Bilinear 采样到 atlas 单元格边缘时会混到相邻帧，半 texel 内缩可以避免边界串帧。
+        float insetX = 0.5f / Mathf.Max(1, atlas.width);
+        float insetY = 0.5f / Mathf.Max(1, atlas.height);
+        return new Vector4(
+            Mathf.Min(minX + insetX, maxX),
+            Mathf.Min(minY + insetY, maxY),
+            Mathf.Max(maxX - insetX, minX),
+            Mathf.Max(maxY - insetY, minY));
     }
 
     private void EnsureComponents()
@@ -263,9 +292,9 @@ public sealed class BakedSequencePlayer : MonoBehaviour
         else
         {
             material.enableInstancing = true;
-            if (atlas != null && material.HasProperty(MainTexId) && material.GetTexture(MainTexId) != atlas)
+            if (atlas != null)
             {
-                material.SetTexture(MainTexId, atlas);
+                atlas.wrapMode = TextureWrapMode.Clamp;
             }
 
             if (meshRenderer.sharedMaterial != material)
