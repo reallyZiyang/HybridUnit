@@ -177,9 +177,11 @@ public static class ParticleAtlasBakeUtility
             }
 
             ParticleSystem.MainModule main = particleSystem.main;
-            // Loop 烘培需要稳定态；非 Loop 烘培必须冷启动，避免源 prefab 自带 prewarm 被烘成固定残影。
-            main.loop = settings.Loop;
-            main.prewarm = settings.Loop;
+            if (settings.Loop)
+            {
+                main.loop = true;
+                main.prewarm = true;
+            }
         }
     }
 

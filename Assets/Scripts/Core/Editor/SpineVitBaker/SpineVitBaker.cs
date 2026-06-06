@@ -33,6 +33,7 @@ public static class SpineVitBaker
         {
             throw new InvalidOperationException("Spine source material must use a Texture2D main texture.");
         }
+        Texture2D runtimeSourceTexture = CreateRuntimeSourceTexture(sourceTexture, settings);
 
         Spine.Animation[] animations = ResolveAnimations(skeletonData, settings.AnimationNames);
         ValidateAnimations(animations);
@@ -83,10 +84,10 @@ public static class SpineVitBaker
         Mesh mesh = CreateMesh(firstSample, combinedBounds);
         Texture2D positionTexture = CreatePositionTexture(vertexCount, totalFrameCount, positionPixels);
         Texture2D colorTexture = CreateColorTexture(vertexCount, totalFrameCount, colorPixels);
-        Material material = CreateMaterial(sourceTexture, positionTexture, colorTexture);
-        BakedSpineVitAsset asset = CreateAssetObject(mesh, material, sourceTexture, positionTexture, colorTexture, settings.FrameRate, vertexCount, totalFrameCount, combinedBounds, clips);
+        Material material = CreateMaterial(runtimeSourceTexture, positionTexture, colorTexture);
+        BakedSpineVitAsset asset = CreateAssetObject(mesh, material, runtimeSourceTexture, positionTexture, colorTexture, settings.FrameRate, vertexCount, totalFrameCount, combinedBounds, clips);
 
-        string assetPath = SaveAsset(settings, asset, mesh, positionTexture, colorTexture, material);
+        string assetPath = SaveAsset(settings, asset, mesh, runtimeSourceTexture, sourceTexture, positionTexture, colorTexture, material);
         return new SpineVitBakeResult(assetPath, vertexCount, totalFrameCount, clips.Length);
     }
 
@@ -100,6 +101,11 @@ public static class SpineVitBaker
         if (!settings.OutputFolder.StartsWith("Assets", StringComparison.Ordinal))
         {
             throw new InvalidOperationException("Output folder must be inside this Unity project Assets folder.");
+        }
+
+        if (settings.SourceTextureMaxSize <= 0)
+        {
+            throw new InvalidOperationException("Source Atlas Max Size must be positive.");
         }
 
         SkeletonData skeletonData = settings.SkeletonDataAsset.GetSkeletonData(false);
@@ -134,6 +140,46 @@ public static class SpineVitBaker
         }
 
         return material;
+    }
+
+    private static Texture2D CreateRuntimeSourceTexture(Texture2D sourceTexture, SpineVitBakeSettings settings)
+    {
+        int maxSize = Mathf.Clamp(settings.SourceTextureMaxSize, 1, SystemInfo.maxTextureSize);
+        int sourceWidth = sourceTexture.width;
+        int sourceHeight = sourceTexture.height;
+        int sourceMaxSide = Mathf.Max(sourceWidth, sourceHeight);
+        if (sourceMaxSide <= maxSize)
+        {
+            sourceTexture.wrapMode = TextureWrapMode.Clamp;
+            return sourceTexture;
+        }
+
+        float scale = maxSize / (float)sourceMaxSide;
+        int targetWidth = Mathf.Max(1, Mathf.RoundToInt(sourceWidth * scale));
+        int targetHeight = Mathf.Max(1, Mathf.RoundToInt(sourceHeight * scale));
+        RenderTexture previous = RenderTexture.active;
+        RenderTexture renderTexture = RenderTexture.GetTemporary(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+        Texture2D copy = new Texture2D(targetWidth, targetHeight, TextureFormat.RGBA32, false, false)
+        {
+            name = sourceTexture.name + "_RuntimeAtlas",
+            filterMode = FilterMode.Bilinear,
+            wrapMode = TextureWrapMode.Clamp
+        };
+
+        try
+        {
+            Graphics.Blit(sourceTexture, renderTexture);
+            RenderTexture.active = renderTexture;
+            copy.ReadPixels(new Rect(0, 0, targetWidth, targetHeight), 0, 0, false);
+            copy.Apply(false, true);
+        }
+        finally
+        {
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(renderTexture);
+        }
+
+        return copy;
     }
 
     private static Spine.Animation[] ResolveAnimations(SkeletonData skeletonData, string[] animationNames)
@@ -328,7 +374,7 @@ public static class SpineVitBaker
         return asset;
     }
 
-    private static string SaveAsset(SpineVitBakeSettings settings, BakedSpineVitAsset asset, Mesh mesh, Texture2D positionTexture, Texture2D colorTexture, Material material)
+    private static string SaveAsset(SpineVitBakeSettings settings, BakedSpineVitAsset asset, Mesh mesh, Texture2D runtimeSourceTexture, Texture2D originalSourceTexture, Texture2D positionTexture, Texture2D colorTexture, Material material)
     {
         string fileBaseName = GetOutputBaseName(settings);
         string outputDirectoryAbsolute = ParticleAtlasPathUtility.ProjectPathToAbsolute(settings.OutputFolder);
@@ -339,10 +385,18 @@ public static class SpineVitBaker
         AssetDatabase.CreateAsset(asset, assetPath);
 
         mesh.name = fileBaseName + "_Mesh";
+        if (runtimeSourceTexture != originalSourceTexture)
+        {
+            runtimeSourceTexture.name = fileBaseName + "_RuntimeAtlas";
+        }
         positionTexture.name = fileBaseName + "_PositionVIT";
         colorTexture.name = fileBaseName + "_ColorVIT";
         material.name = fileBaseName + "_Material";
         AssetDatabase.AddObjectToAsset(mesh, asset);
+        if (runtimeSourceTexture != originalSourceTexture)
+        {
+            AssetDatabase.AddObjectToAsset(runtimeSourceTexture, asset);
+        }
         AssetDatabase.AddObjectToAsset(positionTexture, asset);
         AssetDatabase.AddObjectToAsset(colorTexture, asset);
         AssetDatabase.AddObjectToAsset(material, asset);

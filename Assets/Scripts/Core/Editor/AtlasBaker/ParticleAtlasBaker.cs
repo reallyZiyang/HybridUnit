@@ -10,7 +10,8 @@ public static class ParticleAtlasBaker
 {
     public static bool CanBake(ParticleAtlasBakeSettings settings)
     {
-        return settings.Prefab != null
+        return settings != null
+            && settings.Prefab != null
             && ParticleAtlasBakeUtility.GetBakeDuration(settings) > 0f
             && settings.FrameRate > 0
             && settings.FrameWidth > 0
@@ -625,7 +626,7 @@ public static class ParticleAtlasBaker
                 continue;
             }
 
-            bool matched = particleRenderer.gameObject.name.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0;
+            bool matched = string.Equals(particleRenderer.gameObject.name, filter, StringComparison.OrdinalIgnoreCase);
             particleRenderer.enabled = particleRenderer.enabled && matched;
             if (matched)
             {

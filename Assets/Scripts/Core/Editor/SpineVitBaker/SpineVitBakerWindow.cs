@@ -8,14 +8,16 @@ using UnityEngine;
 
 public sealed class SpineVitBakerWindow : EditorWindow
 {
-    private readonly SpineVitBakeSettings settings = new SpineVitBakeSettings();
+    private const string DefaultSettingsAssetPath = SpineVitBakeSettings.DefaultOutputFolder + "/SpineVitBakeSettings.asset";
+
+    [SerializeField] private SpineVitBakeSettings settings;
     private Vector2 scroll;
     private SkeletonDataAsset cachedSkeletonDataAsset;
     private string[] skinNames = Array.Empty<string>();
     private string[] animationNames = Array.Empty<string>();
     private bool[] selectedAnimations = Array.Empty<bool>();
 
-    [MenuItem("Tools/Rendering/Spine VIT Baker")]
+    [MenuItem("烘培工具/Spine图集烘培")]
     public static void Open()
     {
         SpineVitBakerWindow window = GetWindow<SpineVitBakerWindow>();
@@ -24,9 +26,19 @@ public sealed class SpineVitBakerWindow : EditorWindow
         window.Show();
     }
 
+    private void OnEnable()
+    {
+        EnsureSettings();
+        RefreshSkeletonData(true);
+    }
+
     private void OnGUI()
     {
+        EnsureSettings();
+
         scroll = EditorGUILayout.BeginScrollView(scroll);
+
+        EditorGUI.BeginChangeCheck();
         DrawSource();
         DrawBakeSettings();
         DrawOutput();
@@ -40,7 +52,46 @@ public sealed class SpineVitBakerWindow : EditorWindow
             }
         }
 
+        if (EditorGUI.EndChangeCheck())
+        {
+            SaveSettings();
+        }
+
         EditorGUILayout.EndScrollView();
+    }
+
+    private void EnsureSettings()
+    {
+        if (settings != null)
+        {
+            return;
+        }
+
+        settings = AssetDatabase.LoadAssetAtPath<SpineVitBakeSettings>(DefaultSettingsAssetPath);
+        if (settings != null)
+        {
+            return;
+        }
+
+        System.IO.Directory.CreateDirectory(ParticleAtlasPathUtility.ProjectPathToAbsolute(SpineVitBakeSettings.DefaultOutputFolder));
+        AssetDatabase.Refresh();
+
+        settings = CreateInstance<SpineVitBakeSettings>();
+        settings.name = System.IO.Path.GetFileNameWithoutExtension(DefaultSettingsAssetPath);
+        AssetDatabase.CreateAsset(settings, DefaultSettingsAssetPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.ImportAsset(DefaultSettingsAssetPath);
+    }
+
+    private void SaveSettings()
+    {
+        if (settings == null)
+        {
+            return;
+        }
+
+        EditorUtility.SetDirty(settings);
+        AssetDatabase.SaveAssets();
     }
 
     private void DrawSource()
@@ -49,7 +100,7 @@ public sealed class SpineVitBakerWindow : EditorWindow
         settings.SkeletonDataAsset = (SkeletonDataAsset)EditorGUILayout.ObjectField("Skeleton Data", settings.SkeletonDataAsset, typeof(SkeletonDataAsset), false);
         if (settings.SkeletonDataAsset != cachedSkeletonDataAsset)
         {
-            RefreshSkeletonData();
+            RefreshSkeletonData(true);
         }
 
         using (new EditorGUI.DisabledScope(settings.SkeletonDataAsset == null || skinNames.Length == 0))
@@ -67,8 +118,32 @@ public sealed class SpineVitBakerWindow : EditorWindow
     {
         EditorGUILayout.Space(8f);
         EditorGUILayout.LabelField("Bake Settings", EditorStyles.boldLabel);
-        settings.FrameRate = EditorGUILayout.IntPopup("Frame Rate", settings.FrameRate, new[] { "15", "20", "30", "Custom" }, new[] { 15, 20, 30, settings.FrameRate });
-        settings.FrameRate = Mathf.Max(1, EditorGUILayout.IntField("Custom Frame Rate", settings.FrameRate));
+
+        EditorGUI.BeginChangeCheck();
+        settings.ResolutionPreset = (SpineVitBakeResolutionPreset)EditorGUILayout.EnumPopup(
+            new GUIContent("Resolution Preset", "Controls the baked runtime Spine atlas max texture size. VIT texture size is still determined by vertex count and frame count."),
+            settings.ResolutionPreset);
+        if (EditorGUI.EndChangeCheck())
+        {
+            settings.ApplyResolutionPreset();
+        }
+
+        using (new EditorGUI.DisabledScope(settings.ResolutionPreset != SpineVitBakeResolutionPreset.Custom))
+        {
+            settings.SourceTextureMaxSize = Mathf.Max(1, EditorGUILayout.IntField(new GUIContent("Source Atlas Max Size", "The largest side of the runtime atlas texture copied into the baked asset."), settings.SourceTextureMaxSize));
+        }
+
+        EditorGUI.BeginChangeCheck();
+        settings.FrameRatePreset = (SpineVitBakeFrameRatePreset)EditorGUILayout.EnumPopup("Frame Rate Preset", settings.FrameRatePreset);
+        if (EditorGUI.EndChangeCheck())
+        {
+            settings.ApplyFrameRatePreset();
+        }
+
+        using (new EditorGUI.DisabledScope(settings.FrameRatePreset != SpineVitBakeFrameRatePreset.Custom))
+        {
+            settings.FrameRate = Mathf.Max(1, EditorGUILayout.IntField("Frame Rate", settings.FrameRate));
+        }
 
         EditorGUILayout.Space(4f);
         EditorGUILayout.LabelField("Animations", EditorStyles.boldLabel);
@@ -124,10 +199,11 @@ public sealed class SpineVitBakerWindow : EditorWindow
         MessageType messageType = settings.SkeletonDataAsset == null || selectedCount == 0 ? MessageType.Warning : MessageType.Info;
         EditorGUILayout.HelpBox(
             string.Format(
-                "Selected Clips: {0}\nEstimated Frames: {1}\nVIT FPS: {2}\nV1 Limits: fixed draw order, stable topology, one atlas page",
+                "Selected Clips: {0}\nEstimated Frames: {1}\nVIT FPS: {2}\nSource Atlas Max Size: {3}\nV1 Limits: fixed draw order, stable topology, one atlas page",
                 selectedCount,
                 totalFrames,
-                settings.FrameRate),
+                settings.FrameRate,
+                settings.SourceTextureMaxSize),
             messageType);
     }
 
@@ -149,14 +225,19 @@ public sealed class SpineVitBakerWindow : EditorWindow
         }
     }
 
-    private void RefreshSkeletonData()
+    private void RefreshSkeletonData(bool preserveSelection)
     {
+        string previousSkinName = preserveSelection ? settings.SkinName : string.Empty;
+        string[] previousAnimationNames = preserveSelection && settings.AnimationNames != null ? settings.AnimationNames : Array.Empty<string>();
         cachedSkeletonDataAsset = settings.SkeletonDataAsset;
         skinNames = Array.Empty<string>();
         animationNames = Array.Empty<string>();
         selectedAnimations = Array.Empty<bool>();
-        settings.AnimationNames = Array.Empty<string>();
-        settings.SkinName = string.Empty;
+        if (!preserveSelection)
+        {
+            settings.AnimationNames = Array.Empty<string>();
+            settings.SkinName = string.Empty;
+        }
 
         if (settings.SkeletonDataAsset == null)
         {
@@ -185,7 +266,8 @@ public sealed class SpineVitBakerWindow : EditorWindow
         }
 
         skinNames = skins.ToArray();
-        settings.SkinName = skinNames[0];
+        int skinIndex = Array.IndexOf(skinNames, previousSkinName);
+        settings.SkinName = skinIndex >= 0 ? previousSkinName : skinNames[0];
 
         List<string> animations = new List<string>();
         for (int i = 0; i < skeletonData.Animations.Count; i++)
@@ -199,7 +281,14 @@ public sealed class SpineVitBakerWindow : EditorWindow
 
         animationNames = animations.ToArray();
         selectedAnimations = new bool[animationNames.Length];
-        if (selectedAnimations.Length > 0)
+        bool hasSelectedAnimation = false;
+        for (int i = 0; i < animationNames.Length; i++)
+        {
+            selectedAnimations[i] = Array.IndexOf(previousAnimationNames, animationNames[i]) >= 0;
+            hasSelectedAnimation = hasSelectedAnimation || selectedAnimations[i];
+        }
+
+        if (!hasSelectedAnimation && selectedAnimations.Length > 0)
         {
             selectedAnimations[0] = true;
         }

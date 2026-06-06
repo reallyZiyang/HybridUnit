@@ -2,8 +2,8 @@
 using System;
 using UnityEngine;
 
-[Serializable]
-public sealed class ParticleAtlasBakeSettings
+[CreateAssetMenu(fileName = "ParticleAtlasBakeSettings", menuName = "Hybrid/Rendering/Particle Atlas Bake Settings")]
+public sealed class ParticleAtlasBakeSettings : ScriptableObject
 {
     public const string DefaultOutputFolder = "Assets/BakedSequences";
 

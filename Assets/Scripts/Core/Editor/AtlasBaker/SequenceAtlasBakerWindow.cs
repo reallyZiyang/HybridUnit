@@ -1,14 +1,17 @@
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 public sealed class SequenceAtlasBakerWindow : EditorWindow
 {
-    private readonly ParticleAtlasBakeSettings settings = new ParticleAtlasBakeSettings();
+    private const string DefaultSettingsAssetPath = ParticleAtlasBakeSettings.DefaultOutputFolder + "/ParticleAtlasBakeSettings.asset";
+
+    [SerializeField] private ParticleAtlasBakeSettings settings;
     private Vector2 scroll;
 
-    [MenuItem("Tools/Rendering/Particle Atlas Baker")]
+    [MenuItem("烘培工具/粒子图集烘培")]
     public static void Open()
     {
         SequenceAtlasBakerWindow window = GetWindow<SequenceAtlasBakerWindow>();
@@ -17,10 +20,18 @@ public sealed class SequenceAtlasBakerWindow : EditorWindow
         window.Show();
     }
 
+    private void OnEnable()
+    {
+        EnsureSettings();
+    }
+
     private void OnGUI()
     {
+        EnsureSettings();
+
         scroll = EditorGUILayout.BeginScrollView(scroll);
 
+        EditorGUI.BeginChangeCheck();
         DrawSource();
         DrawBakeSettings();
         DrawParticleSampling();
@@ -39,14 +50,107 @@ public sealed class SequenceAtlasBakerWindow : EditorWindow
             }
         }
 
+        if (EditorGUI.EndChangeCheck())
+        {
+            SaveSettings();
+        }
+
         EditorGUILayout.EndScrollView();
+    }
+
+    private void EnsureSettings()
+    {
+        if (settings != null)
+        {
+            return;
+        }
+
+        settings = AssetDatabase.LoadAssetAtPath<ParticleAtlasBakeSettings>(DefaultSettingsAssetPath);
+        if (settings != null)
+        {
+            return;
+        }
+
+        System.IO.Directory.CreateDirectory(ParticleAtlasPathUtility.ProjectPathToAbsolute(ParticleAtlasBakeSettings.DefaultOutputFolder));
+        AssetDatabase.Refresh();
+
+        settings = CreateInstance<ParticleAtlasBakeSettings>();
+        settings.name = System.IO.Path.GetFileNameWithoutExtension(DefaultSettingsAssetPath);
+        AssetDatabase.CreateAsset(settings, DefaultSettingsAssetPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.ImportAsset(DefaultSettingsAssetPath);
+    }
+
+    private void SaveSettings()
+    {
+        if (settings == null)
+        {
+            return;
+        }
+
+        EditorUtility.SetDirty(settings);
+        AssetDatabase.SaveAssets();
     }
 
     private void DrawSource()
     {
         EditorGUILayout.LabelField("Source", EditorStyles.boldLabel);
         settings.Prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", settings.Prefab, typeof(GameObject), false);
-        settings.RendererNameFilter = EditorGUILayout.TextField(new GUIContent("Renderer Filter", "Debug only. Leave empty to bake all ParticleSystemRenderers. Fill part of a renderer GameObject name such as Fire or bg to isolate one renderer."), settings.RendererNameFilter);
+        DrawRendererFilter();
+    }
+
+    private void DrawRendererFilter()
+    {
+        string[] values = GetRendererFilterValues(settings.Prefab);
+        string[] labels = new string[values.Length];
+        labels[0] = "All Particle Renderers";
+        for (int i = 1; i < labels.Length; i++)
+        {
+            labels[i] = values[i];
+        }
+
+        int currentIndex = Array.IndexOf(values, settings.RendererNameFilter);
+        if (currentIndex < 0)
+        {
+            currentIndex = 0;
+            settings.RendererNameFilter = string.Empty;
+        }
+
+        using (new EditorGUI.DisabledScope(settings.Prefab == null || values.Length <= 1))
+        {
+            int nextIndex = EditorGUILayout.Popup(
+                new GUIContent("Renderer Filter", "Choose one ParticleSystemRenderer from the selected prefab, or bake all renderers."),
+                currentIndex,
+                labels);
+            settings.RendererNameFilter = values[Mathf.Clamp(nextIndex, 0, values.Length - 1)];
+        }
+    }
+
+    private static string[] GetRendererFilterValues(GameObject prefab)
+    {
+        List<string> values = new List<string> { string.Empty };
+        if (prefab == null)
+        {
+            return values.ToArray();
+        }
+
+        ParticleSystemRenderer[] renderers = prefab.GetComponentsInChildren<ParticleSystemRenderer>(true);
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            ParticleSystemRenderer particleRenderer = renderers[i];
+            if (particleRenderer == null || particleRenderer.gameObject == null)
+            {
+                continue;
+            }
+
+            string rendererName = particleRenderer.gameObject.name;
+            if (!string.IsNullOrWhiteSpace(rendererName) && !values.Contains(rendererName))
+            {
+                values.Add(rendererName);
+            }
+        }
+
+        return values.ToArray();
     }
 
     private void DrawBakeSettings()
