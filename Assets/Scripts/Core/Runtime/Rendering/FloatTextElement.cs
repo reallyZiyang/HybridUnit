@@ -3,12 +3,8 @@ using UnityEngine;
 
 [ExecuteAlways]
 [DisallowMultipleComponent]
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-public sealed class FloatTextPlayer : MonoBehaviour
+public sealed class FloatTextElement : MeshElement
 {
-    private static readonly int MainTexId = Shader.PropertyToID("_MainTex");
-    private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
     private static readonly HashSet<string> MissingGlyphWarnings = new HashSet<string>();
 
     [SerializeField] private FloatTextFontAsset fontAsset;
@@ -22,47 +18,52 @@ public sealed class FloatTextPlayer : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float fadeStart = 0.65f;
     [SerializeField] private Color color = Color.white;
 
-    private MeshFilter meshFilter;
-    private MeshRenderer meshRenderer;
-    private MaterialPropertyBlock propertyBlock;
-    private Mesh mesh;
-    private readonly List<Vector3> vertices = new List<Vector3>(32);
-    private readonly List<Vector2> uvs = new List<Vector2>(32);
-    private readonly List<Color32> colors = new List<Color32>(32);
-    private readonly List<int> indices = new List<int>(48);
+    private readonly List<FloatTextQuad> quads = new List<FloatTextQuad>(16);
     private Vector3 baseLocalPosition;
     private float elapsed;
+    private float currentAlpha = 1f;
     private bool playing;
+    private bool editorPreviewVisible;
 
     public bool IsPlaying => playing;
     public FloatTextFontAsset FontAsset => fontAsset;
+    public override bool CanWriteQuads => base.CanWriteQuads && fontAsset != null && quads.Count > 0 && (playing || editorPreviewVisible || !Application.isPlaying);
 
-    private void Awake()
+    protected override void OnEnable()
     {
-        EnsureComponents();
-    }
-
-    private void OnEnable()
-    {
-        EnsureComponents();
+        base.OnEnable();
+        EnsureFontAsset();
+        ConfigureMeshPlayer();
+        DisableLegacyRenderer();
         if (playOnEnable)
         {
             Play(previewText, previewStyle);
         }
+        else if (!Application.isPlaying)
+        {
+            BuildQuads(previewText, previewStyle);
+            editorPreviewVisible = true;
+        }
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
         playing = false;
+        editorPreviewVisible = false;
+        base.OnDisable();
     }
 
-    private void OnValidate()
+    protected override void OnValidate()
     {
-        EnsureComponents();
+        base.OnValidate();
+        EnsureFontAsset();
+        ConfigureMeshPlayer();
+        DisableLegacyRenderer();
         if (!Application.isPlaying && fontAsset != null)
         {
-            BuildMesh(previewText, previewStyle);
-            ApplyAlpha(1f);
+            BuildQuads(previewText, previewStyle);
+            currentAlpha = 1f;
+            editorPreviewVisible = true;
         }
     }
 
@@ -122,26 +123,33 @@ public sealed class FloatTextPlayer : MonoBehaviour
 
     public void Play(string text, FloatTextStyleId style)
     {
-        EnsureComponents();
-        BuildMesh(text, style);
+        EnsureFontAsset();
+        ConfigureMeshPlayer();
+        BuildQuads(text, style);
         baseLocalPosition = transform.localPosition;
         elapsed = 0f;
-        playing = mesh != null && mesh.vertexCount > 0;
-        if (meshRenderer != null)
-        {
-            meshRenderer.enabled = playing;
-        }
-
-        ApplyAlpha(1f);
+        currentAlpha = 1f;
+        playing = quads.Count > 0;
+        editorPreviewVisible = false;
         ApplyMotion(0f);
     }
 
     public void Stop()
     {
         playing = false;
-        if (meshRenderer != null)
+        editorPreviewVisible = false;
+    }
+
+    public override void WriteQuads(MeshQuadWriter writer)
+    {
+        Color instanceColor = color;
+        instanceColor.a *= Mathf.Clamp01(currentAlpha);
+        Color32 vertexColor = instanceColor;
+        Matrix4x4 localToWorld = transform.localToWorldMatrix;
+        for (int i = 0; i < quads.Count; i++)
         {
-            meshRenderer.enabled = false;
+            FloatTextQuad quad = quads[i];
+            writer.AddQuad(localToWorld, quad.XMin, quad.YMin, quad.XMax, quad.YMax, quad.UvRect, vertexColor);
         }
     }
 
@@ -174,7 +182,7 @@ public sealed class FloatTextPlayer : MonoBehaviour
         elapsed += Mathf.Max(0f, deltaTime);
         float normalizedTime = lifetime > 0f ? Mathf.Clamp01(elapsed / lifetime) : 1f;
         ApplyMotion(normalizedTime);
-        ApplyAlpha(CalculateAlpha(normalizedTime));
+        currentAlpha = CalculateAlpha(normalizedTime);
 
         if (elapsed >= lifetime)
         {
@@ -184,15 +192,15 @@ public sealed class FloatTextPlayer : MonoBehaviour
 
     private void ApplyMotion(float normalizedTime)
     {
-        float punch = 1f;
-        if (punchDuration > 0f && elapsed < punchDuration)
-        {
-            float punchT = Mathf.Clamp01(elapsed / punchDuration);
-            punch = Mathf.Lerp(punchScale, 1f, Smooth01(punchT));
-        }
+        // float punch = 1f;
+        // if (punchDuration > 0f && elapsed < punchDuration)
+        // {
+        //     float punchT = Mathf.Clamp01(elapsed / punchDuration);
+        //     punch = Mathf.Lerp(punchScale, 1f, Smooth01(punchT));
+        // }
 
-        transform.localScale = Vector3.one * punch;
-        transform.localPosition = baseLocalPosition + Vector3.up * (floatDistance * Smooth01(normalizedTime));
+        // transform.localScale = Vector3.one * punch;
+        // transform.localPosition = baseLocalPosition + Vector3.up * (floatDistance * Smooth01(normalizedTime));
     }
 
     private float CalculateAlpha(float normalizedTime)
@@ -206,48 +214,17 @@ public sealed class FloatTextPlayer : MonoBehaviour
         return 1f - Smooth01(fadeT);
     }
 
-    private void ApplyAlpha(float alpha)
+    private void BuildQuads(string text, FloatTextStyleId style)
     {
-        if (meshRenderer == null)
-        {
-            return;
-        }
-
-        if (propertyBlock == null)
-        {
-            propertyBlock = new MaterialPropertyBlock();
-        }
-
-        meshRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.Clear();
-        Color instanceColor = color;
-        instanceColor.a *= Mathf.Clamp01(alpha);
-        propertyBlock.SetColor(InstanceColorId, instanceColor);
-        if (fontAsset != null && fontAsset.atlas != null)
-        {
-            propertyBlock.SetTexture(MainTexId, fontAsset.atlas);
-        }
-
-        meshRenderer.SetPropertyBlock(propertyBlock);
-    }
-
-    private void BuildMesh(string text, FloatTextStyleId style)
-    {
-        vertices.Clear();
-        uvs.Clear();
-        colors.Clear();
-        indices.Clear();
-
+        quads.Clear();
         if (fontAsset == null || string.IsNullOrEmpty(text))
         {
-            AssignMesh();
             return;
         }
 
         List<ResolvedGlyph> resolvedGlyphs = ResolveGlyphs(text, style);
         if (resolvedGlyphs.Count == 0)
         {
-            AssignMesh();
             return;
         }
 
@@ -271,11 +248,9 @@ public sealed class FloatTextPlayer : MonoBehaviour
             float xMax = xMin + width / pixelsPerUnit;
             float yMax = yMin + height / pixelsPerUnit;
 
-            AddQuad(xMin, yMin, xMax, yMax, glyph.uvRect);
+            quads.Add(new FloatTextQuad(xMin, yMin, xMax, yMax, glyph.uvRect));
             cursor += GetAdvance(glyph) * glyphScale;
         }
-
-        AssignMesh();
     }
 
     private List<ResolvedGlyph> ResolveGlyphs(string text, FloatTextStyleId style)
@@ -322,99 +297,42 @@ public sealed class FloatTextPlayer : MonoBehaviour
         return result;
     }
 
-    private void AddQuad(float xMin, float yMin, float xMax, float yMax, Vector4 uvRect)
+    private void EnsureFontAsset()
     {
-        int vertexStart = vertices.Count;
-        vertices.Add(new Vector3(xMin, yMin, 0f));
-        vertices.Add(new Vector3(xMax, yMin, 0f));
-        vertices.Add(new Vector3(xMax, yMax, 0f));
-        vertices.Add(new Vector3(xMin, yMax, 0f));
-
-        float uMin = uvRect.x;
-        float uMax = uvRect.x + uvRect.z;
-        float vMin = uvRect.y;
-        float vMax = uvRect.y + uvRect.w;
-        uvs.Add(new Vector2(uMin, vMin));
-        uvs.Add(new Vector2(uMax, vMin));
-        uvs.Add(new Vector2(uMax, vMax));
-        uvs.Add(new Vector2(uMin, vMax));
-
-        colors.Add(Color.white);
-        colors.Add(Color.white);
-        colors.Add(Color.white);
-        colors.Add(Color.white);
-
-        indices.Add(vertexStart);
-        indices.Add(vertexStart + 2);
-        indices.Add(vertexStart + 1);
-        indices.Add(vertexStart);
-        indices.Add(vertexStart + 3);
-        indices.Add(vertexStart + 2);
-    }
-
-    private void AssignMesh()
-    {
-        EnsureOwnedMesh();
-        mesh.Clear();
-        if (vertices.Count > 0)
-        {
-            mesh.SetVertices(vertices);
-            mesh.SetUVs(0, uvs);
-            mesh.SetColors(colors);
-            mesh.SetTriangles(indices, 0);
-            mesh.RecalculateBounds();
-        }
-
-        meshFilter.sharedMesh = mesh;
-    }
-
-    private void EnsureComponents()
-    {
-        if (meshFilter == null)
-        {
-            meshFilter = GetComponent<MeshFilter>();
-        }
-
-        if (meshRenderer == null)
-        {
-            meshRenderer = GetComponent<MeshRenderer>();
-        }
-
-        if (propertyBlock == null)
-        {
-            propertyBlock = new MaterialPropertyBlock();
-        }
-
-        if (fontAsset != null && fontAsset.material != null)
-        {
-            fontAsset.material.enableInstancing = true;
-            if (fontAsset.atlas != null && fontAsset.material.HasProperty(MainTexId))
-            {
-                fontAsset.material.SetTexture(MainTexId, fontAsset.atlas);
-            }
-
-            meshRenderer.sharedMaterial = fontAsset.material;
-        }
-
-        EnsureOwnedMesh();
-        if (meshFilter.sharedMesh != mesh)
-        {
-            meshFilter.sharedMesh = mesh;
-        }
-    }
-
-    private void EnsureOwnedMesh()
-    {
-        if (mesh != null)
+        if (fontAsset != null)
         {
             return;
         }
 
-        mesh = new Mesh
+#if UNITY_EDITOR
+        fontAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<FloatTextFontAsset>("Assets/BakedSequences/FloatText/FloatTextFontAsset.asset");
+#endif
+    }
+
+    private void ConfigureMeshPlayer()
+    {
+        if (MeshPlayer != null && fontAsset != null)
         {
-            name = "Float Text Mesh"
-        };
-        mesh.MarkDynamic();
+            MeshPlayer.SetMaterial(fontAsset.material, fontAsset.atlas);
+        }
+    }
+
+    private void DisableLegacyRenderer()
+    {
+        if (TryGetComponent<MeshPlayer>(out _))
+        {
+            return;
+        }
+
+        if (TryGetComponent<MeshRenderer>(out MeshRenderer legacyRenderer))
+        {
+            legacyRenderer.enabled = false;
+        }
+
+        if (TryGetComponent<MeshFilter>(out MeshFilter legacyFilter))
+        {
+            legacyFilter.sharedMesh = null;
+        }
     }
 
     private static float GetAdvance(FloatTextGlyph glyph)
@@ -435,6 +353,24 @@ public sealed class FloatTextPlayer : MonoBehaviour
         {
             Debug.LogWarning("Missing float text glyph: " + warningKey);
         }
+    }
+
+    private readonly struct FloatTextQuad
+    {
+        public FloatTextQuad(float xMin, float yMin, float xMax, float yMax, Vector4 uvRect)
+        {
+            XMin = xMin;
+            YMin = yMin;
+            XMax = xMax;
+            YMax = yMax;
+            UvRect = uvRect;
+        }
+
+        public float XMin { get; }
+        public float YMin { get; }
+        public float XMax { get; }
+        public float YMax { get; }
+        public Vector4 UvRect { get; }
     }
 
     private readonly struct ResolvedGlyph

@@ -13,7 +13,6 @@ public class Demo : MonoBehaviour
     public float it_time = 1.5f;
 
     public Transform[] eachTransforms;
-    List<string> a = new List<string>();
 
     private void Start()
     {
@@ -21,12 +20,6 @@ public class Demo : MonoBehaviour
 
         StartCoroutine(StartCO());
 
-    }
-
-    void Update()
-    {
-        //var list = new List<Transform>(1000);
-        a.Add(Time.time.ToString());
     }
 
 
