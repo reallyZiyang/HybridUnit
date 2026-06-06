@@ -1,0 +1,180 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf82f3bfebd41cdad7f9f7ef887bda1, type: 3}
+  m_Name: FloatTextFontAsset
+  m_EditorClassIdentifier: 
+  atlas: {fileID: 2800000, guid: f71e0ad1662c4d1d8016b1196bb2c12f, type: 3}
+  material: {fileID: 2100000, guid: c38fdf0fb7a9434d8f562cda79575443, type: 2}
+  pixelsPerUnit: 500
+  defaultLineHeight: 150
+  glyphs:
+  - key: 0
+    style: 0
+    uvRect: {x: 0.015151515, y: 0.6028708, z: 0.084529504, w: 0.12280702}
+    pixelSize: {x: 106, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 116
+    scale: 1
+  - key: 1
+    style: 0
+    uvRect: {x: 0.12599681, y: 0.6028708, z: 0.05661882, w: 0.12280702}
+    pixelSize: {x: 71, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 81
+    scale: 1
+  - key: 2
+    style: 0
+    uvRect: {x: 0.215311, y: 0.6028708, z: 0.08692185, w: 0.12280702}
+    pixelSize: {x: 109, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 119
+    scale: 1
+  - key: 3
+    style: 0
+    uvRect: {x: 0.3110048, y: 0.6028708, z: 0.08293461, w: 0.12280702}
+    pixelSize: {x: 104, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 114
+    scale: 1
+  - key: 4
+    style: 0
+    uvRect: {x: 0.4059011, y: 0.6028708, z: 0.09569378, w: 0.12280702}
+    pixelSize: {x: 120, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 130
+    scale: 1
+  - key: 5
+    style: 0
+    uvRect: {x: 0.5135566, y: 0.6028708, z: 0.08373205, w: 0.12280702}
+    pixelSize: {x: 105, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 115
+    scale: 1
+  - key: 6
+    style: 0
+    uvRect: {x: 0.6092504, y: 0.6028708, z: 0.084529504, w: 0.12280702}
+    pixelSize: {x: 106, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 116
+    scale: 1
+  - key: 7
+    style: 0
+    uvRect: {x: 0.70733654, y: 0.6028708, z: 0.084529504, w: 0.12280702}
+    pixelSize: {x: 106, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 116
+    scale: 1
+  - key: 8
+    style: 0
+    uvRect: {x: 0.80223286, y: 0.6036683, z: 0.08293461, w: 0.12200957}
+    pixelSize: {x: 104, y: 153}
+    offset: {x: 0, y: 0}
+    advance: 114
+    scale: 1
+  - key: 9
+    style: 0
+    uvRect: {x: 0.8979266, y: 0.6028708, z: 0.086124405, w: 0.12280702}
+    pixelSize: {x: 108, y: 154}
+    offset: {x: 0, y: 0}
+    advance: 118
+    scale: 1
+  - key: 0
+    style: 1
+    uvRect: {x: 0.015948962, y: 0.4338118, z: 0.08293461, w: 0.12121212}
+    pixelSize: {x: 104, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 114
+    scale: 1
+  - key: 1
+    style: 1
+    uvRect: {x: 0.12679426, y: 0.4338118, z: 0.055023924, w: 0.12121212}
+    pixelSize: {x: 69, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 79
+    scale: 1
+  - key: 2
+    style: 1
+    uvRect: {x: 0.21610846, y: 0.4338118, z: 0.085326955, w: 0.12121212}
+    pixelSize: {x: 107, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 117
+    scale: 1
+  - key: 3
+    style: 1
+    uvRect: {x: 0.31180224, y: 0.4338118, z: 0.08133971, w: 0.12121212}
+    pixelSize: {x: 102, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 112
+    scale: 1
+  - key: 4
+    style: 1
+    uvRect: {x: 0.40669855, y: 0.4338118, z: 0.09409888, w: 0.12121212}
+    pixelSize: {x: 118, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 128
+    scale: 1
+  - key: 5
+    style: 1
+    uvRect: {x: 0.51435405, y: 0.4338118, z: 0.08213716, w: 0.12121212}
+    pixelSize: {x: 103, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 113
+    scale: 1
+  - key: 6
+    style: 1
+    uvRect: {x: 0.6100478, y: 0.4338118, z: 0.08293461, w: 0.12121212}
+    pixelSize: {x: 104, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 114
+    scale: 1
+  - key: 7
+    style: 1
+    uvRect: {x: 0.708134, y: 0.4338118, z: 0.08293461, w: 0.12121212}
+    pixelSize: {x: 104, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 114
+    scale: 1
+  - key: 8
+    style: 1
+    uvRect: {x: 0.8030303, y: 0.4338118, z: 0.08133971, w: 0.12121212}
+    pixelSize: {x: 102, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 112
+    scale: 1
+  - key: 9
+    style: 1
+    uvRect: {x: 0.8987241, y: 0.4338118, z: 0.08373205, w: 0.12121212}
+    pixelSize: {x: 105, y: 152}
+    offset: {x: 0, y: 0}
+    advance: 115
+    scale: 1
+  - key: +
+    style: 1
+    uvRect: {x: 0.11323764, y: 0.23444976, z: 0.14194578, w: 0.13955343}
+    pixelSize: {x: 178, y: 175}
+    offset: {x: 0, y: 7.5}
+    advance: 178
+    scale: 0.65
+  - key: crit_icon
+    style: 2
+    uvRect: {x: 0.36044657, y: 0.2200957, z: 0.18261562, w: 0.16746412}
+    pixelSize: {x: 229, y: 210}
+    offset: {x: 0, y: 0}
+    advance: 237
+    scale: 0.65
+  - key: MISS
+    style: 3
+    uvRect: {x: 0.6204147, y: 0.24242423, z: 0.32137161, w: 0.114832535}
+    pixelSize: {x: 403, y: 144}
+    offset: {x: 0, y: 0}
+    advance: 413
+    scale: 1

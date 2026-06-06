@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a98564cf66ae491a8917c98f84fe716f, type: 3}
+  m_Name: SpineVitBakeSettings
+  m_EditorClassIdentifier: 
+  SkeletonDataAsset: {fileID: 0}
+  SkinName: 
+  AnimationNames: []
+  ResolutionPreset: 1
+  FrameRatePreset: 1
+  SourceTextureMaxSize: 1024
+  FrameRate: 20
+  OutputFolder: Assets/BakedSequences
+  OutputName: 

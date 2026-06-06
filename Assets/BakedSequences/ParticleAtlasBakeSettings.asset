@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e336b5afac6a7014ba810eb922f0a1ff, type: 3}
+  m_Name: ParticleAtlasBakeSettings
+  m_EditorClassIdentifier: 
+  Prefab: {fileID: 0}
+  RendererNameFilter: 
+  ResolutionPreset: 1
+  FrameRatePreset: 1
+  Loop: 0
+  LoopBlend: 0
+  LoopBlendFrames: 4
+  Duration: 1
+  FrameRate: 20
+  FrameWidth: 128
+  FrameHeight: 128
+  Columns: 0
+  MaxAtlasAspect: 4
+  MaxAtlasSize: 8192
+  OutputFolder: Assets/BakedSequences
+  OutputName: 
+  TransparentBackground: 1
+  BackgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  FirstFrameTopLeft: 1
+  AlphaFromColor: 1
+  UseBakeParticleMaterial: 1
+  TrimEmptyHead: 1
+  TrimEmptyTail: 1
+  TrimFrameRects: 1
+  FrameRectPadding: 2
+  GenerateMetadata: 1
+  ConfigureTextureImporter: 1
+  ForceRandomSeed: 1
+  RandomSeed: 1
+  AddDirectionalLight: 0
+  AntiAliasing: 1
+  BakeLayer: 31
+  Orthographic: 1
+  AutoFrameCamera: 1
+  OrthographicSize: 5
+  FieldOfView: 30
+  CameraPosition: {x: 0, y: 0, z: -10}
+  CameraEulerAngles: {x: 0, y: 0, z: 0}
+  PrefabPosition: {x: 0, y: 0, z: 0}
+  PrefabEulerAngles: {x: 0, y: 0, z: 0}
+  PrefabScale: {x: 1, y: 1, z: 1}
