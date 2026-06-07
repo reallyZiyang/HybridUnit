@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a98564cf66ae491a8917c98f84fe716f, type: 3}
   m_Name: SpineVitBakeSettings
   m_EditorClassIdentifier: 
-  SkeletonDataAsset: {fileID: 0}
-  SkinName: 
-  AnimationNames: []
+  SkeletonDataAsset: {fileID: 11400000, guid: 2d04b290c0684b54fa5b820ad5b2a551, type: 2}
+  SkinName: default
+  AnimationNames:
+  - atk
+  - std
+  - walk
   ResolutionPreset: 1
-  FrameRatePreset: 1
+  FrameRatePreset: 2
   SourceTextureMaxSize: 1024
-  FrameRate: 20
+  FrameRate: 30
   OutputFolder: Assets/BakedSequences
   OutputName: 

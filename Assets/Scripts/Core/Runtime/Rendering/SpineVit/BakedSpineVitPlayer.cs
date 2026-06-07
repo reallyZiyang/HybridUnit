@@ -28,6 +28,7 @@ public sealed class BakedSpineVitPlayer : BakedTickPlayer
     public bool IsPlaying => playing;
     public string CurrentAnimation => currentClip != null ? currentClip.name : string.Empty;
     public int CurrentFrame { get; private set; }
+    public Color InstanceColor => color;
     protected override bool IsRuntimeTickActive => playing;
     protected override bool IsEditorTickActive => playing;
 
@@ -93,6 +94,12 @@ public sealed class BakedSpineVitPlayer : BakedTickPlayer
 
         playing = false;
         ApplyFrame(frame);
+    }
+
+    public void SetInstanceColor(Color instanceColor)
+    {
+        color = instanceColor;
+        ApplyFrame(previewFrame);
     }
 
     protected override void Tick(float deltaTime)

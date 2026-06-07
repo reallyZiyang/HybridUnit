@@ -1,5 +1,5 @@
 #if UNITY_EDITOR
-public readonly struct SpineVitBakeResult
+public struct SpineVitBakeResult
 {
     public SpineVitBakeResult(string assetPath, int vertexCount, int totalFrameCount, int clipCount)
     {

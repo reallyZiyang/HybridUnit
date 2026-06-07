@@ -1,0 +1,444 @@
+{
+  "texture": "TopDownCombatSet_Atlas.png",
+  "width": 1024,
+  "height": 1024,
+  "sprites": [
+    {
+      "name": "turret_machine_base",
+      "rect": {
+        "x": 32,
+        "y": 800,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 32,
+        "y": 32,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_machine_barrel",
+      "rect": {
+        "x": 224,
+        "y": 800,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 224,
+        "y": 32,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.12,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_grenade_base",
+      "rect": {
+        "x": 416,
+        "y": 800,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 416,
+        "y": 32,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_grenade_barrel",
+      "rect": {
+        "x": 608,
+        "y": 800,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 608,
+        "y": 32,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.12,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_laser_base",
+      "rect": {
+        "x": 800,
+        "y": 800,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 800,
+        "y": 32,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_laser_barrel",
+      "rect": {
+        "x": 32,
+        "y": 608,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 32,
+        "y": 224,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.12,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_gatling_base",
+      "rect": {
+        "x": 224,
+        "y": 608,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 224,
+        "y": 224,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_gatling_barrel",
+      "rect": {
+        "x": 416,
+        "y": 608,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 416,
+        "y": 224,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.12,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_gatling_barrel_phase1",
+      "rect": {
+        "x": 32,
+        "y": 128,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 32,
+        "y": 704,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.12,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "turret_gatling_barrel_phase2",
+      "rect": {
+        "x": 224,
+        "y": 128,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 224,
+        "y": 704,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.12,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "monster_melee",
+      "rect": {
+        "x": 608,
+        "y": 608,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 608,
+        "y": 224,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "monster_ranged",
+      "rect": {
+        "x": 800,
+        "y": 608,
+        "width": 192,
+        "height": 192
+      },
+      "pixelRectTopLeft": {
+        "x": 800,
+        "y": 224,
+        "width": 192,
+        "height": 192
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "projectile_machine_bullet",
+      "rect": {
+        "x": 32,
+        "y": 512,
+        "width": 128,
+        "height": 96
+      },
+      "pixelRectTopLeft": {
+        "x": 32,
+        "y": 416,
+        "width": 128,
+        "height": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "effect_machine_hit",
+      "rect": {
+        "x": 160,
+        "y": 512,
+        "width": 128,
+        "height": 96
+      },
+      "pixelRectTopLeft": {
+        "x": 160,
+        "y": 416,
+        "width": 128,
+        "height": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "projectile_grenade_shell",
+      "rect": {
+        "x": 288,
+        "y": 512,
+        "width": 128,
+        "height": 96
+      },
+      "pixelRectTopLeft": {
+        "x": 288,
+        "y": 416,
+        "width": 128,
+        "height": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "effect_grenade_explosion",
+      "rect": {
+        "x": 416,
+        "y": 480,
+        "width": 128,
+        "height": 128
+      },
+      "pixelRectTopLeft": {
+        "x": 416,
+        "y": 416,
+        "width": 128,
+        "height": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "projectile_laser_beam",
+      "rect": {
+        "x": 544,
+        "y": 512,
+        "width": 320,
+        "height": 96
+      },
+      "pixelRectTopLeft": {
+        "x": 544,
+        "y": 416,
+        "width": 320,
+        "height": 96
+      },
+      "pivot": {
+        "x": 0.0,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "projectile_gatling_bullet",
+      "rect": {
+        "x": 864,
+        "y": 512,
+        "width": 128,
+        "height": 96
+      },
+      "pixelRectTopLeft": {
+        "x": 864,
+        "y": 416,
+        "width": 128,
+        "height": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "effect_gatling_spin",
+      "rect": {
+        "x": 32,
+        "y": 352,
+        "width": 128,
+        "height": 128
+      },
+      "pixelRectTopLeft": {
+        "x": 32,
+        "y": 544,
+        "width": 128,
+        "height": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "effect_melee_dash",
+      "rect": {
+        "x": 160,
+        "y": 352,
+        "width": 256,
+        "height": 128
+      },
+      "pixelRectTopLeft": {
+        "x": 160,
+        "y": 544,
+        "width": 256,
+        "height": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "effect_melee_hit",
+      "rect": {
+        "x": 416,
+        "y": 352,
+        "width": 128,
+        "height": 128
+      },
+      "pixelRectTopLeft": {
+        "x": 416,
+        "y": 544,
+        "width": 128,
+        "height": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "effect_ranged_charge",
+      "rect": {
+        "x": 544,
+        "y": 352,
+        "width": 160,
+        "height": 128
+      },
+      "pixelRectTopLeft": {
+        "x": 544,
+        "y": 544,
+        "width": 160,
+        "height": 128
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    {
+      "name": "projectile_ranged_bolt",
+      "rect": {
+        "x": 704,
+        "y": 384,
+        "width": 160,
+        "height": 96
+      },
+      "pixelRectTopLeft": {
+        "x": 704,
+        "y": 544,
+        "width": 160,
+        "height": 96
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  ]
+}

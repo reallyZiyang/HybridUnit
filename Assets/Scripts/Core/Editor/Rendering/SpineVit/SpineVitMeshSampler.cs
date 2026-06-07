@@ -6,6 +6,9 @@ using UnityEngine;
 
 public sealed class SpineVitMeshSampler
 {
+    private static readonly System.Reflection.FieldInfo ActiveClippingField =
+        typeof(SkeletonRendererInstruction).GetField("hasActiveClipping");
+
     private readonly Skeleton skeleton;
     private readonly MeshGenerator meshGenerator;
     private readonly SkeletonRendererInstruction instruction;
@@ -64,7 +67,7 @@ public sealed class SpineVitMeshSampler
             throw new InvalidOperationException("Spine VIT v1 only supports a single submesh/material.");
         }
 
-        if (instruction.hasActiveClipping)
+        if (HasActiveClipping(instruction))
         {
             throw new InvalidOperationException("Spine VIT v1 does not support clipping attachments because topology can change per frame.");
         }
@@ -80,9 +83,15 @@ public sealed class SpineVitMeshSampler
         int[] triangles = scratchMesh.GetTriangles(0);
         return new SpineVitSample(vertices, uvs, colors, triangles, scratchMesh.bounds);
     }
+
+    private static bool HasActiveClipping(SkeletonRendererInstruction rendererInstruction)
+    {
+        return ActiveClippingField != null
+            && (bool)ActiveClippingField.GetValue(rendererInstruction);
+    }
 }
 
-public readonly struct SpineVitSample
+public struct SpineVitSample
 {
     public SpineVitSample(Vector3[] vertices, Vector2[] uvs, Color32[] colors, int[] triangles, Bounds bounds)
     {
