@@ -1,15 +1,11 @@
 using System;
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditorInternal;
-#endif
 using UnityEngine;
 
 [ExecuteAlways]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-public sealed class BakedSpineVitPlayer : MonoBehaviour
+public sealed class BakedSpineVitPlayer : BakedTickPlayer
 {
     private static readonly int FrameIndexId = Shader.PropertyToID("_FrameIndex");
     private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
@@ -23,22 +19,17 @@ public sealed class BakedSpineVitPlayer : MonoBehaviour
     [SerializeField] private bool loop = true;
     [SerializeField] private float speed = 1f;
     [SerializeField] private Color color = Color.white;
-    [SerializeField] private bool simulateInEditMode = true;
     [SerializeField, Min(0)] private int previewFrame;
 
-    private MeshFilter meshFilter;
-    private MeshRenderer meshRenderer;
-    private MaterialPropertyBlock propertyBlock;
     private BakedSpineVitClip currentClip;
     private float time;
     private bool playing;
-#if UNITY_EDITOR
-    private double lastEditorTime;
-#endif
 
     public bool IsPlaying => playing;
     public string CurrentAnimation => currentClip != null ? currentClip.name : string.Empty;
     public int CurrentFrame { get; private set; }
+    protected override bool IsRuntimeTickActive => playing;
+    protected override bool IsEditorTickActive => playing;
 
     private void Awake()
     {
@@ -47,26 +38,14 @@ public sealed class BakedSpineVitPlayer : MonoBehaviour
         ApplyFrame(previewFrame);
     }
 
-    private void OnEnable()
+    protected override void OnPlayerEnable()
     {
-#if UNITY_EDITOR
-        EditorApplication.update -= EditorUpdate;
-        EditorApplication.update += EditorUpdate;
-        lastEditorTime = EditorApplication.timeSinceStartup;
-#endif
         EnsureComponents();
         ApplyDefaultClip();
         if (playOnEnable)
         {
             Play(defaultAnimation);
         }
-    }
-
-    private void OnDisable()
-    {
-#if UNITY_EDITOR
-        EditorApplication.update -= EditorUpdate;
-#endif
     }
 
     private void OnValidate()
@@ -78,41 +57,6 @@ public sealed class BakedSpineVitPlayer : MonoBehaviour
             ApplyFrame(previewFrame);
         }
     }
-
-    private void Update()
-    {
-        if (Application.isPlaying)
-        {
-            Tick(Time.deltaTime);
-        }
-    }
-
-#if UNITY_EDITOR
-    private void EditorUpdate()
-    {
-        if (Application.isPlaying || !simulateInEditMode)
-        {
-            return;
-        }
-
-        EnsureComponents();
-
-        double now = EditorApplication.timeSinceStartup;
-        float deltaTime = Mathf.Min(0.1f, Mathf.Max(0f, (float)(now - lastEditorTime)));
-        lastEditorTime = now;
-
-        if (playing)
-        {
-            Tick(deltaTime);
-            SceneView.RepaintAll();
-            InternalEditorUtility.RepaintAllViews();
-        }
-        else
-        {
-            ApplyFrame(previewFrame);
-        }
-    }
-#endif
 
     public void Play(string animationName)
     {
@@ -151,7 +95,7 @@ public sealed class BakedSpineVitPlayer : MonoBehaviour
         ApplyFrame(frame);
     }
 
-    private void Tick(float deltaTime)
+    protected override void Tick(float deltaTime)
     {
         if (!playing || currentClip == null || asset == null || currentClip.frameCount <= 0)
         {
@@ -177,6 +121,16 @@ public sealed class BakedSpineVitPlayer : MonoBehaviour
         ApplyFrame(localFrame);
     }
 
+    protected override void OnBeforeEditorTick()
+    {
+        EnsureComponents();
+    }
+
+    protected override void OnEditorPreviewTick()
+    {
+        ApplyFrame(previewFrame);
+    }
+
     private void ApplyDefaultClip()
     {
         if (asset == null)
@@ -193,14 +147,14 @@ public sealed class BakedSpineVitPlayer : MonoBehaviour
 
     private void ApplyFrame(int localFrame)
     {
-        if (meshRenderer == null)
+        if (PlayerRenderer == null)
         {
             return;
         }
 
         if (asset == null || currentClip == null || currentClip.frameCount <= 0)
         {
-            meshRenderer.enabled = false;
+            SetRendererVisible(false);
             return;
         }
 
@@ -209,61 +163,39 @@ public sealed class BakedSpineVitPlayer : MonoBehaviour
         CurrentFrame = absoluteFrame;
         previewFrame = safeLocalFrame;
 
-        meshRenderer.enabled = asset.mesh != null && asset.material != null;
-        if (!meshRenderer.enabled)
+        bool visible = asset.mesh != null && asset.material != null;
+        SetRendererVisible(visible);
+        if (!visible)
         {
-            meshRenderer.SetPropertyBlock(null);
+            ClearPropertyBlock();
             return;
         }
 
-        meshRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.Clear();
+        MaterialPropertyBlock propertyBlock = BeginPropertyBlock();
         propertyBlock.SetFloat(FrameIndexId, absoluteFrame);
         propertyBlock.SetColor(InstanceColorId, color);
-        meshRenderer.SetPropertyBlock(propertyBlock);
+        ApplyPropertyBlock();
     }
 
     private void EnsureComponents()
     {
-        if (meshFilter == null)
-        {
-            meshFilter = GetComponent<MeshFilter>();
-        }
-
-        if (meshRenderer == null)
-        {
-            meshRenderer = GetComponent<MeshRenderer>();
-        }
-
-        if (propertyBlock == null)
-        {
-            propertyBlock = new MaterialPropertyBlock();
-        }
+        EnsureRendererComponents();
 
         if (asset == null)
         {
-            meshFilter.sharedMesh = null;
-            meshRenderer.sharedMaterial = null;
+            SetSharedMesh(null);
+            SetSharedMaterial(null);
             return;
         }
 
-        meshFilter.sharedMesh = asset.mesh;
+        SetSharedMesh(asset.mesh);
         if (asset.material != null)
         {
-            asset.material.enableInstancing = true;
-            SetMaterialTextureIfNeeded(asset.material, MainTexId, asset.sourceTexture);
-            SetMaterialTextureIfNeeded(asset.material, PositionTexId, asset.positionTexture);
-            SetMaterialTextureIfNeeded(asset.material, ColorTexId, asset.colorTexture);
+            BakedMaterialUtility.SetTextureIfNeeded(asset.material, MainTexId, asset.sourceTexture);
+            BakedMaterialUtility.SetTextureIfNeeded(asset.material, PositionTexId, asset.positionTexture);
+            BakedMaterialUtility.SetTextureIfNeeded(asset.material, ColorTexId, asset.colorTexture);
         }
 
-        meshRenderer.sharedMaterial = asset.material;
-    }
-
-    private static void SetMaterialTextureIfNeeded(Material targetMaterial, int propertyId, Texture texture)
-    {
-        if (targetMaterial != null && texture != null && targetMaterial.HasProperty(propertyId) && targetMaterial.GetTexture(propertyId) != texture)
-        {
-            targetMaterial.SetTexture(propertyId, texture);
-        }
+        SetSharedMaterial(asset.material);
     }
 }

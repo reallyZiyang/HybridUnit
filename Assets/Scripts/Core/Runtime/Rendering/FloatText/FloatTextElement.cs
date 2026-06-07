@@ -3,7 +3,7 @@ using UnityEngine;
 
 [ExecuteAlways]
 [DisallowMultipleComponent]
-public sealed class FloatTextElement : MeshElement
+public sealed class FloatTextElement : TickMeshElement
 {
     private static readonly HashSet<string> MissingGlyphWarnings = new HashSet<string>();
 
@@ -28,10 +28,11 @@ public sealed class FloatTextElement : MeshElement
     public bool IsPlaying => playing;
     public FloatTextFontAsset FontAsset => fontAsset;
     public override bool CanWriteQuads => base.CanWriteQuads && fontAsset != null && quads.Count > 0 && (playing || editorPreviewVisible || !Application.isPlaying);
+    protected override bool IsRuntimeTickActive => playing;
+    protected override bool IsEditorTickActive => playing;
 
-    protected override void OnEnable()
+    protected override void OnElementEnable()
     {
-        base.OnEnable();
         EnsureFontAsset();
         ConfigureMeshPlayer();
         DisableLegacyRenderer();
@@ -46,11 +47,10 @@ public sealed class FloatTextElement : MeshElement
         }
     }
 
-    protected override void OnDisable()
+    protected override void OnElementDisable()
     {
         playing = false;
         editorPreviewVisible = false;
-        base.OnDisable();
     }
 
     protected override void OnValidate()
@@ -65,16 +65,6 @@ public sealed class FloatTextElement : MeshElement
             currentAlpha = 1f;
             editorPreviewVisible = true;
         }
-    }
-
-    private void Update()
-    {
-        if (!playing)
-        {
-            return;
-        }
-
-        Tick(Application.isPlaying ? Time.deltaTime : Time.unscaledDeltaTime);
     }
 
     public void PlayDamage(int value)
@@ -177,7 +167,7 @@ public sealed class FloatTextElement : MeshElement
         PlayMiss();
     }
 
-    private void Tick(float deltaTime)
+    protected override void Tick(float deltaTime)
     {
         elapsed += Mathf.Max(0f, deltaTime);
         float normalizedTime = lifetime > 0f ? Mathf.Clamp01(elapsed / lifetime) : 1f;

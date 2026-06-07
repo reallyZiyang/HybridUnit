@@ -1,15 +1,11 @@
 using System;
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditorInternal;
-#endif
 using UnityEngine;
 
 [ExecuteAlways]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-public sealed class BakedSequencePlayer : MonoBehaviour
+public sealed class BakedSequencePlayer : BakedTickPlayer
 {
     private static readonly int MainTexId = Shader.PropertyToID("_MainTex");
     private static readonly int FrameUVRectId = Shader.PropertyToID("_FrameUVRect");
@@ -26,26 +22,22 @@ public sealed class BakedSequencePlayer : MonoBehaviour
     [SerializeField] private float speed = 1f;
     [SerializeField] private float displayScale = 1f;
     [SerializeField] private Color color = Color.white;
-    [SerializeField] private bool simulateInEditMode = true;
     [SerializeField] private bool skipEmptyFrames = true;
     [SerializeField] private bool flipU;
     [SerializeField] private bool flipV;
     [SerializeField, Min(0)] private int previewFrame;
 
-    private MeshRenderer meshRenderer;
-    private MaterialPropertyBlock propertyBlock;
     private BakedSequenceMetadata metadata;
     private float time;
     private int currentFrame = -1;
     private bool playing;
     private bool currentFrameVisible;
-#if UNITY_EDITOR
-    private double lastEditorTime;
-#endif
 
     public bool IsPlaying => playing;
     public int CurrentFrame => currentFrame;
     public float Duration => metadata != null ? metadata.effectiveDuration : 0f;
+    protected override bool IsRuntimeTickActive => playing;
+    protected override bool IsEditorTickActive => playing;
 
     private void Awake()
     {
@@ -54,24 +46,12 @@ public sealed class BakedSequencePlayer : MonoBehaviour
         ApplyFrame(0);
     }
 
-    private void OnEnable()
+    protected override void OnPlayerEnable()
     {
-#if UNITY_EDITOR
-        EditorApplication.update -= EditorUpdate;
-        EditorApplication.update += EditorUpdate;
-        lastEditorTime = EditorApplication.timeSinceStartup;
-#endif
         if (playOnEnable)
         {
             Play();
         }
-    }
-
-    private void OnDisable()
-    {
-#if UNITY_EDITOR
-        EditorApplication.update -= EditorUpdate;
-#endif
     }
 
     private void OnValidate()
@@ -88,44 +68,7 @@ public sealed class BakedSequencePlayer : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (!Application.isPlaying)
-        {
-            return;
-        }
-
-        Tick(Time.deltaTime);
-    }
-
-#if UNITY_EDITOR
-    private void EditorUpdate()
-    {
-        if (Application.isPlaying || !simulateInEditMode)
-        {
-            return;
-        }
-
-        EnsureComponents();
-
-        double now = EditorApplication.timeSinceStartup;
-        float deltaTime = Mathf.Min(0.1f, Mathf.Max(0f, (float)(now - lastEditorTime)));
-        lastEditorTime = now;
-
-        if (playing)
-        {
-            Tick(deltaTime);
-            SceneView.RepaintAll();
-            InternalEditorUtility.RepaintAllViews();
-        }
-        else
-        {
-            ApplyFrame(previewFrame);
-        }
-    }
-#endif
-
-    private void Tick(float deltaTime)
+    protected override void Tick(float deltaTime)
     {
         if (!playing || metadata == null || metadata.frameCount <= 0)
         {
@@ -149,6 +92,16 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 
         int frame = Mathf.Clamp(Mathf.FloorToInt(time * metadata.frameRate), 0, metadata.frameCount - 1);
         ApplyFrame(frame);
+    }
+
+    protected override void OnBeforeEditorTick()
+    {
+        EnsureComponents();
+    }
+
+    protected override void OnEditorPreviewTick()
+    {
+        ApplyFrame(previewFrame);
     }
 
     public void Play()
@@ -190,14 +143,14 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 
     private void ApplyFrame(int frame)
     {
-        if (meshRenderer == null)
+        if (PlayerRenderer == null)
         {
             return;
         }
 
         if (metadata == null || metadata.frameRects == null || metadata.frameRects.Length == 0)
         {
-            meshRenderer.enabled = false;
+            SetRendererVisible(false);
             return;
         }
 
@@ -213,15 +166,14 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 
         bool visible = rect.uvWidth > 0f && rect.uvHeight > 0f && rect.quadWidth > 0f && rect.quadHeight > 0f;
         currentFrameVisible = visible;
-        meshRenderer.enabled = visible;
+        SetRendererVisible(visible);
         if (!visible)
         {
-            meshRenderer.SetPropertyBlock(null);
+            ClearPropertyBlock();
             return;
         }
 
-        meshRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.Clear();
+        MaterialPropertyBlock propertyBlock = BeginPropertyBlock();
 
         float uvX = flipU ? rect.uvX + rect.uvWidth : rect.uvX;
         float uvY = flipV ? rect.uvY + rect.uvHeight : rect.uvY;
@@ -244,7 +196,7 @@ public sealed class BakedSequencePlayer : MonoBehaviour
             propertyBlock.SetTexture(MainTexId, atlas);
         }
 
-        meshRenderer.SetPropertyBlock(propertyBlock);
+        ApplyPropertyBlock();
     }
 
     private Vector4 CalculateUvClamp(float uvX, float uvY, float uvWidth, float uvHeight)
@@ -271,41 +223,21 @@ public sealed class BakedSequencePlayer : MonoBehaviour
 
     private void EnsureComponents()
     {
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        if (meshFilter.sharedMesh == null)
-        {
-            meshFilter.sharedMesh = GetQuadMesh();
-        }
-
-        if (meshRenderer == null)
-        {
-            meshRenderer = GetComponent<MeshRenderer>();
-        }
+        EnsureRendererComponents();
+        SetSharedMesh(GetQuadMesh());
 
         if (material == null)
         {
-            if (meshRenderer != null)
-            {
-                meshRenderer.sharedMaterial = null;
-            }
+            SetSharedMaterial(null);
         }
         else
         {
-            material.enableInstancing = true;
             if (atlas != null)
             {
                 atlas.wrapMode = TextureWrapMode.Clamp;
             }
 
-            if (meshRenderer.sharedMaterial != material)
-            {
-                meshRenderer.sharedMaterial = material;
-            }
-        }
-
-        if (propertyBlock == null)
-        {
-            propertyBlock = new MaterialPropertyBlock();
+            SetSharedMaterial(material);
         }
     }
 

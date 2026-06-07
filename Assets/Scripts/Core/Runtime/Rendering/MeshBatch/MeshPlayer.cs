@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
-public sealed class MeshPlayer : MonoBehaviour
+public sealed class MeshPlayer : BakedMeshPlayerBase
 {
     private static readonly int MainTexId = Shader.PropertyToID("_MainTex");
     private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
@@ -18,9 +18,6 @@ public sealed class MeshPlayer : MonoBehaviour
 
     private readonly List<MeshElement> elements = new List<MeshElement>(128);
     private readonly MeshQuadWriter writer = new MeshQuadWriter();
-    private MeshFilter meshFilter;
-    private MeshRenderer meshRenderer;
-    private MaterialPropertyBlock propertyBlock;
     private Mesh mesh;
 
     public Material Material => material;
@@ -99,27 +96,14 @@ public sealed class MeshPlayer : MonoBehaviour
 
         mesh.indexFormat = writer.VertexCount > 65535 ? IndexFormat.UInt32 : IndexFormat.UInt16;
         writer.ApplyTo(mesh);
-        meshRenderer.enabled = writer.VertexCount > 0 && material != null;
-        meshFilter.sharedMesh = mesh;
-        ApplyPropertyBlock();
+        SetRendererVisible(writer.VertexCount > 0 && material != null);
+        SetSharedMesh(mesh);
+        ApplyMeshPlayerPropertyBlock();
     }
 
     private void EnsureComponents()
     {
-        if (meshFilter == null)
-        {
-            meshFilter = GetComponent<MeshFilter>();
-        }
-
-        if (meshRenderer == null)
-        {
-            meshRenderer = GetComponent<MeshRenderer>();
-        }
-
-        if (propertyBlock == null)
-        {
-            propertyBlock = new MaterialPropertyBlock();
-        }
+        EnsureRendererComponents();
 
         if (mesh == null)
         {
@@ -130,48 +114,27 @@ public sealed class MeshPlayer : MonoBehaviour
             mesh.MarkDynamic();
         }
 
-        if (meshFilter.sharedMesh != mesh)
-        {
-            meshFilter.sharedMesh = mesh;
-        }
+        SetSharedMesh(mesh);
 
         ApplyMaterial();
     }
 
     private void ApplyMaterial()
     {
-        if (meshRenderer == null)
-        {
-            return;
-        }
+        BakedMaterialUtility.SetTextureIfNeeded(material, MainTexId, texture);
 
-        if (material != null)
-        {
-            material.enableInstancing = true;
-            if (texture != null && material.HasProperty(MainTexId))
-            {
-                material.SetTexture(MainTexId, texture);
-            }
-        }
-
-        meshRenderer.sharedMaterial = material;
+        SetSharedMaterial(material);
     }
 
-    private void ApplyPropertyBlock()
+    private void ApplyMeshPlayerPropertyBlock()
     {
-        if (meshRenderer == null)
-        {
-            return;
-        }
-
-        meshRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.Clear();
+        MaterialPropertyBlock propertyBlock = BeginPropertyBlock();
         propertyBlock.SetColor(InstanceColorId, color);
         if (texture != null)
         {
             propertyBlock.SetTexture(MainTexId, texture);
         }
 
-        meshRenderer.SetPropertyBlock(propertyBlock);
+        ApplyPropertyBlock();
     }
 }
