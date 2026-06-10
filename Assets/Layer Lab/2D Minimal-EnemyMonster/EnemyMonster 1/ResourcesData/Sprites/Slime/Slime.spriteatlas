@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &2284853813
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Slime
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: b0f6c00bb569bf8478dd1e9c5ccc51a5, type: 3}
+    - {fileID: 2800000, guid: 5dd6d929e4554704395ec53c54169df4, type: 3}
+    - {fileID: 102900000, guid: a965ba6a213fe5f4db295309624dcde2, type: 3}
+    - {fileID: 102900000, guid: 8ab5e2c7828af464899338ecf2d4f128, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - ac2d6f32dabde1f4ea684f2feb9836f5: 21300000
+    - e4e76262990b7a748abdd0f58d4c69eb: 21300000
+    - 23bcaec3c564a7e44aac3ab6d1d64104: 21300000
+    - 503e6f457090ae54296fe0e8c6ef7e1b: 21300000
+    - 183b1ca582569124593955678e43839e: 21300000
+    - 5dd6d929e4554704395ec53c54169df4: 21300000
+    - b0f6c00bb569bf8478dd1e9c5ccc51a5: 21300000
+    - d2bc1cbb5d092bd4a82156a9fa023ffd: 21300000
+    - 544985cd804bc1f449a847b770df9fd9: 21300000
+    - ad9385ef123036247bda40dba7250ede: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: ac2d6f32dabde1f4ea684f2feb9836f5, type: 3}
+  - {fileID: 21300000, guid: e4e76262990b7a748abdd0f58d4c69eb, type: 3}
+  - {fileID: 21300000, guid: 23bcaec3c564a7e44aac3ab6d1d64104, type: 3}
+  - {fileID: 21300000, guid: 503e6f457090ae54296fe0e8c6ef7e1b, type: 3}
+  - {fileID: 21300000, guid: 183b1ca582569124593955678e43839e, type: 3}
+  - {fileID: 21300000, guid: 5dd6d929e4554704395ec53c54169df4, type: 3}
+  - {fileID: 21300000, guid: b0f6c00bb569bf8478dd1e9c5ccc51a5, type: 3}
+  - {fileID: 21300000, guid: d2bc1cbb5d092bd4a82156a9fa023ffd, type: 3}
+  - {fileID: 21300000, guid: 544985cd804bc1f449a847b770df9fd9, type: 3}
+  - {fileID: 21300000, guid: ad9385ef123036247bda40dba7250ede, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Hit_2
+  - Attack
+  - Body
+  - Hit_2
+  - Attack
+  - Shadow
+  - Dead
+  - Hit
+  - Body
+  - Hit
+  m_RenderDataMap: {}
+  m_Tag: Slime
+  m_IsVariant: 0

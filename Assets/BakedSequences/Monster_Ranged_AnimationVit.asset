@@ -1,0 +1,334 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!43 &-3036090808716641634
+Mesh:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Monster_Ranged_Mesh
+  serializedVersion: 11
+  m_SubMeshes:
+  - serializedVersion: 2
+    firstByte: 0
+    indexCount: 27
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 11
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  m_Shapes:
+    vertices: []
+    shapes: []
+    channels: []
+    fullWeights: []
+  m_BindPose: []
+  m_BoneNameHashes: 
+  m_RootBoneNameHash: 0
+  m_BonesAABB: []
+  m_VariableBoneCountWeights:
+    m_Data: 
+  m_MeshCompression: 0
+  m_IsReadable: 1
+  m_KeepVertices: 1
+  m_KeepIndices: 1
+  m_IndexFormat: 0
+  m_IndexBuffer: 0a0009000800070008000900040008000700060004000700050004000600000004000500030004000000010003000000020001000000
+  m_VertexData:
+    serializedVersion: 3
+    m_VertexCount: 11
+    m_Channels:
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 12
+      format: 0
+      dimension: 2
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    m_DataSize: 220
+    _typelessdata: 0000000000000000000000000040753f0040393f00000000000000000000000000c0763f0080293f00000000000000000000000000c0763f00c0373f0000000000000000000000000040703f00001f3f00000000000000000000000000006e3f00401d3f0000000000000000000000000080693f00c0403f00000000000000000000000000805c3f0080423f00000000000000000000000000405a3f0080423f0000000000000000000000000080503f00401d3f00000000000000000000000000804f3f00003f3f00000000000000000000000000804f3f00c01e3f
+  m_CompressedMesh:
+    m_Vertices:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UV:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Normals:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Tangents:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Weights:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_NormalSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_TangentSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_FloatColors:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_BoneIndices:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Triangles:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UVInfo: 0
+  m_LocalAABB:
+    m_Center: {x: 0.25915557, y: -0.006187439, z: 0}
+    m_Extent: {x: 0.98322886, y: 0.92192066, z: 0}
+  m_MeshUsageFlags: 0
+  m_CookingOptions: 30
+  m_BakedConvexCollisionMesh: 
+  m_BakedTriangleCollisionMesh: 
+  m_MeshMetrics[0]: 1
+  m_MeshMetrics[1]: 1
+  m_MeshOptimizationFlags: 1
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
+--- !u!21 &-2766674623306950584
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Monster_Ranged_Material
+  m_Shader: {fileID: 4800000, guid: 0d97937e3f7242bebe0064e9c3e7b095, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _ColorTex:
+        m_Texture: {fileID: 4533358235267324281}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 549f149731084cc59b131a1baeb23de9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PositionTex:
+        m_Texture: {fileID: 8165618388295410495}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _FrameIndex: 0
+    m_Colors:
+    - _InstanceColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19aaa67546384906913016370d7cc274, type: 3}
+  m_Name: Monster_Ranged_AnimationVit
+  m_EditorClassIdentifier: 
+  mesh: {fileID: -3036090808716641634}
+  material: {fileID: -2766674623306950584}
+  sourceTexture: {fileID: 2800000, guid: 549f149731084cc59b131a1baeb23de9, type: 3}
+  positionTexture: {fileID: 8165618388295410495}
+  colorTexture: {fileID: 4533358235267324281}
+  frameRate: 20
+  vertexCount: 11
+  totalFrameCount: 14
+  bounds:
+    m_Center: {x: 0.25915557, y: -0.006187439, z: 0}
+    m_Extent: {x: 0.98322886, y: 0.92192066, z: 0}
+  clips:
+  - name: Monster_Ranged_attack
+    startFrame: 0
+    frameCount: 14
+    duration: 0.7
+    loop: 1
+--- !u!28 &4533358235267324281
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Monster_Ranged_ColorVIT
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 2
+  m_Width: 11
+  m_Height: 14
+  m_CompleteImageSize: 616
+  m_MipsStripped: 0
+  m_TextureFormat: 4
+  m_MipCount: 1
+  m_IsReadable: 0
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 0
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_LightmapFormat: 0
+  m_ColorSpace: 1
+  m_PlatformBlob: 
+  image data: 616
+  _typelessdata: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
+--- !u!28 &8165618388295410495
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Monster_Ranged_PositionVIT
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 2
+  m_Width: 11
+  m_Height: 14
+  m_CompleteImageSize: 1232
+  m_MipsStripped: 0
+  m_TextureFormat: 17
+  m_MipCount: 1
+  m_IsReadable: 0
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 0
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_LightmapFormat: 0
+  m_ColorSpace: 0
+  m_PlatformBlob: 
+  image data: 1232
+  _typelessdata: cd3aec350000003c483b29b40000003c483bf6340000003c333971b90000003c7b3800ba0000003c14365c390000003c7bb0ec390000003c5cb3ec390000003cf6b800ba0000003c48b9cd380000003c48b985b90000003c343a3a360000003ca63a60b40000003ca63a38350000003cb838b9b90000003c0d3850ba0000003c6c35a3390000003c9ab03a3a0000003c47b33a3a0000003cb7b850ba0000003c03b90d390000003c03b9ceb90000003c53399e360000003cba39a7b40000003cba398c350000003cf73715ba0000003cc236b5ba0000003c5734fe390000003c47b19e3a0000003cb1b39e3a0000003c8ab8b5ba0000003ccfb85e390000003ccfb82cba0000003c6738ff360000003cc338ebb40000003cc338dd350000003c65366eba0000003c503517bb0000003c4b32563a0000003c37b2ff3a0000003c31b4ff3a0000003c71b817bb0000003caeb8ac390000003caeb886ba0000003c583744370000003c00381bb50000003c003816360000003c2335adba0000003c25345dbb0000003c5330943a0000003c23b3443b0000003c8fb4443b0000003c6eb85dbb0000003ca6b8e4390000003ca6b8c6ba0000003cbf3653370000003c643726b50000003c643723360000003c9a34bbba0000003c45336dbb0000003cd12ea23a0000003cc0b3533b0000003cd7b4533b0000003c83b86dbb0000003cbab8f1390000003cbab8d5ba0000003cc9370b370000003c3e38f3b40000003c3e38e7350000003c763579ba0000003c6b3424bb0000003ca630613a0000003c70b30b3b0000003cc4b40b3b0000003ca6b824bb0000003ce2b8b6390000003ce2b891ba0000003cbe392e360000003c2d3a58b40000003c2d3a2e350000003c4b38aeb90000003c483744ba0000003cac3499390000003cbab12e3a0000003c2bb42e3a0000003ce9b844ba0000003c33b903390000003c33b9c3b90000003cf33b2b350000003c3e3c43b30000003c3e3c54340000003c293ac0b80000003c5b393db90000003c7c37ae380000003c4daf2b390000003ce0b22b390000003c36b93db90000003c91b931380000003c91b9d1b80000003cab3c8f340000003cf83c68b20000003cf83ca3330000003c573b30b80000003c703a9fb80000003ca43821380000003c7dac8f380000003cd8b18f380000003c5cb99fb80000003cc3b964370000003cc3b940b80000003caa3c95340000003cf63c71b20000003cf63cae330000003c523b36b80000003c6c3aa5b80000003c9e3826380000003cb2ac95380000003cf3b195380000003c64b9a5b80000003ccbb96e370000003ccbb946b80000003c4b3cf5340000003c943cf8b20000003c943c27340000003cb23a8eb80000003cd83906b90000003c24387d380000003c32aef5380000003c81b2f5380000003c50b906b90000003cb1b905380000003cb1b9a0b80000003c993b79350000003c0f3cb2b30000003c0f3c96340000003cdd3908b90000003c15398cb90000003c0c37f5380000003ce3af79390000003c10b379390000003c26b98cb90000003c7fb970380000003c7fb91bb90000003cd13aec350000003c4c3b29b40000003c4c3bf6340000003c383971b90000003c7f3800ba0000003c1d365c390000003c69b0ec390000003c4ab3ec390000003cf1b800ba0000003c43b9cd380000003c43b985b90000003c
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 

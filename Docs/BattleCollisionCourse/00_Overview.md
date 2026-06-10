@@ -1,14 +1,24 @@
 # 00. 空间划分课程总览
 
-这套课程的目标是从零实现一套适合 2D 战斗的空间划分碰撞系统。最终结果不是依赖 `Physics2D`，也不是每个抛射物挂一个检测脚本，而是一个数据化的 `BattleCollisionManager`：
+这套课程的目标是从零实现一套适合 2D 战斗的空间划分碰撞系统。最终结果不是依赖 `Physics2D`，也不是每个抛射物挂一个检测脚本，而是一组数据化 Manager 协作：
 
 ```text
-单位数据注册到 Manager
-Manager 每帧维护空间网格
-技能和抛射物向 Manager 发起形状查询
-Manager 返回 target index
-战斗逻辑处理伤害
-表现层播放 Spine 受击色、特效、飘字
+BattleUnitManager 管理单位数据
+BattleCollisionManager 只管理可命中目标和空间网格
+ProjectileManager / SkillManager 发起形状查询
+CombatSystem 处理伤害和状态
+RenderManager 只管理 Spine、HUD、飘字、特效等表现句柄
+```
+
+最终链路：
+
+```text
+UnitManager Spawn/Move/Death
+  -> 同步 collision target
+  -> CollisionManager 重建或更新网格
+  -> Projectile/Skill 批量 Query
+  -> CombatSystem 结算
+  -> RenderManager 播放表现
 ```
 
 ## 本章目标
@@ -17,7 +27,8 @@ Manager 返回 target index
 
 最终能力：
 
-- 支持大量单位。
+- 支持大量单位的数据化管理。
+- 支持大量单位的空间划分查询。
 - 支持圆、矩形、扇形、胶囊线段查询。
 - 支持抛射物 sweep 检测，避免高速穿透。
 - 支持阵营、状态、地面/空中层级过滤。
@@ -39,6 +50,36 @@ Manager 返回 target index
 
 这些查询只需要回答“哪些目标被命中”，不需要刚体、摩擦、反弹、接触点、碰撞回调。大量单位和抛射物下，自己维护数据结构更容易做到稳定无 GC，也更容易和 Manager 化渲染系统配合。
 
+## 为什么要先讲 UnitManager
+
+空间划分系统只关心“可命中目标”，但正式战斗里单位不只是碰撞目标。单位还包含：
+
+```text
+血量
+阵营
+状态
+移动位置
+渲染句柄
+碰撞目标句柄
+HUD 句柄
+技能状态
+```
+
+如果碰撞系统直接管理完整单位，会让碰撞层和战斗逻辑、表现逻辑耦合。更合理的分层是：
+
+```text
+BattleUnitManager
+  保存完整单位业务数据
+
+BattleCollisionManager
+  保存查询所需的最小目标数据
+
+RenderManager
+  保存表现对象和渲染句柄
+```
+
+所以课程会先从最小目标数据开始，逐步引入正式 `BattleUnitManager` 的句柄、数组、free list、generation 和同步策略。
+
 ## 课程路线
 
 ```text
@@ -54,6 +95,7 @@ O(N) 暴力检测
   -> 大范围 fallback
   -> 调试和压测
   -> 最终接入战斗和表现层
+  -> 大规模单位数据管理
 ```
 
 ## 当前项目关系
@@ -74,9 +116,11 @@ Assets/Scripts/Core/Runtime/Battle/Collision/
 
 这套代码适合看网格、拖拽形状、验证命中颜色。课程前半段会利用它解释概念。后半段会把正式运行时改成数组 Manager，不把 `SpineVitColorController`、Gizmos、Detector GameObject 放进正式路径。
 
+当前项目还没有正式 `BattleUnitManager`。第 14 章会从零设计它和碰撞系统的同步关系。
+
 ## 最终接口目标
 
-课程最终会落到这组接口：
+碰撞查询接口：
 
 ```csharp
 public enum BattleCollisionShapeType
@@ -124,6 +168,25 @@ public sealed class BattleCollisionManager
 }
 ```
 
+单位管理接口：
+
+```csharp
+public struct BattleUnitHandle
+{
+    public int index;
+    public int generation;
+}
+
+public sealed class BattleUnitManager
+{
+    public BattleUnitHandle SpawnUnit(in BattleUnitSpawnDesc desc);
+    public void DespawnUnit(BattleUnitHandle unit);
+    public bool IsAlive(BattleUnitHandle unit);
+    public void SetPosition(BattleUnitHandle unit, Vector2 position);
+    public void SyncCollisionTargets(BattleCollisionManager collisionManager);
+}
+```
+
 ## 验收标准
 
 学完整套课程后，应该能做到：
@@ -133,4 +196,5 @@ public sealed class BattleCollisionManager
 - 查询阶段没有每帧 GC。
 - 高速子弹不会穿透目标。
 - 大范围技能不会因为扫大量 cell 反而更慢。
+- UnitManager 能稳定管理大量单位的生成、死亡、回收和位置同步。
 - 碰撞层不直接依赖 Spine、飘字、特效或伤害结算。

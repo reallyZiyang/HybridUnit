@@ -1,0 +1,27 @@
+{
+    "name": "Game.Play.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2a81c6962524d424a8ef5072bd3b0fa0",
+        "GUID:3d5fe4a62e6bc204bafb466aed0a6319",
+        "GUID:b530ff582d4962243bc008f98e0a3963",
+        "GUID:f88d34942a7345649404f2b6632f1f4b",
+        "GUID:144d6fe5c4062774385c78f2708e1c1f",
+        "GUID:9f642dceddb7de2489cc82b7c0d8ac3d",
+        "GUID:0a0471484b079be408cb3a0d7fe94736",
+        "GUID:f2e44a59fc364908b66f610621334dbd",
+        "GUID:18af003c1ee879d4194746eda8e70538",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

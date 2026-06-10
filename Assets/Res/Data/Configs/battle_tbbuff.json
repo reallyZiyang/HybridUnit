@@ -1,0 +1,37 @@
+[
+  {
+    "id": 7001,
+    "name": "燃烧",
+    "durationMs": 5000,
+    "maxStack": 3,
+    "stackMode": 3,
+    "tickMs": 1000,
+    "attrs": [],
+    "tickEffects": [
+      {
+        "type": 1,
+        "id": 3003,
+        "value": 10000
+      }
+    ],
+    "beginEffects": [],
+    "endEffects": []
+  },
+  {
+    "id": 7002,
+    "name": "加速",
+    "durationMs": 3000,
+    "maxStack": 1,
+    "stackMode": 1,
+    "tickMs": 0,
+    "attrs": [
+      {
+        "id": 104,
+        "value": 500
+      }
+    ],
+    "tickEffects": [],
+    "beginEffects": [],
+    "endEffects": []
+  }
+]

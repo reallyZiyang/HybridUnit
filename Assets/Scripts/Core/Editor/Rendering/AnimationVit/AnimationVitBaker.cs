@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -377,21 +378,18 @@ public static class AnimationVitBaker
 
         string assetPath = ParticleAtlasPathUtility.CombineProjectPath(settings.OutputFolder, fileBaseName + "_AnimationVit.asset");
         AssetDatabase.DeleteAsset(assetPath);
+
+        Texture2D persistentSourceTexture = SaveOrResolveRuntimeSourceTexture(settings, runtimeSourceTexture, originalSourceTexture);
+        asset.sourceTexture = persistentSourceTexture;
+        material.SetTexture("_MainTex", persistentSourceTexture);
+
         AssetDatabase.CreateAsset(asset, assetPath);
 
         mesh.name = fileBaseName + "_Mesh";
-        if (runtimeSourceTexture != originalSourceTexture)
-        {
-            runtimeSourceTexture.name = fileBaseName + "_RuntimeAtlas";
-        }
         positionTexture.name = fileBaseName + "_PositionVIT";
         colorTexture.name = fileBaseName + "_ColorVIT";
         material.name = fileBaseName + "_Material";
         AssetDatabase.AddObjectToAsset(mesh, asset);
-        if (runtimeSourceTexture != originalSourceTexture)
-        {
-            AssetDatabase.AddObjectToAsset(runtimeSourceTexture, asset);
-        }
         AssetDatabase.AddObjectToAsset(positionTexture, asset);
         AssetDatabase.AddObjectToAsset(colorTexture, asset);
         AssetDatabase.AddObjectToAsset(material, asset);
@@ -399,6 +397,124 @@ public static class AnimationVitBaker
         AssetDatabase.SaveAssets();
         AssetDatabase.ImportAsset(assetPath);
         return assetPath;
+    }
+
+    private static Texture2D SaveOrResolveRuntimeSourceTexture(AnimationVitBakeSettings settings, Texture2D runtimeSourceTexture, Texture2D originalSourceTexture)
+    {
+        if (runtimeSourceTexture == null)
+        {
+            throw new InvalidOperationException("Animation VIT runtime source texture is null.");
+        }
+
+        string runtimeAssetPath = AssetDatabase.GetAssetPath(runtimeSourceTexture);
+        bool isPersistentAsset = !string.IsNullOrEmpty(runtimeAssetPath) && EditorUtility.IsPersistent(runtimeSourceTexture);
+        bool needsRuntimeCopy = runtimeSourceTexture != originalSourceTexture || !isPersistentAsset;
+        if (!needsRuntimeCopy)
+        {
+            runtimeSourceTexture.wrapMode = TextureWrapMode.Clamp;
+            return runtimeSourceTexture;
+        }
+
+        string textureProjectPath = SaveSharedRuntimeSourceTexture(settings, runtimeSourceTexture);
+
+        Texture2D importedTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(textureProjectPath);
+        if (importedTexture == null)
+        {
+            throw new InvalidOperationException("Failed to import Animation VIT runtime source texture: " + textureProjectPath);
+        }
+
+        importedTexture.wrapMode = TextureWrapMode.Clamp;
+        return importedTexture;
+    }
+
+    private static string SaveSharedRuntimeSourceTexture(AnimationVitBakeSettings settings, Texture2D sourceTexture)
+    {
+        Texture2D readableTexture = CopyTextureToReadable(sourceTexture);
+        try
+        {
+            byte[] pngBytes = readableTexture.EncodeToPNG();
+            if (pngBytes == null || pngBytes.Length == 0)
+            {
+                throw new InvalidOperationException("Failed to encode Animation VIT runtime source texture as PNG.");
+            }
+
+            string hash = ComputeRuntimeAtlasHash(pngBytes);
+            string textureProjectPath = ParticleAtlasPathUtility.CombineProjectPath(settings.OutputFolder, "AnimationVit_RuntimeAtlas_" + hash + ".png");
+            string textureAbsolutePath = ParticleAtlasPathUtility.ProjectPathToAbsolute(textureProjectPath);
+            string textureDirectory = Path.GetDirectoryName(textureAbsolutePath);
+            if (!string.IsNullOrEmpty(textureDirectory))
+            {
+                Directory.CreateDirectory(textureDirectory);
+            }
+
+            if (!File.Exists(textureAbsolutePath))
+            {
+                File.WriteAllBytes(textureAbsolutePath, pngBytes);
+                AssetDatabase.ImportAsset(textureProjectPath);
+            }
+
+            ConfigureRuntimeSourceTextureImporter(textureProjectPath);
+            return textureProjectPath;
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(readableTexture);
+        }
+    }
+
+    private static string ComputeRuntimeAtlasHash(byte[] pngBytes)
+    {
+        using (SHA256 sha = SHA256.Create())
+        {
+            byte[] hashBytes = sha.ComputeHash(pngBytes);
+            return BitConverter.ToString(hashBytes, 0, 8).Replace("-", string.Empty).ToLowerInvariant();
+        }
+    }
+
+    private static Texture2D CopyTextureToReadable(Texture2D sourceTexture)
+    {
+        RenderTexture previous = RenderTexture.active;
+        RenderTexture renderTexture = RenderTexture.GetTemporary(sourceTexture.width, sourceTexture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+        Texture2D readableTexture = new Texture2D(sourceTexture.width, sourceTexture.height, TextureFormat.RGBA32, false, false)
+        {
+            name = sourceTexture.name + "_ReadableCopy",
+            filterMode = sourceTexture.filterMode,
+            wrapMode = TextureWrapMode.Clamp
+        };
+
+        try
+        {
+            Graphics.Blit(sourceTexture, renderTexture);
+            RenderTexture.active = renderTexture;
+            readableTexture.ReadPixels(new Rect(0, 0, sourceTexture.width, sourceTexture.height), 0, 0, false);
+            readableTexture.Apply(false, false);
+        }
+        finally
+        {
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(renderTexture);
+        }
+
+        return readableTexture;
+    }
+
+    private static void ConfigureRuntimeSourceTextureImporter(string textureProjectPath)
+    {
+        TextureImporter importer = AssetImporter.GetAtPath(textureProjectPath) as TextureImporter;
+        if (importer == null)
+        {
+            return;
+        }
+
+        importer.textureType = TextureImporterType.Default;
+        importer.alphaSource = TextureImporterAlphaSource.FromInput;
+        importer.alphaIsTransparency = true;
+        importer.mipmapEnabled = false;
+        importer.sRGBTexture = true;
+        importer.npotScale = TextureImporterNPOTScale.None;
+        importer.wrapMode = TextureWrapMode.Clamp;
+        importer.filterMode = FilterMode.Bilinear;
+        importer.SaveAndReimport();
     }
 
     private static string GetOutputBaseName(AnimationVitBakeSettings settings)

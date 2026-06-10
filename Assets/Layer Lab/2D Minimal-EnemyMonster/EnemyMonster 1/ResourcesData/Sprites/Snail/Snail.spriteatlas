@@ -1,0 +1,121 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &2287022123
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Snail
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 7fec2adf742fef9419c61481eeeb7a19, type: 3}
+    - {fileID: 2800000, guid: 422d6b56bfe8fee4a8b901f95ccc8a40, type: 3}
+    - {fileID: 102900000, guid: afb051ee3469a24478d11b065a35d4bd, type: 3}
+    - {fileID: 102900000, guid: cb1217ba8304cc44dabe0d8b850e5d68, type: 3}
+    - {fileID: 102900000, guid: 5c6ba0dfe8272fd459fc9ce37a003fa1, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - b028807148e224c42a882969b0682378: 21300000
+    - d05490b2b443ce14392f50a4aafddf5c: 21300000
+    - 099888f3da70b30418e323c3d10e05c3: 21300000
+    - ab8846552bc18b14eb8ee803832f8c20: 21300000
+    - a1225c65d5dd0bb47b2176923bd30427: 21300000
+    - 422d6b56bfe8fee4a8b901f95ccc8a40: 21300000
+    - 674c7f37be2125d42b082c9aa9a9abea: 21300000
+    - e1960ec70ce249143931525b20746ab0: 21300000
+    - afba22487fad48b4795d18dd7c4be8a1: 21300000
+    - 41c87da8f6ba25c49b89894f6b6c9462: 21300000
+    - 4a5bc2b8896a7df489a62370c5f93697: 21300000
+    - 06edb22915cb0284896ca5cf285187b8: 21300000
+    - d6d2b169debde864cb938a20d56425a1: 21300000
+    - 529365e914b17134e94cb5666d3bb747: 21300000
+    - 7996273a28ffa17478e90239c63f6e4c: 21300000
+    - de157c1b6c2c1454094bc1db1f64b679: 21300000
+    - cb3dc72b233639545b61a0e9e585e2b5: 21300000
+    - 7d94bd3b23dd5bc40a93f52470d6ab7b: 21300000
+    - f62c6e7b31440344bb876c5bef86d1df: 21300000
+    - ef00788c1c75c1344915255fe367c341: 21300000
+    - d3bb66cd3ce1783458ed2d3ec1ea1085: 21300000
+    - f2793dedc61790a4c9ceb5e7b4613ed1: 21300000
+    - 9b2eccae05e78f54ead8ed46b436482c: 21300000
+    - 7fec2adf742fef9419c61481eeeb7a19: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: b028807148e224c42a882969b0682378, type: 3}
+  - {fileID: 21300000, guid: d05490b2b443ce14392f50a4aafddf5c, type: 3}
+  - {fileID: 21300000, guid: 099888f3da70b30418e323c3d10e05c3, type: 3}
+  - {fileID: 21300000, guid: ab8846552bc18b14eb8ee803832f8c20, type: 3}
+  - {fileID: 21300000, guid: a1225c65d5dd0bb47b2176923bd30427, type: 3}
+  - {fileID: 21300000, guid: 422d6b56bfe8fee4a8b901f95ccc8a40, type: 3}
+  - {fileID: 21300000, guid: 674c7f37be2125d42b082c9aa9a9abea, type: 3}
+  - {fileID: 21300000, guid: e1960ec70ce249143931525b20746ab0, type: 3}
+  - {fileID: 21300000, guid: afba22487fad48b4795d18dd7c4be8a1, type: 3}
+  - {fileID: 21300000, guid: 41c87da8f6ba25c49b89894f6b6c9462, type: 3}
+  - {fileID: 21300000, guid: 4a5bc2b8896a7df489a62370c5f93697, type: 3}
+  - {fileID: 21300000, guid: 06edb22915cb0284896ca5cf285187b8, type: 3}
+  - {fileID: 21300000, guid: d6d2b169debde864cb938a20d56425a1, type: 3}
+  - {fileID: 21300000, guid: 529365e914b17134e94cb5666d3bb747, type: 3}
+  - {fileID: 21300000, guid: 7996273a28ffa17478e90239c63f6e4c, type: 3}
+  - {fileID: 21300000, guid: de157c1b6c2c1454094bc1db1f64b679, type: 3}
+  - {fileID: 21300000, guid: cb3dc72b233639545b61a0e9e585e2b5, type: 3}
+  - {fileID: 21300000, guid: 7d94bd3b23dd5bc40a93f52470d6ab7b, type: 3}
+  - {fileID: 21300000, guid: f62c6e7b31440344bb876c5bef86d1df, type: 3}
+  - {fileID: 21300000, guid: ef00788c1c75c1344915255fe367c341, type: 3}
+  - {fileID: 21300000, guid: d3bb66cd3ce1783458ed2d3ec1ea1085, type: 3}
+  - {fileID: 21300000, guid: f2793dedc61790a4c9ceb5e7b4613ed1, type: 3}
+  - {fileID: 21300000, guid: 9b2eccae05e78f54ead8ed46b436482c, type: 3}
+  - {fileID: 21300000, guid: 7fec2adf742fef9419c61481eeeb7a19, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Up
+  - Front
+  - Up
+  - Up_Hit
+  - Hit
+  - Shadow
+  - Attack
+  - Hit_2
+  - Up
+  - Hit
+  - Hit_2
+  - Attack
+  - Up_Hit
+  - Front
+  - Attack
+  - Body
+  - Front_Hit
+  - Body
+  - Hit_2
+  - Up_Hit
+  - Body
+  - Front_Hit
+  - Hit
+  - Dead
+  m_RenderDataMap: {}
+  m_Tag: Snail
+  m_IsVariant: 0

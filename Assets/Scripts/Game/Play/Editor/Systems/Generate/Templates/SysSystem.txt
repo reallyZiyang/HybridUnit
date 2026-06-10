@@ -1,0 +1,17 @@
+﻿using UniKit.Framework.Base;
+using UniKit.Framework.Event;
+using #USING#.Interface;
+
+namespace #NAMESPACE#
+{
+    public partial class #NAME# : AbstractSystem, I#NAME#
+    {
+        protected override void OnInitialize()
+        {
+        }
+        
+        protected override void OnDispose()
+        {
+        }
+    }
+}

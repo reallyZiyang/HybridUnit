@@ -1,0 +1,163 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &2135999927
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Turtle
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: c154f42e43ba0e24fb356045f78b21fd, type: 3}
+    - {fileID: 2800000, guid: 58840dbb9d43089459fc754f60cc8806, type: 3}
+    - {fileID: 102900000, guid: b420821d4f79c2948a23887f83ed6a9a, type: 3}
+    - {fileID: 102900000, guid: edd97801b9897dd48adbd38062f7445a, type: 3}
+    - {fileID: 102900000, guid: 50c2600e52c91a04097c2415f76171de, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 77c1d8801ddae264184c063e78065839: 21300000
+    - af0e58b0f37311549b3cfc353cbe93fd: 21300000
+    - eb745f213dbf559498aae80ab5f8fac8: 21300000
+    - 18aa0281894202c49883bf3c677128fb: 21300000
+    - e06ab1a17787c50489f6afbc739a10bc: 21300000
+    - 34a543e139281774084c794c1f362217: 21300000
+    - 1398fb5255d212447ae714c2b5928a80: 21300000
+    - 73629172e8d79db4dab5f496576f52bc: 21300000
+    - 0e0f4ae2a9a9e0c48a4d5235ab3e4242: 21300000
+    - b2d610934ee3775448188e41db6242c1: 21300000
+    - 60a19614bdc15e8449436dd49b211d76: 21300000
+    - 8c5f92a5a666a434aa9a24252c7c8076: 21300000
+    - e4e5f2d5479c8dc49857127b8a5fa456: 21300000
+    - 81881996a8453334eb559e1cbe98b93e: 21300000
+    - 8c6c7a376dadff841980ec70f73c6917: 21300000
+    - ab5905572996b474882e23818f2ddd34: 21300000
+    - a852ad28d4eb0a540b98c52b9cd6257e: 21300000
+    - b41bcf48dda26a145956f813d6d3fb7f: 21300000
+    - 47b187584c57bc449a79d70a2b5b847d: 21300000
+    - ae7018789b4ecb547bbe96c5dae96aba: 21300000
+    - e6ea5f88af633db45a9e0aacfdce9c4b: 21300000
+    - 113f61d9ab2bcbf4bbd29efc7c38e831: 21300000
+    - 8b4adcd9d8264ae4583eeb89c79312a8: 21300000
+    - f99d6ff9ded8a7c49b58a64100be731e: 21300000
+    - 03cf840aae1c7624c8ffa320f93434f1: 21300000
+    - 4713629a5225bca42b5b136b4bf06a87: 21300000
+    - 1efeb54b415509641b566dbbc34076ae: 21300000
+    - 58840dbb9d43089459fc754f60cc8806: 21300000
+    - 2bec0dbb41e5d1c428227723414698e3: 21300000
+    - 0bf7b9ebbaa969147ae338054ed06658: 21300000
+    - bb115d2d9a0d64244a6a305d9e2efc25: 21300000
+    - 5ad6d2cdc018a8545be8cf4f45aefe43: 21300000
+    - c154f42e43ba0e24fb356045f78b21fd: 21300000
+    - 8f52845ef9909a245b30a8e0fc750bd3: 21300000
+    - d320f8ae43ba0e442a0df9db0fe8460d: 21300000
+    - 818c16fe11f73444092e624123063be1: 21300000
+    - 210ef6fe4d007994bae2468b7aec9793: 21300000
+    - 4e4a7d4fd1b85bd449cb081a7f39b10d: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 77c1d8801ddae264184c063e78065839, type: 3}
+  - {fileID: 21300000, guid: af0e58b0f37311549b3cfc353cbe93fd, type: 3}
+  - {fileID: 21300000, guid: eb745f213dbf559498aae80ab5f8fac8, type: 3}
+  - {fileID: 21300000, guid: 18aa0281894202c49883bf3c677128fb, type: 3}
+  - {fileID: 21300000, guid: e06ab1a17787c50489f6afbc739a10bc, type: 3}
+  - {fileID: 21300000, guid: 34a543e139281774084c794c1f362217, type: 3}
+  - {fileID: 21300000, guid: 1398fb5255d212447ae714c2b5928a80, type: 3}
+  - {fileID: 21300000, guid: 73629172e8d79db4dab5f496576f52bc, type: 3}
+  - {fileID: 21300000, guid: 0e0f4ae2a9a9e0c48a4d5235ab3e4242, type: 3}
+  - {fileID: 21300000, guid: b2d610934ee3775448188e41db6242c1, type: 3}
+  - {fileID: 21300000, guid: 60a19614bdc15e8449436dd49b211d76, type: 3}
+  - {fileID: 21300000, guid: 8c5f92a5a666a434aa9a24252c7c8076, type: 3}
+  - {fileID: 21300000, guid: e4e5f2d5479c8dc49857127b8a5fa456, type: 3}
+  - {fileID: 21300000, guid: 81881996a8453334eb559e1cbe98b93e, type: 3}
+  - {fileID: 21300000, guid: 8c6c7a376dadff841980ec70f73c6917, type: 3}
+  - {fileID: 21300000, guid: ab5905572996b474882e23818f2ddd34, type: 3}
+  - {fileID: 21300000, guid: a852ad28d4eb0a540b98c52b9cd6257e, type: 3}
+  - {fileID: 21300000, guid: b41bcf48dda26a145956f813d6d3fb7f, type: 3}
+  - {fileID: 21300000, guid: 47b187584c57bc449a79d70a2b5b847d, type: 3}
+  - {fileID: 21300000, guid: ae7018789b4ecb547bbe96c5dae96aba, type: 3}
+  - {fileID: 21300000, guid: e6ea5f88af633db45a9e0aacfdce9c4b, type: 3}
+  - {fileID: 21300000, guid: 113f61d9ab2bcbf4bbd29efc7c38e831, type: 3}
+  - {fileID: 21300000, guid: 8b4adcd9d8264ae4583eeb89c79312a8, type: 3}
+  - {fileID: 21300000, guid: f99d6ff9ded8a7c49b58a64100be731e, type: 3}
+  - {fileID: 21300000, guid: 03cf840aae1c7624c8ffa320f93434f1, type: 3}
+  - {fileID: 21300000, guid: 4713629a5225bca42b5b136b4bf06a87, type: 3}
+  - {fileID: 21300000, guid: 1efeb54b415509641b566dbbc34076ae, type: 3}
+  - {fileID: 21300000, guid: 58840dbb9d43089459fc754f60cc8806, type: 3}
+  - {fileID: 21300000, guid: 2bec0dbb41e5d1c428227723414698e3, type: 3}
+  - {fileID: 21300000, guid: 0bf7b9ebbaa969147ae338054ed06658, type: 3}
+  - {fileID: 21300000, guid: bb115d2d9a0d64244a6a305d9e2efc25, type: 3}
+  - {fileID: 21300000, guid: 5ad6d2cdc018a8545be8cf4f45aefe43, type: 3}
+  - {fileID: 21300000, guid: c154f42e43ba0e24fb356045f78b21fd, type: 3}
+  - {fileID: 21300000, guid: 8f52845ef9909a245b30a8e0fc750bd3, type: 3}
+  - {fileID: 21300000, guid: d320f8ae43ba0e442a0df9db0fe8460d, type: 3}
+  - {fileID: 21300000, guid: 818c16fe11f73444092e624123063be1, type: 3}
+  - {fileID: 21300000, guid: 210ef6fe4d007994bae2468b7aec9793, type: 3}
+  - {fileID: 21300000, guid: 4e4a7d4fd1b85bd449cb081a7f39b10d, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Up
+  - Arm2_Hit
+  - Leg2_Hit
+  - Leg2
+  - Eye
+  - Arm_Hit
+  - Arm_Hit
+  - Leg2_Hit
+  - Arm2
+  - Hit
+  - Arm2
+  - Leg
+  - Leg2
+  - Up
+  - Arm2_Hit
+  - Hit
+  - Arm
+  - Arm
+  - Eye
+  - Leg2_Hit
+  - Leg_Hit
+  - Arm_Hit
+  - Leg
+  - Arm2_Hit
+  - Body
+  - Arm2
+  - Body
+  - Shadow
+  - Leg2
+  - Hit
+  - Leg
+  - Leg_Hit
+  - Dead
+  - Up
+  - Eye
+  - Leg_Hit
+  - Arm
+  - Body
+  m_RenderDataMap: {}
+  m_Tag: Turtle
+  m_IsVariant: 0

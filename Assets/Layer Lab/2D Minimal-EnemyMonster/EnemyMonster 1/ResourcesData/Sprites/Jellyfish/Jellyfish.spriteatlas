@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &1526816629
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Jellyfish
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 689f4e340b7c4c4448c7930296eb2e72, type: 3}
+    - {fileID: 2800000, guid: 152fe574aaf1a0541811ce62a5399c46, type: 3}
+    - {fileID: 102900000, guid: 739b8f962861ec84bb362ffd7017a483, type: 3}
+    - {fileID: 102900000, guid: 11bb2c2305a50d640beec1dee45b039f, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 25213b30a0ea9fa438b199ce5e96c28e: 21300000
+    - abdb851273f538e4fbc272af1fc12077: 21300000
+    - 49e95263ae10b7f4b97651865594f6ad: 21300000
+    - 3ddbdf93e94024c4cb105ec534ea7fad: 21300000
+    - 689f4e340b7c4c4448c7930296eb2e72: 21300000
+    - 152fe574aaf1a0541811ce62a5399c46: 21300000
+    - 8e33abc4912c3584f8a88b5533065baa: 21300000
+    - b44eb966483527b4e8522bfcdb0e29ac: 21300000
+    - fdfae8f65343cf548b2438197d42c991: 21300000
+    - c70c89870280fae42a1541dfcf28c629: 21300000
+    - af126a0d11f183141b5b19e3dee23980: 21300000
+    - a9472e2e5c560e740bfb2577da15d49b: 21300000
+    - 92743e3ecdafa7b4fad7c116e417cde9: 21300000
+    - 9b37361f6aff6ff47b7cee9252053d63: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 25213b30a0ea9fa438b199ce5e96c28e, type: 3}
+  - {fileID: 21300000, guid: abdb851273f538e4fbc272af1fc12077, type: 3}
+  - {fileID: 21300000, guid: 49e95263ae10b7f4b97651865594f6ad, type: 3}
+  - {fileID: 21300000, guid: 3ddbdf93e94024c4cb105ec534ea7fad, type: 3}
+  - {fileID: 21300000, guid: 689f4e340b7c4c4448c7930296eb2e72, type: 3}
+  - {fileID: 21300000, guid: 152fe574aaf1a0541811ce62a5399c46, type: 3}
+  - {fileID: 21300000, guid: 8e33abc4912c3584f8a88b5533065baa, type: 3}
+  - {fileID: 21300000, guid: b44eb966483527b4e8522bfcdb0e29ac, type: 3}
+  - {fileID: 21300000, guid: fdfae8f65343cf548b2438197d42c991, type: 3}
+  - {fileID: 21300000, guid: c70c89870280fae42a1541dfcf28c629, type: 3}
+  - {fileID: 21300000, guid: af126a0d11f183141b5b19e3dee23980, type: 3}
+  - {fileID: 21300000, guid: a9472e2e5c560e740bfb2577da15d49b, type: 3}
+  - {fileID: 21300000, guid: 92743e3ecdafa7b4fad7c116e417cde9, type: 3}
+  - {fileID: 21300000, guid: 9b37361f6aff6ff47b7cee9252053d63, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Hit_2
+  - Tentacle2
+  - Hit
+  - Body
+  - Dead
+  - Shadow
+  - Tentacle
+  - Tentacle
+  - Hit_2
+  - Attack
+  - Body
+  - Attack
+  - Tentacle2
+  - Hit
+  m_RenderDataMap: {}
+  m_Tag: Jellyfish
+  m_IsVariant: 0

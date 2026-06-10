@@ -1,0 +1,11 @@
+﻿using UniKit.Framework.Base;
+
+namespace #NAMESPACE#
+{
+    public class #NAME# : AbstractModel
+    {
+        protected override void OnInitialize()
+        {
+        }
+    }
+}

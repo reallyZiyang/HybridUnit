@@ -1,0 +1,16 @@
+[
+  {
+    "id": 5001,
+    "name": "添加燃烧",
+    "buffId": 7001,
+    "durationOverrideMs": 0,
+    "stack": 1
+  },
+  {
+    "id": 5002,
+    "name": "添加加速",
+    "buffId": 7002,
+    "durationOverrideMs": 3000,
+    "stack": 1
+  }
+]

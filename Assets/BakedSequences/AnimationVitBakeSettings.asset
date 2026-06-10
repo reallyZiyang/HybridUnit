@@ -12,14 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0db77acf6e40a9bbb9cb6857845ee0, type: 3}
   m_Name: AnimationVitBakeSettings
   m_EditorClassIdentifier: 
-  SourceRoot: {fileID: 0}
+  SourceRoot: {fileID: 7560383200906015339, guid: c5281b1620563fd45a9b54357fb4ce70, type: 3}
   Clips:
-  - {fileID: 7400000, guid: 868be51bd36f22a41ac36247304bb4ba, type: 2}
-  - {fileID: 7400000, guid: 8e411f677b13e9d49bcb595f3508d5a9, type: 2}
-  - {fileID: 7400000, guid: c6ddb87dbcbc83247a87d1cd26af0579, type: 2}
+  - {fileID: 7400000, guid: 643f04ef215a8564294768f7901fa2b6, type: 2}
+  - {fileID: 7400000, guid: 026e1e721a530bf4e9b05ee3fb26d55a, type: 2}
+  - {fileID: 7400000, guid: cd57147a3494e3548809f2d8f6105ab9, type: 2}
+  - {fileID: 7400000, guid: 03a586ef401d0894fb5adca0ac7754da, type: 2}
+  - {fileID: 7400000, guid: 575a048f001a65c489ed34a4736ad9a7, type: 2}
   ResolutionPreset: 1
-  FrameRatePreset: 1
+  FrameRatePreset: 2
   SourceTextureMaxSize: 1024
-  FrameRate: 20
-  OutputFolder: Assets/BakedSequences
+  FrameRate: 30
+  OutputFolder: Assets/BakedSequences/Animation/Animal
   OutputName: 

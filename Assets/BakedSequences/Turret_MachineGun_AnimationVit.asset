@@ -1,0 +1,339 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!28 &-8499328300177589429
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Turret_MachineGun_ColorVIT
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 2
+  m_Width: 19
+  m_Height: 40
+  m_CompleteImageSize: 3040
+  m_MipsStripped: 0
+  m_TextureFormat: 4
+  m_MipCount: 1
+  m_IsReadable: 0
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 0
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_LightmapFormat: 0
+  m_ColorSpace: 1
+  m_PlatformBlob: 
+  image data: 3040
+  _typelessdata: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
+--- !u!28 &-7395134872922839255
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Turret_MachineGun_PositionVIT
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 2
+  m_Width: 19
+  m_Height: 40
+  m_CompleteImageSize: 6080
+  m_MipsStripped: 0
+  m_TextureFormat: 17
+  m_MipCount: 1
+  m_IsReadable: 0
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 0
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 0
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_LightmapFormat: 0
+  m_ColorSpace: 0
+  m_PlatformBlob: 
+  image data: 6080
+  _typelessdata: d73785390000003cd739d7b90000003cd7393d380000003cf634c3390000003c0ab7c3390000003c33b7d7b90000003c8fb871390000003cc3b929340000003cc3b948b90000003cd73d66320000003ccc3da4b40000003cd73d5cb30000003ca33db8320000003ceb3cb8320000003cb83a7b340000003c81ac7b340000003c81aca4b40000003c11af52340000003c11af5cb30000003cd73785390000003cd739d7b90000003cd7393d380000003cf634c3390000003c0ab7c3390000003c33b7d7b90000003c8fb871390000003cc3b929340000003cc3b948b90000003c583d66320000003c4e3da4b40000003c583d5cb30000003c273db8320000003c753cb8320000003ce8397b340000003c76b07b340000003c76b0a4b40000003cb2b152340000003cb2b15cb30000003cd73785390000003cd739d7b90000003cd7393d380000003cf634c3390000003c0ab7c3390000003c33b7d7b90000003c8fb871390000003cc3b929340000003cc3b948b90000003c583d66320000003c4e3da4b40000003c583d5cb30000003c263db8320000003c753cb8320000003ce7397b340000003c77b07b340000003c77b0a4b40000003cb3b152340000003cb3b15cb30000003cd73785390000003cd739d7b90000003cd7393d380000003cf634c3390000003c0ab7c3390000003c33b7d7b90000003c8fb871390000003cc3b929340000003cc3b948b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cd73785390000003cd739d7b90000003cd7393d380000003cf634c3390000003c0ab7c3390000003c33b7d7b90000003c8fb871390000003cc3b929340000003cc3b948b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cd93786390000003cd839d8b90000003cd8393e380000003cf734c4390000003c0cb7c4390000003c35b7d8b90000003c90b872390000003cc4b92a340000003cc4b949b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cdb3788390000003cda39dab90000003cda393f380000003cf834c5390000003c0eb7c5390000003c37b7dab90000003c91b873390000003cc5b92b340000003cc5b94ab90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cdd3789390000003cdb39dbb90000003cdb3941380000003cf934c7390000003c0fb7c7390000003c38b7dbb90000003c93b875390000003cc7b92c340000003cc7b94cb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cdf378b390000003cdd39ddb90000003cdd3942380000003cfb34c8390000003c11b7c8390000003c3ab7ddb90000003c94b876390000003cc8b92d340000003cc8b94db90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003ce1378c390000003cdf39dfb90000003cdf3943380000003cfc34ca390000003c13b7ca390000003c3cb7dfb90000003c95b878390000003ccab92e340000003ccab94eb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003ce3378e390000003ce039e0b90000003ce03944380000003cfe34cc390000003c15b7cc390000003c3eb7e0b90000003c96b879390000003cccb92f340000003cccb950b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003ce6378f390000003ce239e2b90000003ce23945380000003cff34cd390000003c17b7cd390000003c41b7e2b90000003c98b87b390000003ccdb931340000003ccdb951b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003ce83791390000003ce339e3b90000003ce33946380000003c0035cf390000003c19b7cf390000003c43b7e3b90000003c99b87c390000003ccfb932340000003ccfb953b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cea3792390000003ce539e5b90000003ce53948380000003c0235d0390000003c1bb7d0390000003c44b7e5b90000003c9ab87e390000003cd0b933340000003cd0b954b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cec3794390000003ce739e7b90000003ce73949380000003c0335d2390000003c1db7d2390000003c46b7e7b90000003c9bb87f390000003cd2b934340000003cd2b956b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cee3795390000003ce839e8b90000003ce8394a380000003c0435d3390000003c1fb7d3390000003c48b7e8b90000003c9db880390000003cd3b935340000003cd3b957b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf03796390000003ce939e9b90000003ce9394b380000003c0535d5390000003c20b7d5390000003c4ab7e9b90000003c9eb882390000003cd5b936340000003cd5b958b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf13798390000003cea39eab90000003cea394c380000003c0635d6390000003c22b7d6390000003c4bb7eab90000003c9fb883390000003cd6b937340000003cd6b959b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf33798390000003ceb39ebb90000003ceb394c380000003c0735d7390000003c23b7d7390000003c4cb7ebb90000003c9fb884390000003cd7b938340000003cd7b95ab90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf43799390000003cec39ecb90000003cec394d380000003c0835d8390000003c24b7d8390000003c4db7ecb90000003ca0b884390000003cd8b938340000003cd8b95bb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf4379a390000003ced39edb90000003ced394d380000003c0835d8390000003c25b7d8390000003c4eb7edb90000003ca0b885390000003cd8b939340000003cd8b95bb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf5379a390000003ced39edb90000003ced394e380000003c0935d9390000003c25b7d9390000003c4fb7edb90000003ca1b885390000003cd9b939340000003cd9b95cb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf5379a390000003ced39edb90000003ced394e380000003c0935d9390000003c25b7d9390000003c4fb7edb90000003ca1b886390000003cd9b939340000003cd9b95cb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf5379a390000003ced39edb90000003ced394e380000003c0935d9390000003c25b7d9390000003c4fb7edb90000003ca1b885390000003cd9b939340000003cd9b95cb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf4379a390000003ced39edb90000003ced394d380000003c0835d8390000003c25b7d8390000003c4eb7edb90000003ca0b885390000003cd8b939340000003cd8b95bb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf43799390000003cec39ecb90000003cec394d380000003c0835d8390000003c24b7d8390000003c4db7ecb90000003ca0b884390000003cd8b938340000003cd8b95bb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf33798390000003ceb39ebb90000003ceb394c380000003c0735d7390000003c23b7d7390000003c4cb7ebb90000003c9fb884390000003cd7b938340000003cd7b95ab90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf13798390000003cea39eab90000003cea394c380000003c0635d6390000003c22b7d6390000003c4bb7eab90000003c9fb883390000003cd6b937340000003cd6b959b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cf03796390000003ce939e9b90000003ce9394b380000003c0535d5390000003c20b7d5390000003c4ab7e9b90000003c9eb882390000003cd5b936340000003cd5b958b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cee3795390000003ce839e8b90000003ce8394a380000003c0435d3390000003c1fb7d3390000003c48b7e8b90000003c9db880390000003cd3b935340000003cd3b957b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cec3794390000003ce739e7b90000003ce73949380000003c0335d2390000003c1db7d2390000003c46b7e7b90000003c9bb87f390000003cd2b934340000003cd2b956b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cea3792390000003ce539e5b90000003ce53948380000003c0235d0390000003c1bb7d0390000003c44b7e5b90000003c9ab87e390000003cd0b933340000003cd0b954b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003ce83791390000003ce339e3b90000003ce33946380000003c0035cf390000003c19b7cf390000003c43b7e3b90000003c99b87c390000003ccfb932340000003ccfb953b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003ce6378f390000003ce239e2b90000003ce23945380000003cff34cd390000003c17b7cd390000003c41b7e2b90000003c98b87b390000003ccdb931340000003ccdb951b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003ce3378e390000003ce039e0b90000003ce03944380000003cfe34cc390000003c15b7cc390000003c3eb7e0b90000003c96b879390000003cccb92f340000003cccb950b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003ce1378c390000003cdf39dfb90000003cdf3943380000003cfc34ca390000003c13b7ca390000003c3cb7dfb90000003c95b878390000003ccab92e340000003ccab94eb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cdf378b390000003cdd39ddb90000003cdd3942380000003cfb34c8390000003c11b7c8390000003c3ab7ddb90000003c94b876390000003cc8b92d340000003cc8b94db90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cdd3789390000003cdb39dbb90000003cdb3941380000003cf934c7390000003c0fb7c7390000003c38b7dbb90000003c93b875390000003cc7b92c340000003cc7b94cb90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cdb3788390000003cda39dab90000003cda393f380000003cf834c5390000003c0eb7c5390000003c37b7dab90000003c91b873390000003cc5b92b340000003cc5b94ab90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003cd93786390000003cd839d8b90000003cd8393e380000003cf734c4390000003c0cb7c4390000003c35b7d8b90000003c90b872390000003cc4b92a340000003cc4b949b90000003ca83d66320000003c9e3da4b40000003ca83d5cb30000003c763db8320000003cc03cb8320000003c6c3a7b340000003c1eae7b340000003c1eaea4b40000003c52b052340000003c52b05cb30000003c
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
+--- !u!21 &-5607556151011130511
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Turret_MachineGun_Material
+  m_Shader: {fileID: 4800000, guid: 0d97937e3f7242bebe0064e9c3e7b095, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _ColorTex:
+        m_Texture: {fileID: -8499328300177589429}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 549f149731084cc59b131a1baeb23de9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PositionTex:
+        m_Texture: {fileID: -7395134872922839255}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _FrameIndex: 0
+    m_Colors:
+    - _InstanceColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19aaa67546384906913016370d7cc274, type: 3}
+  m_Name: Turret_MachineGun_AnimationVit
+  m_EditorClassIdentifier: 
+  mesh: {fileID: 7384657885228354330}
+  material: {fileID: -5607556151011130511}
+  sourceTexture: {fileID: 2800000, guid: 549f149731084cc59b131a1baeb23de9, type: 3}
+  positionTexture: {fileID: -7395134872922839255}
+  colorTexture: {fileID: -8499328300177589429}
+  frameRate: 30
+  vertexCount: 19
+  totalFrameCount: 40
+  bounds:
+    m_Center: {x: 0.36440027, y: -0.005074978, z: 0}
+    m_Extent: {x: 1.0952003, y: 0.735875, z: 0}
+  clips:
+  - name: Turret_MachineGun_attack
+    startFrame: 0
+    frameCount: 4
+    duration: 0.13333334
+    loop: 1
+  - name: Turret_MachineGun_idle
+    startFrame: 4
+    frameCount: 36
+    duration: 1.2
+    loop: 1
+--- !u!43 &7384657885228354330
+Mesh:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Turret_MachineGun_Mesh
+  serializedVersion: 11
+  m_SubMeshes:
+  - serializedVersion: 2
+    firstByte: 0
+    indexCount: 45
+    topology: 0
+    baseVertex: 0
+    firstVertex: 0
+    vertexCount: 19
+    localAABB:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+  m_Shapes:
+    vertices: []
+    shapes: []
+    channels: []
+    fullWeights: []
+  m_BindPose: []
+  m_BoneNameHashes: 
+  m_RootBoneNameHash: 0
+  m_BonesAABB: []
+  m_VariableBoneCountWeights:
+    m_Data: 
+  m_MeshCompression: 0
+  m_IsReadable: 1
+  m_KeepVertices: 1
+  m_KeepIndices: 1
+  m_IndexFormat: 0
+  m_IndexBuffer: 0800070005000600050007000400050006000100050004000300010004000000010003000200010000001200110010000f00100011000a0010000f000e000a000f000d000a000e000c000a000d0009000a000c000b000a000900
+  m_VertexData:
+    serializedVersion: 3
+    m_VertexCount: 19
+    m_Channels:
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 3
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 12
+      format: 0
+      dimension: 2
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    m_DataSize: 380
+    _typelessdata: 0000000000000000000000000000313e0040713f0000000000000000000000000000493e00c04d3f0000000000000000000000000000493e00406d3f00000000000000000000000000001f3e0000723f0000000000000000000000000000a83d0000723f0000000000000000000000000000a63d00c04d3f00000000000000000000000000008e3d0000713f0000000000000000000000000000603d0080663f0000000000000000000000000000603d00804f3f0000000000000000000000000080c43e0000653f0000000000000000000000000000c43e00c0583f0000000000000000000000000080c43e00405a3f0000000000000000000000000000c23e0040653f0000000000000000000000000000b93e0040653f0000000000000000000000000080a53e0000673f0000000000000000000000000000703e0000673f0000000000000000000000000000703e00c0583f00000000000000000000000000006c3e00c0663f00000000000000000000000000006c3e00405a3f
+  m_CompressedMesh:
+    m_Vertices:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UV:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Normals:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Tangents:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Weights:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_NormalSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_TangentSigns:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_FloatColors:
+      m_NumItems: 0
+      m_Range: 0
+      m_Start: 0
+      m_Data: 
+      m_BitSize: 0
+    m_BoneIndices:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_Triangles:
+      m_NumItems: 0
+      m_Data: 
+      m_BitSize: 0
+    m_UVInfo: 0
+  m_LocalAABB:
+    m_Center: {x: 0.36440027, y: -0.005074978, z: 0}
+    m_Extent: {x: 1.0952003, y: 0.735875, z: 0}
+  m_MeshUsageFlags: 0
+  m_CookingOptions: 30
+  m_BakedConvexCollisionMesh: 
+  m_BakedTriangleCollisionMesh: 
+  m_MeshMetrics[0]: 1
+  m_MeshMetrics[1]: 1
+  m_MeshOptimizationFlags: 1
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 

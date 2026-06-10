@@ -1,0 +1,24 @@
+{
+    "name": "Game.Play.Battle.Tests",
+    "references": [
+        "Game.Play",
+        "Game.Runtime.Data",
+        "Luban.Runtime",
+        "UniKit.Framework",
+        "UniTask"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "noEngineReferences": false
+}

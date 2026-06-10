@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &1665627893
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Octopus
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: f6125ac0794ba43408efc9b652a7216f, type: 3}
+    - {fileID: 2800000, guid: 3282bb1ebab7fd84383a58c43b0930de, type: 3}
+    - {fileID: 102900000, guid: 600e3513315b4f840b6b069fd7f2deb3, type: 3}
+    - {fileID: 102900000, guid: 7467cd991bdaddc4abb19434e90f438f, type: 3}
+    - {fileID: 102900000, guid: 3cfd1d90daec8764da996119e267351c, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 60504740bd697f14ca9de4dfb958f28a: 21300000
+    - f6125ac0794ba43408efc9b652a7216f: 21300000
+    - 545aea331a24f7a44829fcbf5eb88058: 21300000
+    - 45c6a16489864a5479297edb9b69e4c8: 21300000
+    - 103f0fb432ad601438fcc0e0526e4d1d: 21300000
+    - 466ac42564489e54ab14bf8d14ef7b60: 21300000
+    - f5041bb561d858f4c918451e34504a15: 21300000
+    - 2293861712fae9848b6277423ba6a7ad: 21300000
+    - 918b6da801d2b704f8582665c504c607: 21300000
+    - 3dac0aa98a9606b4fa758b3e467deb61: 21300000
+    - c3a82dfa064077349ba6133718df59a2: 21300000
+    - ca7d82db24c156c4f9ada3a8dddc3844: 21300000
+    - 1abc74ace6819c24ab4599391d964259: 21300000
+    - 3f8faaed97e72044fb334892272489bd: 21300000
+    - 3282bb1ebab7fd84383a58c43b0930de: 21300000
+    - 7202ccfeb07bb324c974bc89e563b980: 21300000
+    - 0cf09e9f391b262408d6a499b64ff010: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 60504740bd697f14ca9de4dfb958f28a, type: 3}
+  - {fileID: 21300000, guid: f6125ac0794ba43408efc9b652a7216f, type: 3}
+  - {fileID: 21300000, guid: 545aea331a24f7a44829fcbf5eb88058, type: 3}
+  - {fileID: 21300000, guid: 45c6a16489864a5479297edb9b69e4c8, type: 3}
+  - {fileID: 21300000, guid: 103f0fb432ad601438fcc0e0526e4d1d, type: 3}
+  - {fileID: 21300000, guid: 466ac42564489e54ab14bf8d14ef7b60, type: 3}
+  - {fileID: 21300000, guid: f5041bb561d858f4c918451e34504a15, type: 3}
+  - {fileID: 21300000, guid: 2293861712fae9848b6277423ba6a7ad, type: 3}
+  - {fileID: 21300000, guid: 918b6da801d2b704f8582665c504c607, type: 3}
+  - {fileID: 21300000, guid: 3dac0aa98a9606b4fa758b3e467deb61, type: 3}
+  - {fileID: 21300000, guid: c3a82dfa064077349ba6133718df59a2, type: 3}
+  - {fileID: 21300000, guid: ca7d82db24c156c4f9ada3a8dddc3844, type: 3}
+  - {fileID: 21300000, guid: 1abc74ace6819c24ab4599391d964259, type: 3}
+  - {fileID: 21300000, guid: 3f8faaed97e72044fb334892272489bd, type: 3}
+  - {fileID: 21300000, guid: 3282bb1ebab7fd84383a58c43b0930de, type: 3}
+  - {fileID: 21300000, guid: 7202ccfeb07bb324c974bc89e563b980, type: 3}
+  - {fileID: 21300000, guid: 0cf09e9f391b262408d6a499b64ff010, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Hit_2
+  - Dead
+  - Hit_2
+  - Hit
+  - Mouth
+  - Hit
+  - Body
+  - Body
+  - Hit
+  - Mouth
+  - Body
+  - Mouth
+  - Attack
+  - Hit_2
+  - Shadow
+  - Attack
+  - Attack
+  m_RenderDataMap: {}
+  m_Tag: Octopus
+  m_IsVariant: 0

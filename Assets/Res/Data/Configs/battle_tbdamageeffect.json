@@ -1,0 +1,32 @@
+[
+  {
+    "id": 3001,
+    "name": "普攻伤害",
+    "attr": 101,
+    "ratio": 10000,
+    "fixedValue": 0,
+    "damageElement": 0,
+    "canCrit": true,
+    "hitCount": 1
+  },
+  {
+    "id": 3002,
+    "name": "火球命中伤害",
+    "attr": 101,
+    "ratio": 12000,
+    "fixedValue": 0,
+    "damageElement": 0,
+    "canCrit": true,
+    "hitCount": 1
+  },
+  {
+    "id": 3003,
+    "name": "燃烧周期伤害",
+    "attr": 101,
+    "ratio": 3000,
+    "fixedValue": 0,
+    "damageElement": 1,
+    "canCrit": false,
+    "hitCount": 0
+  }
+]

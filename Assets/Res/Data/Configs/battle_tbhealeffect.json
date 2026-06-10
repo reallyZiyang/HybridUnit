@@ -1,0 +1,18 @@
+[
+  {
+    "id": 4001,
+    "name": "小治疗",
+    "attr": 102,
+    "ratio": 1000,
+    "fixedValue": 0,
+    "canCrit": false
+  },
+  {
+    "id": 4002,
+    "name": "固定回血",
+    "attr": 0,
+    "ratio": 0,
+    "fixedValue": 50,
+    "canCrit": false
+  }
+]

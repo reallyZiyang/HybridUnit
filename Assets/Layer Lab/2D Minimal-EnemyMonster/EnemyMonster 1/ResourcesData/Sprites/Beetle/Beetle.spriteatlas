@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &3004045549
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Beetle
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: a72c9e51af8ac5440bb3cf6f3fd8d16a, type: 3}
+    - {fileID: 2800000, guid: e1d0cd1cc593c2b439345b8f2863aa70, type: 3}
+    - {fileID: 102900000, guid: 2ed8d1ee34118c845b87f8dea603feeb, type: 3}
+    - {fileID: 102900000, guid: f1dcfd6101914e74f90665b23caa0997, type: 3}
+    - {fileID: 102900000, guid: 5943c7232deaa7d4b824933ce8e3e510, type: 3}
+    - {fileID: 102900000, guid: 0a37360b28a5b5844b4c749601bd12b6, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 85c007f07fd510c4e8534eb7268e0113: 21300000
+    - a72c9e51af8ac5440bb3cf6f3fd8d16a: 21300000
+    - 61d4ce22e0bb751479c642fccc4f48b4: 21300000
+    - 05e9c0d35ad357146a07de51587842a5: 21300000
+    - a4caca05df202914aa0aa99b59c658d7: 21300000
+    - f92fe867bdd337c4e834f31bbe162209: 21300000
+    - dd283338315dce44a8672659a624a57f: 21300000
+    - 9881b178fca7a3646984495a57ff7b30: 21300000
+    - d748e61971f9c104e9607d3b4536588f: 21300000
+    - 08e7ff2bb67e29c4da6e0d1f1d068de4: 21300000
+    - dbedb75b9d0340249a42a60a95bccd5e: 21300000
+    - e1d0cd1cc593c2b439345b8f2863aa70: 21300000
+    - e8b43bdc08e131d42a286b533b83e892: 21300000
+    - adf5f4fc007fe2b45aa567c5424e16ab: 21300000
+    - 153edc8dfc3cbba45b912775f5c51bf4: 21300000
+    - 28fb679decab39e449765de68bd4a8a6: 21300000
+    - 3cf3545e6839c454389a8f4463a30f9f: 21300000
+    - 2b64d44fc78e7e94885ba21036038d56: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 85c007f07fd510c4e8534eb7268e0113, type: 3}
+  - {fileID: 21300000, guid: a72c9e51af8ac5440bb3cf6f3fd8d16a, type: 3}
+  - {fileID: 21300000, guid: 61d4ce22e0bb751479c642fccc4f48b4, type: 3}
+  - {fileID: 21300000, guid: 05e9c0d35ad357146a07de51587842a5, type: 3}
+  - {fileID: 21300000, guid: a4caca05df202914aa0aa99b59c658d7, type: 3}
+  - {fileID: 21300000, guid: f92fe867bdd337c4e834f31bbe162209, type: 3}
+  - {fileID: 21300000, guid: dd283338315dce44a8672659a624a57f, type: 3}
+  - {fileID: 21300000, guid: 9881b178fca7a3646984495a57ff7b30, type: 3}
+  - {fileID: 21300000, guid: d748e61971f9c104e9607d3b4536588f, type: 3}
+  - {fileID: 21300000, guid: 08e7ff2bb67e29c4da6e0d1f1d068de4, type: 3}
+  - {fileID: 21300000, guid: dbedb75b9d0340249a42a60a95bccd5e, type: 3}
+  - {fileID: 21300000, guid: e1d0cd1cc593c2b439345b8f2863aa70, type: 3}
+  - {fileID: 21300000, guid: e8b43bdc08e131d42a286b533b83e892, type: 3}
+  - {fileID: 21300000, guid: adf5f4fc007fe2b45aa567c5424e16ab, type: 3}
+  - {fileID: 21300000, guid: 153edc8dfc3cbba45b912775f5c51bf4, type: 3}
+  - {fileID: 21300000, guid: 28fb679decab39e449765de68bd4a8a6, type: 3}
+  - {fileID: 21300000, guid: 3cf3545e6839c454389a8f4463a30f9f, type: 3}
+  - {fileID: 21300000, guid: 2b64d44fc78e7e94885ba21036038d56, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Hit
+  - Dead
+  - Attack
+  - Body
+  - Head
+  - Hit
+  - Attack
+  - Hit
+  - Body
+  - Body
+  - Head
+  - Shadow
+  - Attack
+  - Head
+  - Body
+  - Head
+  - Attack
+  - Hit
+  m_RenderDataMap: {}
+  m_Tag: Beetle
+  m_IsVariant: 0

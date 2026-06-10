@@ -1,0 +1,176 @@
+{
+    "FileVersion": "2025.9.30",
+    "EnableAddressable": true,
+    "SupportExtensionless": true,
+    "LocationToLower": false,
+    "IncludeAssetGUID": false,
+    "ReplaceAssetPathWithAddress": false,
+    "OutputNameStyle": 0,
+    "BuildBundleType": 1,
+    "BuildPipeline": "EditorSimulateBuildPipeline",
+    "PackageName": "GameArt",
+    "PackageVersion": "Simulate",
+    "PackageNote": "2026/6/11 1:47:55",
+    "AssetList": [
+        {
+            "Address": "animal_tbanimal",
+            "AssetPath": "Assets/Res/Data/Configs/animal_tbanimal.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbaddbuffeffect",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbaddbuffeffect.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbbuff",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbbuff.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbdamageeffect",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbdamageeffect.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbhealeffect",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbhealeffect.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbprojectileeffect",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbprojectileeffect.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbskill",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbskill.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbunit",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbunit.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "global_tbglobal",
+            "AssetPath": "Assets/Res/Data/Configs/global_tbglobal.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "global_tblocalization",
+            "AssetPath": "Assets/Res/Data/Configs/global_tblocalization.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "UI_Palette",
+            "AssetPath": "Assets/Res/Data/Settings/UI_Palette.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "Animal_Cat_AnimationVit",
+            "AssetPath": "Assets/Res/Monster/Animal/Animal_Cat_AnimationVit.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "Animal_Dog_AnimationVit",
+            "AssetPath": "Assets/Res/Monster/Animal/Animal_Dog_AnimationVit.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "AnimationVit_RuntimeAtlas_18c0b587c5afdb37",
+            "AssetPath": "Assets/Res/Monster/Animal/AnimationVit_RuntimeAtlas_18c0b587c5afdb37.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "Cat",
+            "AssetPath": "Assets/Res/Monster/Animal/Cat.prefab",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "Dog",
+            "AssetPath": "Assets/Res/Monster/Animal/Dog.prefab",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        }
+    ],
+    "BundleList": [
+        {
+            "BundleName": "assets_res_data_configs.bundle",
+            "UnityCRC": 0,
+            "FileHash": "00245fec3888b7861514533b7e1997a3",
+            "FileCRC": 0,
+            "FileSize": 6409,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_res_data_settings.bundle",
+            "UnityCRC": 0,
+            "FileHash": "19dc3d13b310ad1f673393d19737ea24",
+            "FileCRC": 0,
+            "FileSize": 436,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_res_monster_animal.bundle",
+            "UnityCRC": 0,
+            "FileHash": "996b5c793021fc9d86aeeff75cea8cff",
+            "FileCRC": 0,
+            "FileSize": 933246,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        }
+    ]
+}

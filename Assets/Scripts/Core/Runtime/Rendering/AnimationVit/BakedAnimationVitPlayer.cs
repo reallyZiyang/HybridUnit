@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public sealed class BakedAnimationVitPlayer : BakedTickPlayer
 {
+    private static readonly int RenderTrans = Shader.PropertyToID("_RenderTrans");
     private static readonly int FrameIndexId = Shader.PropertyToID("_FrameIndex");
     private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
     private static readonly int MainTexId = Shader.PropertyToID("_MainTex");
@@ -19,6 +20,9 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
     [SerializeField] private float speed = 1f;
     [SerializeField] private Color color = Color.white;
     [SerializeField, Min(0)] private int previewFrame;
+
+    [SerializeField]
+    private Vector2 renderOffset = new Vector2(0, 0);
 
     private BakedAnimationVitClip currentClip;
     private float time;
@@ -181,6 +185,7 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
         MaterialPropertyBlock propertyBlock = BeginPropertyBlock();
         propertyBlock.SetFloat(FrameIndexId, absoluteFrame);
         propertyBlock.SetColor(InstanceColorId, color);
+        //propertyBlock.SetVector(RenderTrans, renderTrans);
         ApplyPropertyBlock();
     }
 

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360">
+  <rect width="1200" height="360" fill="#eef0f2"/>
+
+  <!-- Concept 01: floating core, 2 parts: body + core -->
+  <g id="floating_core" transform="translate(150 180)">
+    <ellipse cx="0" cy="0" rx="112" ry="70" fill="#273039" stroke="#12171c" stroke-width="8"/>
+    <polygon points="-92,-8 -58,-42 42,-52 98,-14 70,46 -34,58 -96,24" fill="#313b46"/>
+    <circle cx="-42" cy="0" r="22" fill="#35c7b7" stroke="#11181c" stroke-width="6"/>
+    <circle cx="-42" cy="0" r="8" fill="#e7fff8"/>
+  </g>
+
+  <!-- Concept 02: sliding blob, 2 parts: body + core -->
+  <g id="flat_blob" transform="translate(440 190)">
+    <path d="M-120 36 C-105 -36 -52 -72 28 -66 C92 -60 126 -16 118 38 C84 62 -78 66 -120 36 Z" fill="#2f3a34" stroke="#141a17" stroke-width="8"/>
+    <path d="M-76 26 C-56 -12 -16 -30 34 -28 C74 -26 94 -4 94 30 C52 42 -36 44 -76 26 Z" fill="#3d4a42"/>
+    <circle cx="-36" cy="-8" r="18" fill="#8be04f" stroke="#11170f" stroke-width="6"/>
+  </g>
+
+  <!-- Concept 03: shield pod, 3 parts: body + shield + core -->
+  <g id="shield_pod" transform="translate(735 180)">
+    <polygon points="-118,-54 36,-72 118,-26 112,50 10,78 -118,46" fill="#30343c" stroke="#121419" stroke-width="8"/>
+    <polygon points="-118,-54 -56,-66 -38,56 -118,46" fill="#57606a" stroke="#121419" stroke-width="6"/>
+    <rect x="-8" y="-24" width="52" height="48" rx="4" fill="#d3a22d" stroke="#15120a" stroke-width="6"/>
+  </g>
+
+  <!-- Concept 04: spore drone, 3 parts: body + fins + core -->
+  <g id="spore_drone" transform="translate(1030 180)">
+    <polygon points="-128,-8 -82,-34 -82,34" fill="#353c45" stroke="#12161b" stroke-width="7"/>
+    <polygon points="92,-34 132,-4 92,34" fill="#353c45" stroke="#12161b" stroke-width="7"/>
+    <circle cx="0" cy="0" r="78" fill="#2b3038" stroke="#11161b" stroke-width="8"/>
+    <polygon points="-42,-44 46,-34 58,36 -26,54 -66,10" fill="#38404a"/>
+    <circle cx="-16" cy="0" r="20" fill="#8d63ff" stroke="#151022" stroke-width="6"/>
+  </g>
+</svg>

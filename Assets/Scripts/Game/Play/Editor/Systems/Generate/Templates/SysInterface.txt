@@ -1,0 +1,8 @@
+﻿using UniKit.Framework.Base;
+
+namespace #NAMESPACE#
+{
+    public interface #NAME# : ISystem
+    {
+    }
+}

@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &1051504481
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Crab
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: f168ca7d243edc84f8eae1c1de742f3b, type: 3}
+    - {fileID: 2800000, guid: 7976072818947c64fa9c329236950626, type: 3}
+    - {fileID: 102900000, guid: 5392f5fb4ce3a8a4c832405f4060840d, type: 3}
+    - {fileID: 102900000, guid: 97944aafd9f71b340a45047c2dc45fef, type: 3}
+    - {fileID: 102900000, guid: 4b691292057bf30459f676a9cb1f0eff, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 55707620e6d1fd644892f0e2c2c88e27: 21300000
+    - 10edeae0023e3a74f9da8e36148c100a: 21300000
+    - 1ca8abe0f3069e742b19e35515e17b58: 21300000
+    - 79632301b297c2e498b8a1dd7e85c350: 21300000
+    - 5710eaa1a48517b47bf59cf213adb600: 21300000
+    - 8816c842536d70941ba2946e45e552b3: 21300000
+    - 4785c243252100a45b3f4b7e12fbae00: 21300000
+    - 2aac593590e702749969943fa3e3443c: 21300000
+    - 37af9a7556526c347925bea71e22b730: 21300000
+    - 72ab56c5ad1fbbf4c9774c88252e30ea: 21300000
+    - 63e678c5ca5b37c4091c2524cbc40b80: 21300000
+    - fe841f171083d674593708507d26d0f2: 21300000
+    - 414cc537ea899524db22d7bc50b0cc22: 21300000
+    - b3008e47f92044e43919eb13dca4feef: 21300000
+    - 6592ce87b2902c24492b7175731175f4: 21300000
+    - 7976072818947c64fa9c329236950626: 21300000
+    - 5f29e859e4e6aef40aba40c67698f4d8: 21300000
+    - abd8cf996083002489f22050cbd8c99b: 21300000
+    - 450bdeb9fd2e000489380fc62602ad6d: 21300000
+    - 7d0a502a191871e48b2f9522ecf7585e: 21300000
+    - 491bda6a4131eca45b344159d37146f3: 21300000
+    - 50c042fa2deadeb4d81713057837476a: 21300000
+    - e529e87b16172854893f989c62f9bc79: 21300000
+    - 2645336d1d161264d8fe8b42457f17f6: 21300000
+    - f168ca7d243edc84f8eae1c1de742f3b: 21300000
+    - cbd6df0e0b7a5ed4282e9bdf14882a25: 21300000
+    - a2b7531e81883a54db1e4516bb91c99e: 21300000
+    - 6f950cae0d0dabc4ea52e7efb3d66c85: 21300000
+    - 1fe851cedb8bf9c4cad007ece4f024f6: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 55707620e6d1fd644892f0e2c2c88e27, type: 3}
+  - {fileID: 21300000, guid: 10edeae0023e3a74f9da8e36148c100a, type: 3}
+  - {fileID: 21300000, guid: 1ca8abe0f3069e742b19e35515e17b58, type: 3}
+  - {fileID: 21300000, guid: 79632301b297c2e498b8a1dd7e85c350, type: 3}
+  - {fileID: 21300000, guid: 5710eaa1a48517b47bf59cf213adb600, type: 3}
+  - {fileID: 21300000, guid: 8816c842536d70941ba2946e45e552b3, type: 3}
+  - {fileID: 21300000, guid: 4785c243252100a45b3f4b7e12fbae00, type: 3}
+  - {fileID: 21300000, guid: 2aac593590e702749969943fa3e3443c, type: 3}
+  - {fileID: 21300000, guid: 37af9a7556526c347925bea71e22b730, type: 3}
+  - {fileID: 21300000, guid: 72ab56c5ad1fbbf4c9774c88252e30ea, type: 3}
+  - {fileID: 21300000, guid: 63e678c5ca5b37c4091c2524cbc40b80, type: 3}
+  - {fileID: 21300000, guid: fe841f171083d674593708507d26d0f2, type: 3}
+  - {fileID: 21300000, guid: 414cc537ea899524db22d7bc50b0cc22, type: 3}
+  - {fileID: 21300000, guid: b3008e47f92044e43919eb13dca4feef, type: 3}
+  - {fileID: 21300000, guid: 6592ce87b2902c24492b7175731175f4, type: 3}
+  - {fileID: 21300000, guid: 7976072818947c64fa9c329236950626, type: 3}
+  - {fileID: 21300000, guid: 5f29e859e4e6aef40aba40c67698f4d8, type: 3}
+  - {fileID: 21300000, guid: abd8cf996083002489f22050cbd8c99b, type: 3}
+  - {fileID: 21300000, guid: 450bdeb9fd2e000489380fc62602ad6d, type: 3}
+  - {fileID: 21300000, guid: 7d0a502a191871e48b2f9522ecf7585e, type: 3}
+  - {fileID: 21300000, guid: 491bda6a4131eca45b344159d37146f3, type: 3}
+  - {fileID: 21300000, guid: 50c042fa2deadeb4d81713057837476a, type: 3}
+  - {fileID: 21300000, guid: e529e87b16172854893f989c62f9bc79, type: 3}
+  - {fileID: 21300000, guid: 2645336d1d161264d8fe8b42457f17f6, type: 3}
+  - {fileID: 21300000, guid: f168ca7d243edc84f8eae1c1de742f3b, type: 3}
+  - {fileID: 21300000, guid: cbd6df0e0b7a5ed4282e9bdf14882a25, type: 3}
+  - {fileID: 21300000, guid: a2b7531e81883a54db1e4516bb91c99e, type: 3}
+  - {fileID: 21300000, guid: 6f950cae0d0dabc4ea52e7efb3d66c85, type: 3}
+  - {fileID: 21300000, guid: 1fe851cedb8bf9c4cad007ece4f024f6, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Hit_2
+  - Leg4
+  - Body
+  - Hit
+  - Arm
+  - Body
+  - Leg1
+  - Arm2
+  - Leg2
+  - Body
+  - Leg2
+  - Arm2
+  - Hit
+  - Leg3
+  - Leg1
+  - Shadow
+  - Leg4
+  - Hit_2
+  - Leg2
+  - Leg4
+  - Arm2
+  - Arm
+  - Leg1
+  - Arm
+  - Dead
+  - Hit
+  - Leg3
+  - Hit_2
+  - Leg3
+  m_RenderDataMap: {}
+  m_Tag: Crab
+  m_IsVariant: 0

@@ -1,0 +1,493 @@
+using Game.Play.Battle.Unit;
+using UnityEngine;
+
+namespace Game.Play.Battle.Collision
+{
+    public sealed class BattleCollisionManager
+    {
+        private const float MinCellSize = 0.0001f;
+
+        private readonly int capacity;
+        private readonly Vector2 gridMin;
+        private readonly int gridWidth;
+        private readonly int gridHeight;
+        private readonly float cellSize;
+        private readonly float largeQueryCellRatio;
+
+        private readonly Vector2[] positions;
+        private readonly float[] radii;
+        private readonly int[] camps;
+        private readonly int[] states;
+        private readonly int[] layers;
+        private readonly int[] renderHandles;
+        private readonly BattleUnitHandle[] unitHandles;
+        private readonly bool[] active;
+        private readonly int[] generations;
+        private readonly int[] freeStack;
+
+        private readonly int[] cellHeads;
+        private readonly int[] linkTargets;
+        private readonly int[] linkNext;
+        private readonly int[] queryStamp;
+
+        private int allocatedCount;
+        private int activeCount;
+        private int freeCount;
+        private int linkCount;
+        private int currentQueryId;
+        private float maxTargetRadius;
+        private bool gridDirty = true;
+        private bool gridUsable = true;
+
+        public BattleCollisionManager(
+            int capacity,
+            Vector2 gridMin,
+            int gridWidth,
+            int gridHeight,
+            float cellSize,
+            float largeQueryCellRatio = 0.35f,
+            int maxGridLinks = 0)
+        {
+            this.capacity = Mathf.Max(1, capacity);
+            this.gridMin = gridMin;
+            this.gridWidth = Mathf.Max(1, gridWidth);
+            this.gridHeight = Mathf.Max(1, gridHeight);
+            this.cellSize = Mathf.Max(MinCellSize, cellSize);
+            this.largeQueryCellRatio = Mathf.Clamp01(largeQueryCellRatio);
+
+            int safeLinkCapacity = maxGridLinks > 0 ? maxGridLinks : this.capacity * 16;
+
+            positions = new Vector2[this.capacity];
+            radii = new float[this.capacity];
+            camps = new int[this.capacity];
+            states = new int[this.capacity];
+            layers = new int[this.capacity];
+            renderHandles = new int[this.capacity];
+            unitHandles = new BattleUnitHandle[this.capacity];
+            active = new bool[this.capacity];
+            generations = new int[this.capacity];
+            freeStack = new int[this.capacity];
+
+            cellHeads = new int[this.gridWidth * this.gridHeight];
+            linkTargets = new int[Mathf.Max(1, safeLinkCapacity)];
+            linkNext = new int[Mathf.Max(1, safeLinkCapacity)];
+            queryStamp = new int[this.capacity];
+
+            ClearCellHeads();
+        }
+
+        public int Capacity => capacity;
+        public int ActiveCount => activeCount;
+        public bool IsGridDirty => gridDirty;
+
+        public BattleCollisionTargetHandle RegisterTarget(
+            Vector2 position,
+            float radius,
+            int camp,
+            int state,
+            int layer,
+            int renderHandle,
+            BattleUnitHandle unitHandle = default)
+        {
+            int index;
+            if (freeCount > 0)
+            {
+                index = freeStack[--freeCount];
+            }
+            else
+            {
+                if (allocatedCount >= capacity)
+                {
+                    Debug.LogError($"[BattleCollision] Target capacity exceeded: {capacity}");
+                    return BattleCollisionTargetHandle.Invalid;
+                }
+
+                index = allocatedCount++;
+            }
+
+            int generation = generations[index] + 1;
+            generations[index] = generation > 0 ? generation : 1;
+            positions[index] = position;
+            radii[index] = Mathf.Max(0f, radius);
+            camps[index] = camp;
+            states[index] = state;
+            layers[index] = layer;
+            renderHandles[index] = renderHandle;
+            unitHandles[index] = unitHandle;
+            active[index] = true;
+            activeCount++;
+            gridDirty = true;
+
+            return new BattleCollisionTargetHandle(index, generations[index]);
+        }
+
+        public bool UnregisterTarget(BattleCollisionTargetHandle target)
+        {
+            if (!IsValidTarget(target))
+            {
+                return false;
+            }
+
+            int index = target.index;
+            active[index] = false;
+            unitHandles[index] = BattleUnitHandle.Invalid;
+            freeStack[freeCount++] = index;
+            activeCount--;
+            gridDirty = true;
+            return true;
+        }
+
+        public bool UpdateTargetPosition(BattleCollisionTargetHandle target, Vector2 position)
+        {
+            if (!IsValidTarget(target))
+            {
+                return false;
+            }
+
+            positions[target.index] = position;
+            gridDirty = true;
+            return true;
+        }
+
+        public bool UpdateTargetRadius(BattleCollisionTargetHandle target, float radius)
+        {
+            if (!IsValidTarget(target))
+            {
+                return false;
+            }
+
+            radii[target.index] = Mathf.Max(0f, radius);
+            gridDirty = true;
+            return true;
+        }
+
+        public bool UpdateTargetFilter(BattleCollisionTargetHandle target, int camp, int state, int layer)
+        {
+            if (!IsValidTarget(target))
+            {
+                return false;
+            }
+
+            camps[target.index] = camp;
+            states[target.index] = state;
+            layers[target.index] = layer;
+            return true;
+        }
+
+        public bool IsValidTarget(BattleCollisionTargetHandle target)
+        {
+            return target.index >= 0
+                && target.index < capacity
+                && active[target.index]
+                && generations[target.index] == target.generation;
+        }
+
+        public BattleUnitHandle GetUnitHandle(int targetIndex)
+        {
+            if (targetIndex < 0 || targetIndex >= capacity || !active[targetIndex])
+            {
+                return BattleUnitHandle.Invalid;
+            }
+
+            return unitHandles[targetIndex];
+        }
+
+        public int GetRenderHandle(int targetIndex)
+        {
+            if (targetIndex < 0 || targetIndex >= capacity || !active[targetIndex])
+            {
+                return -1;
+            }
+
+            return renderHandles[targetIndex];
+        }
+
+        public void RebuildGrid()
+        {
+            ClearCellHeads();
+            linkCount = 0;
+            maxTargetRadius = 0f;
+            gridUsable = true;
+
+            for (int i = 0; i < allocatedCount; i++)
+            {
+                if (!active[i])
+                {
+                    continue;
+                }
+
+                float radius = radii[i];
+                if (radius > maxTargetRadius)
+                {
+                    maxTargetRadius = radius;
+                }
+
+                Rect targetAabb = BattleCollisionMath.CircleAabb(positions[i], radius);
+                if (!TryGetClampedCellRange(targetAabb, out int minX, out int minY, out int maxX, out int maxY))
+                {
+                    continue;
+                }
+
+                for (int y = minY; y <= maxY; y++)
+                {
+                    for (int x = minX; x <= maxX; x++)
+                    {
+                        if (!TryInsertToCell(CellIndex(x, y), i))
+                        {
+                            gridUsable = false;
+                            gridDirty = false;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            gridDirty = false;
+        }
+
+        public int Query(in BattleCollisionShape shape, in BattleCollisionQueryOptions options, BattleCollisionQueryBuffer buffer)
+        {
+            if (buffer == null)
+            {
+                Debug.LogError("[BattleCollision] Query buffer is null.");
+                return 0;
+            }
+
+            buffer.Clear();
+            if (activeCount == 0)
+            {
+                return 0;
+            }
+
+            if (gridDirty)
+            {
+                RebuildGrid();
+            }
+
+            Rect broadAabb = BattleCollisionMath.Expand(BattleCollisionMath.ShapeAabb(shape), maxTargetRadius);
+            if (!gridUsable || ShouldFallback(broadAabb))
+            {
+                return QueryAllTargets(shape, options, buffer);
+            }
+
+            if (!TryGetClampedCellRange(broadAabb, out int minX, out int minY, out int maxX, out int maxY))
+            {
+                return 0;
+            }
+
+            BeginQueryStamp();
+            Vector2 sortOrigin = BattleCollisionMath.SortOrigin(shape);
+
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    int link = cellHeads[CellIndex(x, y)];
+                    while (link >= 0)
+                    {
+                        int targetIndex = linkTargets[link];
+                        link = linkNext[link];
+
+                        if (queryStamp[targetIndex] == currentQueryId)
+                        {
+                            continue;
+                        }
+
+                        queryStamp[targetIndex] = currentQueryId;
+                        if (!TryAppendHit(targetIndex, shape, options, sortOrigin, buffer))
+                        {
+                            return FinishQuery(options, buffer);
+                        }
+                    }
+                }
+            }
+
+            return FinishQuery(options, buffer);
+        }
+
+        public int BruteForceQuery(in BattleCollisionShape shape, in BattleCollisionQueryOptions options, BattleCollisionQueryBuffer buffer)
+        {
+            if (buffer == null)
+            {
+                Debug.LogError("[BattleCollision] Query buffer is null.");
+                return 0;
+            }
+
+            buffer.Clear();
+            return QueryAllTargets(shape, options, buffer);
+        }
+
+        private int QueryAllTargets(in BattleCollisionShape shape, in BattleCollisionQueryOptions options, BattleCollisionQueryBuffer buffer)
+        {
+            Vector2 sortOrigin = BattleCollisionMath.SortOrigin(shape);
+            for (int i = 0; i < allocatedCount; i++)
+            {
+                if (!TryAppendHit(i, shape, options, sortOrigin, buffer))
+                {
+                    return FinishQuery(options, buffer);
+                }
+            }
+
+            return FinishQuery(options, buffer);
+        }
+
+        private bool TryAppendHit(
+            int targetIndex,
+            in BattleCollisionShape shape,
+            in BattleCollisionQueryOptions options,
+            Vector2 sortOrigin,
+            BattleCollisionQueryBuffer buffer)
+        {
+            if (!PassFilter(targetIndex, options))
+            {
+                return true;
+            }
+
+            if (!BattleCollisionMath.ShapeHitsCircle(shape, positions[targetIndex], radii[targetIndex]))
+            {
+                return true;
+            }
+
+            float sortDistance = options.sortByDistance ? (positions[targetIndex] - sortOrigin).sqrMagnitude : 0f;
+            if (!buffer.TryAdd(targetIndex, sortDistance))
+            {
+                return false;
+            }
+
+            return options.sortByDistance || options.maxHits <= 0 || buffer.Count < options.maxHits;
+        }
+
+        private int FinishQuery(in BattleCollisionQueryOptions options, BattleCollisionQueryBuffer buffer)
+        {
+            if (options.sortByDistance)
+            {
+                SortBufferByDistance(buffer);
+                if (options.maxHits > 0 && buffer.Count > options.maxHits)
+                {
+                    buffer.Trim(options.maxHits);
+                }
+            }
+
+            return buffer.Count;
+        }
+
+        private bool PassFilter(int targetIndex, in BattleCollisionQueryOptions options)
+        {
+            if (targetIndex < 0 || targetIndex >= capacity || !active[targetIndex])
+            {
+                return false;
+            }
+
+            if (options.campMask != 0 && !PassIndexMask(options.campMask, camps[targetIndex]))
+            {
+                return false;
+            }
+
+            if (options.stateMask != 0 && (options.stateMask & states[targetIndex]) == 0)
+            {
+                return false;
+            }
+
+            if (options.layerMask != 0 && !PassIndexMask(options.layerMask, layers[targetIndex]))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool PassIndexMask(int mask, int index)
+        {
+            return index >= 0 && index < 32 && (mask & (1 << index)) != 0;
+        }
+
+        private bool ShouldFallback(Rect broadAabb)
+        {
+            if (!TryGetClampedCellRange(broadAabb, out int minX, out int minY, out int maxX, out int maxY))
+            {
+                return false;
+            }
+
+            int coveredCells = (maxX - minX + 1) * (maxY - minY + 1);
+            int totalCells = gridWidth * gridHeight;
+            return coveredCells > totalCells * largeQueryCellRatio;
+        }
+
+        private void BeginQueryStamp()
+        {
+            currentQueryId++;
+            if (currentQueryId == int.MaxValue)
+            {
+                System.Array.Clear(queryStamp, 0, queryStamp.Length);
+                currentQueryId = 1;
+            }
+        }
+
+        private bool TryInsertToCell(int cellIndex, int targetIndex)
+        {
+            if (linkCount >= linkTargets.Length)
+            {
+                Debug.LogError($"[BattleCollision] Grid link capacity exceeded: {linkTargets.Length}. Query will fallback to full scan.");
+                return false;
+            }
+
+            int linkIndex = linkCount++;
+            linkTargets[linkIndex] = targetIndex;
+            linkNext[linkIndex] = cellHeads[cellIndex];
+            cellHeads[cellIndex] = linkIndex;
+            return true;
+        }
+
+        private void ClearCellHeads()
+        {
+            for (int i = 0; i < cellHeads.Length; i++)
+            {
+                cellHeads[i] = -1;
+            }
+        }
+
+        private bool TryGetClampedCellRange(Rect aabb, out int minX, out int minY, out int maxX, out int maxY)
+        {
+            minX = Mathf.FloorToInt((aabb.xMin - gridMin.x) / cellSize);
+            minY = Mathf.FloorToInt((aabb.yMin - gridMin.y) / cellSize);
+            maxX = Mathf.FloorToInt((aabb.xMax - gridMin.x) / cellSize);
+            maxY = Mathf.FloorToInt((aabb.yMax - gridMin.y) / cellSize);
+
+            if (maxX < 0 || maxY < 0 || minX >= gridWidth || minY >= gridHeight)
+            {
+                return false;
+            }
+
+            minX = Mathf.Clamp(minX, 0, gridWidth - 1);
+            minY = Mathf.Clamp(minY, 0, gridHeight - 1);
+            maxX = Mathf.Clamp(maxX, 0, gridWidth - 1);
+            maxY = Mathf.Clamp(maxY, 0, gridHeight - 1);
+            return minX <= maxX && minY <= maxY;
+        }
+
+        private int CellIndex(int x, int y)
+        {
+            return y * gridWidth + x;
+        }
+
+        private static void SortBufferByDistance(BattleCollisionQueryBuffer buffer)
+        {
+            for (int i = 1; i < buffer.Count; i++)
+            {
+                int target = buffer.TargetIndices[i];
+                float distance = buffer.SortDistances[i];
+                int j = i - 1;
+
+                while (j >= 0 && buffer.SortDistances[j] > distance)
+                {
+                    buffer.TargetIndices[j + 1] = buffer.TargetIndices[j];
+                    buffer.SortDistances[j + 1] = buffer.SortDistances[j];
+                    j--;
+                }
+
+                buffer.TargetIndices[j + 1] = target;
+                buffer.SortDistances[j + 1] = distance;
+            }
+        }
+    }
+}

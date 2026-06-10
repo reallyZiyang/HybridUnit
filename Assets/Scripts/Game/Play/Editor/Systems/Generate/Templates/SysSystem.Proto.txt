@@ -1,0 +1,21 @@
+﻿using SprotoType;
+using Game.Play.Systems.Common.Network;
+
+namespace #NAMESPACE#
+{
+    public partial class #NAME#
+    {
+        #region Auto Gen Proto
+
+        private void InitProto()
+        {
+#CALLBACKS#
+        }
+
+#METHODS#
+
+        #endregion  Auto Gen Proto
+
+#CUSTOM_BLOCK#
+    }
+}

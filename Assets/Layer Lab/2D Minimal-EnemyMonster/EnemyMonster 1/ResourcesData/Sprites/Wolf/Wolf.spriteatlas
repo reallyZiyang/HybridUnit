@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &2573831807
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Wolf
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 48a496d9b15318147b29b417a770499c, type: 3}
+    - {fileID: 2800000, guid: 8b85b1c2dc1b7b6409139879967c9252, type: 3}
+    - {fileID: 102900000, guid: 74722687167b0534ca7e3ddba794887b, type: 3}
+    - {fileID: 102900000, guid: 01c59d75ff6267d4ebcbfbd9237b91d6, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 18eec9208c0c27c49a36130a113e14ba: 21300000
+    - 82b9bc90f1cc1e845bb73ecdf50dd645: 21300000
+    - 17e5ddc0f358a134a8c3e019c5dd9620: 21300000
+    - d66e8c61dc411894e989dc62b4d4f0c4: 21300000
+    - 87c5cba129185084bb66278d715657ab: 21300000
+    - fae52aa259735db4aa98be29decbf9b6: 21300000
+    - 8b85b1c2dc1b7b6409139879967c9252: 21300000
+    - fabb12f288014b44eab958c2f4b5be61: 21300000
+    - ccb2eac3df51cd24380168256a0e7662: 21300000
+    - 8e2fcb34489e7b54c9519368aac1934d: 21300000
+    - ca78c495583dd8846be9eb0ac1fe8e86: 21300000
+    - 71c5cab52823c9b489c073226973cfbb: 21300000
+    - 825d06c8e798c1d49a327f83a5650314: 21300000
+    - 45d51ad899b83fe4e9d74de25b83efb5: 21300000
+    - 48a496d9b15318147b29b417a770499c: 21300000
+    - 11dae33af84ae28448c1a686dc32177a: 21300000
+    - 6395869ba25f0b846ac2c673c7cee700: 21300000
+    - cd04cb4cbcc83fb4992e156b3f48b996: 21300000
+    - ac6f1d7df487da646a0c59c1bc520250: 21300000
+    - 04b9080ea374fe440a99dc9279c61ab5: 21300000
+    - 92ac086f44755664ba3b272e28932ad8: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 18eec9208c0c27c49a36130a113e14ba, type: 3}
+  - {fileID: 21300000, guid: 82b9bc90f1cc1e845bb73ecdf50dd645, type: 3}
+  - {fileID: 21300000, guid: 17e5ddc0f358a134a8c3e019c5dd9620, type: 3}
+  - {fileID: 21300000, guid: d66e8c61dc411894e989dc62b4d4f0c4, type: 3}
+  - {fileID: 21300000, guid: 87c5cba129185084bb66278d715657ab, type: 3}
+  - {fileID: 21300000, guid: fae52aa259735db4aa98be29decbf9b6, type: 3}
+  - {fileID: 21300000, guid: 8b85b1c2dc1b7b6409139879967c9252, type: 3}
+  - {fileID: 21300000, guid: fabb12f288014b44eab958c2f4b5be61, type: 3}
+  - {fileID: 21300000, guid: ccb2eac3df51cd24380168256a0e7662, type: 3}
+  - {fileID: 21300000, guid: 8e2fcb34489e7b54c9519368aac1934d, type: 3}
+  - {fileID: 21300000, guid: ca78c495583dd8846be9eb0ac1fe8e86, type: 3}
+  - {fileID: 21300000, guid: 71c5cab52823c9b489c073226973cfbb, type: 3}
+  - {fileID: 21300000, guid: 825d06c8e798c1d49a327f83a5650314, type: 3}
+  - {fileID: 21300000, guid: 45d51ad899b83fe4e9d74de25b83efb5, type: 3}
+  - {fileID: 21300000, guid: 48a496d9b15318147b29b417a770499c, type: 3}
+  - {fileID: 21300000, guid: 11dae33af84ae28448c1a686dc32177a, type: 3}
+  - {fileID: 21300000, guid: 6395869ba25f0b846ac2c673c7cee700, type: 3}
+  - {fileID: 21300000, guid: cd04cb4cbcc83fb4992e156b3f48b996, type: 3}
+  - {fileID: 21300000, guid: ac6f1d7df487da646a0c59c1bc520250, type: 3}
+  - {fileID: 21300000, guid: 04b9080ea374fe440a99dc9279c61ab5, type: 3}
+  - {fileID: 21300000, guid: 92ac086f44755664ba3b272e28932ad8, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Tail
+  - Attack
+  - Hit
+  - Arm2
+  - Leg
+  - Head
+  - Shadow
+  - Body
+  - Arm2
+  - Leg
+  - Attack
+  - Hit_2
+  - Wing1
+  - Head
+  - Dead
+  - Wing2
+  - Hit
+  - Arm
+  - Arm
+  - Body
+  - Hit_2
+  m_RenderDataMap: {}
+  m_Tag: Wolf
+  m_IsVariant: 0

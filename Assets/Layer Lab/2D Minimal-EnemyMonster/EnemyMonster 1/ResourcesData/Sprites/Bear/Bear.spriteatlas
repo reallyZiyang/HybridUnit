@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &2007547867
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Bear
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 1
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: ee24e439752d0e14892603924fee26ea, type: 3}
+    - {fileID: 2800000, guid: 53690248c3a9dce4b82fabd6b80dfa68, type: 3}
+    - {fileID: 102900000, guid: 37e2bef7b8bada44ca58f0e564a56368, type: 3}
+    - {fileID: 102900000, guid: 2d3dcca811d259645a9ba24a5d02f475, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 0cdb5660cb1077a43bca12da0e58f45f: 21300000
+    - d19515d00b8f8594d9b033fb93dfa22f: 21300000
+    - b3ffbd626a3cf344688d954278110eeb: 21300000
+    - c920edb2c80015d47b48d2440d29ded0: 21300000
+    - 419bbe23f380e914c86f75e7153b7c35: 21300000
+    - 66b80a544c14a4448be7b0a9b5329047: 21300000
+    - 4d92abc466a3e1e4086dc1f74b678705: 21300000
+    - de884e65e33a21a43a1220ded8f52764: 21300000
+    - 0c4f43b647b26464d9698737d22c5888: 21300000
+    - 53690248c3a9dce4b82fabd6b80dfa68: 21300000
+    - ee24e439752d0e14892603924fee26ea: 21300000
+    - 5a43876a2d248354a9d7732bbecaa0ba: 21300000
+    - a6a112aa845653a41b3694874ccd0498: 21300000
+    - bcda863b56be135419f2319370ae675c: 21300000
+    - 57c2778ba09a9d341bf09461bf77a4c7: 21300000
+    - 8f01adbb07b52c54fb19c5ccfa37e19c: 21300000
+    - 82f388fb7973c674baa686a40fdbc4b2: 21300000
+    - d5f4c6ecb68502f4ea6121881f9cf28d: 21300000
+    - 9c1a7f7db5ac18549881b9d308574001: 21300000
+    - 46e4135fb0c7fde419d786a39259c9a8: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 0cdb5660cb1077a43bca12da0e58f45f, type: 3}
+  - {fileID: 21300000, guid: d19515d00b8f8594d9b033fb93dfa22f, type: 3}
+  - {fileID: 21300000, guid: b3ffbd626a3cf344688d954278110eeb, type: 3}
+  - {fileID: 21300000, guid: c920edb2c80015d47b48d2440d29ded0, type: 3}
+  - {fileID: 21300000, guid: 419bbe23f380e914c86f75e7153b7c35, type: 3}
+  - {fileID: 21300000, guid: 66b80a544c14a4448be7b0a9b5329047, type: 3}
+  - {fileID: 21300000, guid: 4d92abc466a3e1e4086dc1f74b678705, type: 3}
+  - {fileID: 21300000, guid: de884e65e33a21a43a1220ded8f52764, type: 3}
+  - {fileID: 21300000, guid: 0c4f43b647b26464d9698737d22c5888, type: 3}
+  - {fileID: 21300000, guid: 53690248c3a9dce4b82fabd6b80dfa68, type: 3}
+  - {fileID: 21300000, guid: ee24e439752d0e14892603924fee26ea, type: 3}
+  - {fileID: 21300000, guid: 5a43876a2d248354a9d7732bbecaa0ba, type: 3}
+  - {fileID: 21300000, guid: a6a112aa845653a41b3694874ccd0498, type: 3}
+  - {fileID: 21300000, guid: bcda863b56be135419f2319370ae675c, type: 3}
+  - {fileID: 21300000, guid: 57c2778ba09a9d341bf09461bf77a4c7, type: 3}
+  - {fileID: 21300000, guid: 8f01adbb07b52c54fb19c5ccfa37e19c, type: 3}
+  - {fileID: 21300000, guid: 82f388fb7973c674baa686a40fdbc4b2, type: 3}
+  - {fileID: 21300000, guid: d5f4c6ecb68502f4ea6121881f9cf28d, type: 3}
+  - {fileID: 21300000, guid: 9c1a7f7db5ac18549881b9d308574001, type: 3}
+  - {fileID: 21300000, guid: 46e4135fb0c7fde419d786a39259c9a8, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Arm2
+  - Hit
+  - Leg
+  - Leg2
+  - Hit_2
+  - Attack
+  - Arm2
+  - Body
+  - Arm
+  - Shadow
+  - Dead
+  - Arm
+  - Head
+  - Body
+  - Hit_2
+  - Leg2
+  - Head
+  - Hit
+  - Attack
+  - Leg
+  m_RenderDataMap: {}
+  m_Tag: Bear
+  m_IsVariant: 0

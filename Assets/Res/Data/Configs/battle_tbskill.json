@@ -1,0 +1,80 @@
+[
+  {
+    "id": 2001,
+    "name": "普攻",
+    "actionName": "attack",
+    "castPreMs": 300,
+    "castBackMs": 200,
+    "cooldownMs": 1000,
+    "targetType": 2,
+    "selectType": 1,
+    "shape": {
+      "shapeType": 1,
+      "radius": 1.2,
+      "width": 0,
+      "length": 0,
+      "angleDeg": 0,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "effects": [
+      {
+        "type": 1,
+        "id": 3001,
+        "value": 10000
+      }
+    ]
+  },
+  {
+    "id": 2002,
+    "name": "火球术",
+    "actionName": "skill_1",
+    "castPreMs": 400,
+    "castBackMs": 300,
+    "cooldownMs": 2000,
+    "targetType": 2,
+    "selectType": 1,
+    "shape": {
+      "shapeType": 0,
+      "radius": 0,
+      "width": 0,
+      "length": 0,
+      "angleDeg": 0,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "effects": [
+      {
+        "type": 4,
+        "id": 6001,
+        "value": 0
+      }
+    ]
+  },
+  {
+    "id": 2101,
+    "name": "怪物撕咬",
+    "actionName": "attack",
+    "castPreMs": 500,
+    "castBackMs": 200,
+    "cooldownMs": 1500,
+    "targetType": 2,
+    "selectType": 1,
+    "shape": {
+      "shapeType": 1,
+      "radius": 1,
+      "width": 0,
+      "length": 0,
+      "angleDeg": 0,
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "effects": [
+      {
+        "type": 1,
+        "id": 3001,
+        "value": 8000
+      }
+    ]
+  }
+]

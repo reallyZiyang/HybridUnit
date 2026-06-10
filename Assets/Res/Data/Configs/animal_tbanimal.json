@@ -1,0 +1,114 @@
+[
+  {
+    "id": 101,
+    "gene": 1,
+    "name": "猫",
+    "product": [
+      {
+        "id": 10002,
+        "value": 1
+      }
+    ],
+    "productInterval": {
+      "min": 10,
+      "max": 15
+    },
+    "lifetime": 90
+  },
+  {
+    "id": 102,
+    "gene": 1,
+    "name": "狗",
+    "product": [
+      {
+        "id": 10002,
+        "value": 2
+      }
+    ],
+    "productInterval": {
+      "min": 10,
+      "max": 15
+    },
+    "lifetime": 90
+  },
+  {
+    "id": 103,
+    "gene": 1,
+    "name": "狐狸",
+    "product": [
+      {
+        "id": 10002,
+        "value": 5
+      }
+    ],
+    "productInterval": {
+      "min": 10,
+      "max": 15
+    },
+    "lifetime": 90
+  },
+  {
+    "id": 201,
+    "gene": 2,
+    "name": "羊",
+    "product": [
+      {
+        "id": 10002,
+        "value": 2
+      }
+    ],
+    "productInterval": {
+      "min": 10,
+      "max": 15
+    },
+    "lifetime": 120
+  },
+  {
+    "id": 202,
+    "gene": 2,
+    "name": "牛",
+    "product": [
+      {
+        "id": 10002,
+        "value": 5
+      }
+    ],
+    "productInterval": {
+      "min": 10,
+      "max": 15
+    },
+    "lifetime": 120
+  },
+  {
+    "id": 301,
+    "gene": 3,
+    "name": "灰熊",
+    "product": [
+      {
+        "id": 10002,
+        "value": 10
+      }
+    ],
+    "productInterval": {
+      "min": 10,
+      "max": 15
+    },
+    "lifetime": 150
+  },
+  {
+    "id": 302,
+    "gene": 3,
+    "name": "北极熊",
+    "product": [
+      {
+        "id": 10002,
+        "value": 50
+      }
+    ],
+    "productInterval": {
+      "min": 10,
+      "max": 15
+    },
+    "lifetime": 150
+  }
+]
