@@ -13,7 +13,7 @@ namespace Game.Play.Editor.Battle
             using (new EditorGUI.DisabledScope(IsRunning))
             {
                 DrawBattlefieldBox();
-                DrawMultiplierBox();
+                DrawSpawnSummaryBox();
                 DrawUnitTemplatesBox();
             }
 
@@ -46,19 +46,12 @@ namespace Game.Play.Editor.Battle
             EditorGUILayout.EndVertical();
         }
 
-        private void DrawMultiplierBox()
+        private void DrawSpawnSummaryBox()
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.LabelField("Spawn Multipliers", EditorStyles.boldLabel);
-            string[] labels = { "x1", "x5", "x10", "Custom" };
-            spawnMultiplierPreset = (BattleTesterSpawnMultiplierPreset)GUILayout.Toolbar((int)spawnMultiplierPreset, labels);
-            if (spawnMultiplierPreset == BattleTesterSpawnMultiplierPreset.Custom)
-            {
-                customSpawnMultiplier = Mathf.Max(1, EditorGUILayout.IntField("Custom Multiplier", customSpawnMultiplier));
-            }
-
             int templates = CountEnabledTemplates(playerUnits) + CountEnabledTemplates(enemyUnits);
-            int expanded = templates * GetCurrentMultiplier();
+            int expanded = GetPreviewUnitCount();
+            EditorGUILayout.LabelField("Spawn Summary", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("Preview Count", $"{templates} templates -> {expanded} units", EditorStyles.miniLabel);
             EditorGUILayout.EndVertical();
         }
@@ -99,7 +92,7 @@ namespace Game.Play.Editor.Battle
             EditorGUILayout.LabelField("Config", configStatus);
             EditorGUILayout.LabelField("Elapsed", $"{elapsedSeconds:0.00}s");
             EditorGUILayout.LabelField("Fixed Tick", $"{Mathf.Max(1, logicStepMs)} ms");
-            EditorGUILayout.LabelField("Spawn Multiplier", $"x{GetCurrentMultiplier()}");
+            EditorGUILayout.LabelField("Spawn Units", GetPreviewUnitCount().ToString());
             CountAlive(out int players, out int enemies);
             EditorGUILayout.LabelField("Alive Player", players.ToString());
             EditorGUILayout.LabelField("Alive Enemy", enemies.ToString());

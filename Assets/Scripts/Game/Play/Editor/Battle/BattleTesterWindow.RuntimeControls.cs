@@ -14,6 +14,9 @@ namespace Game.Play.Editor.Battle
         {
             API.InitConfig().GetAwaiter().GetResult();
             tables = API.Tables;
+            unitConfigIds = Array.Empty<int>();
+            unitConfigLabels = Array.Empty<string>();
+            unitConfigCacheStatus = "Unit configs not loaded";
             configStatus = tables == null ? "Load failed" : "Loaded";
             AddEvent(configStatus);
         }
@@ -44,7 +47,7 @@ namespace Game.Play.Editor.Battle
 
             IBattleRenderWorld renderWorld = useNullRenderWorld
                 ? new NullBattleRenderWorld()
-                : new GameObjectBattleRenderWorld();
+                : new DrawMeshBattleRenderWorld();
             if (!targetDriver.StartBattle(tables, scenario, renderWorld))
             {
                 runtimeStatus = "Start failed";

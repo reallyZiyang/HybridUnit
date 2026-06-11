@@ -6,7 +6,7 @@ namespace Game.Play.Battle.Tester
 {
     public static class BattleTesterScenarioJsonUtility
     {
-        private const int CurrentSchemaVersion = 2;
+        private const int CurrentSchemaVersion = 4;
 
         public static string ToJson(BattleTesterScenario scenario, bool prettyPrint = true)
         {
@@ -67,6 +67,8 @@ namespace Game.Play.Battle.Tester
                     enabled = unit.enabled,
                     label = unit.label,
                     unitCfgId = unit.unitCfgId,
+                    spawnCount = Mathf.Max(1, unit.spawnCount),
+                    spawnSpacing = Mathf.Max(0f, unit.spawnSpacing),
                     camp = unit.camp,
                     positionX = unit.position.x,
                     positionY = unit.position.y,
@@ -149,6 +151,8 @@ namespace Game.Play.Battle.Tester
                     enabled = unit.enabled || unit.schemaVersion <= 0,
                     label = unit.label,
                     unitCfgId = unit.unitCfgId,
+                    spawnCount = unit.spawnCount > 0 ? unit.spawnCount : 1,
+                    spawnSpacing = Mathf.Max(0f, unit.spawnSpacing),
                     camp = unit.camp,
                     position = new Vector2(unit.positionX, unit.positionY),
                     overrideRadius = unit.overrideRadius,
@@ -247,6 +251,8 @@ namespace Game.Play.Battle.Tester
         public bool enabled;
         public string label;
         public int unitCfgId;
+        public int spawnCount;
+        public float spawnSpacing;
         public int camp;
         public float positionX;
         public float positionY;

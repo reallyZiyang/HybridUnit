@@ -21,11 +21,16 @@ MonoBehaviour:
   autoStart: 1
   defaultRunSeconds: 10
   useNullRenderWorld: 0
-  units:
-  - label: Player
+  spawnMultiplierPreset: 0
+  customSpawnMultiplier: 5
+  playerUnits:
+  - enabled: 1
+    label: Player
     unitCfgId: 1001
+    spawnCount: 80
+    spawnSpacing: 0.5
     camp: 1
-    position: {x: -1, y: 0}
+    position: {x: -2.4234047, y: -0.13617073}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0
@@ -33,10 +38,42 @@ MonoBehaviour:
     renderKey: 
     skillIds: 
     attrs: []
-  - label: Enemy
-    unitCfgId: 1101
+  - enabled: 1
+    label: Player 2
+    unitCfgId: 1001
+    spawnCount: 80
+    spawnSpacing: 0.525
+    camp: 1
+    position: {x: 4.2425537, y: 6.8765955}
+    overrideRadius: 0
+    radius: 0
+    overrideLayer: 0
+    layer: 0
+    renderKey: 
+    skillIds: 
+    attrs: []
+  - enabled: 1
+    label: Player 3
+    unitCfgId: 1001
+    spawnCount: 80
+    spawnSpacing: 0.525
+    camp: 1
+    position: {x: 4.072341, y: -7.080852}
+    overrideRadius: 0
+    radius: 0
+    overrideLayer: 0
+    layer: 0
+    renderKey: 
+    skillIds: 
+    attrs: []
+  enemyUnits:
+  - enabled: 1
+    label: Enemy
+    unitCfgId: 1001
+    spawnCount: 250
+    spawnSpacing: 0.5
     camp: 2
-    position: {x: 1, y: 0}
+    position: {x: 4.5, y: -0.1021274}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0
@@ -44,3 +81,4 @@ MonoBehaviour:
     renderKey: 
     skillIds: 
     attrs: []
+  units: []

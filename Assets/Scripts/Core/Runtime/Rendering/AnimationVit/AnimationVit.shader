@@ -9,6 +9,7 @@ Shader "Hybrid/Animation VIT"
         _FrameIndex ("Frame Index", Float) = 0
         _InstanceColor ("Instance Color", Color) = (1, 1, 1, 1)
         _RenderTrans ("Render Transform", Vector) = (0, 0, 1, 1)
+        _RenderRotation ("Render Rotation", Vector) = (1, 0, 0, 0)
     }
 
     SubShader
@@ -50,6 +51,7 @@ Shader "Hybrid/Animation VIT"
                 UNITY_DEFINE_INSTANCED_PROP(float, _FrameIndex)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _InstanceColor)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _RenderTrans)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _RenderRotation)
             UNITY_INSTANCING_BUFFER_END(Props)
 
             struct Attributes
@@ -77,7 +79,11 @@ Shader "Hybrid/Animation VIT"
                 float4 bakedPosition = LOAD_TEXTURE2D(_PositionTex, int2(input.vertexID, frameIndex));
                 float4 bakedColor = LOAD_TEXTURE2D(_ColorTex, int2(input.vertexID, frameIndex));
                 float4 renderTrans = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderTrans);
-                bakedPosition.xy = bakedPosition.xy * renderTrans.zw + renderTrans.xy;
+                float4 renderRotation = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderRotation);
+                float2 renderPosition = bakedPosition.xy * renderTrans.zw;
+                bakedPosition.xy = float2(
+                    renderPosition.x * renderRotation.x - renderPosition.y * renderRotation.y,
+                    renderPosition.x * renderRotation.y + renderPosition.y * renderRotation.x) + renderTrans.xy;
 
                 output.positionCS = TransformObjectToHClip(float3(bakedPosition.xyz));
                 output.uv = input.uv;

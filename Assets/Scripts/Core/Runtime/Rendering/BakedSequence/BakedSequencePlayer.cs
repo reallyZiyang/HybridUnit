@@ -11,9 +11,12 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
     private static readonly int FrameUVRectId = Shader.PropertyToID("_FrameUVRect");
     private static readonly int FrameUVClampId = Shader.PropertyToID("_FrameUVClamp");
     private static readonly int FrameTransformId = Shader.PropertyToID("_FrameTransform");
+    private static readonly int RenderTransId = Shader.PropertyToID("_RenderTrans");
+    private static readonly int RenderRotationId = Shader.PropertyToID("_RenderRotation");
     private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
     private static Mesh sharedQuadMesh;
 
+    [SerializeField] private BakedSequenceAsset asset;
     [SerializeField] private Texture2D atlas;
     [SerializeField] private TextAsset metadataJson;
     [SerializeField] private Material material;
@@ -39,6 +42,14 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
     protected override bool IsRuntimeTickActive => playing;
     protected override bool IsEditorTickActive => playing;
 
+    public void BindAsset(BakedSequenceAsset renderAsset)
+    {
+        asset = renderAsset;
+        EnsureComponents();
+        LoadMetadata();
+        ApplyFrame(previewFrame);
+    }
+
     private void Awake()
     {
         EnsureComponents();
@@ -48,7 +59,7 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
 
     protected override void OnPlayerEnable()
     {
-        if (playOnEnable)
+        if (GetPlayOnEnable())
         {
             Play();
         }
@@ -75,11 +86,11 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
             return;
         }
 
-        time += deltaTime * Mathf.Max(0f, speed);
+        time += deltaTime * Mathf.Max(0f, GetSpeed());
         float duration = Mathf.Max(0.0001f, metadata.effectiveDuration);
         if (time >= duration)
         {
-            if (loop)
+            if (GetLoop())
             {
                 time %= duration;
             }
@@ -113,7 +124,7 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
 
         time = 0f;
         playing = true;
-        ApplyFrame(skipEmptyFrames ? FindNextVisibleFrame(0) : 0);
+        ApplyFrame(GetSkipEmptyFrames() ? FindNextVisibleFrame(0) : 0);
     }
 
     public void Stop()
@@ -132,12 +143,13 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
     private void LoadMetadata()
     {
         metadata = null;
-        if (metadataJson == null || string.IsNullOrWhiteSpace(metadataJson.text))
+        TextAsset runtimeMetadata = GetMetadataJson();
+        if (runtimeMetadata == null || string.IsNullOrWhiteSpace(runtimeMetadata.text))
         {
             return;
         }
 
-        metadata = JsonUtility.FromJson<BakedSequenceMetadata>(metadataJson.text);
+        metadata = JsonUtility.FromJson<BakedSequenceMetadata>(runtimeMetadata.text);
         previewFrame = metadata != null ? Mathf.Clamp(previewFrame, 0, Mathf.Max(0, metadata.frameCount - 1)) : 0;
     }
 
@@ -155,7 +167,7 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
         }
 
         int safeFrame = Mathf.Clamp(frame, 0, metadata.frameRects.Length - 1);
-        if (skipEmptyFrames)
+        if (GetSkipEmptyFrames())
         {
             safeFrame = FindNextVisibleFrame(safeFrame);
         }
@@ -175,13 +187,15 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
 
         MaterialPropertyBlock propertyBlock = BeginPropertyBlock();
 
-        float uvX = flipU ? rect.uvX + rect.uvWidth : rect.uvX;
-        float uvY = flipV ? rect.uvY + rect.uvHeight : rect.uvY;
-        float uvWidth = flipU ? -rect.uvWidth : rect.uvWidth;
-        float uvHeight = flipV ? -rect.uvHeight : rect.uvHeight;
+        bool runtimeFlipU = GetFlipU();
+        bool runtimeFlipV = GetFlipV();
+        float uvX = runtimeFlipU ? rect.uvX + rect.uvWidth : rect.uvX;
+        float uvY = runtimeFlipV ? rect.uvY + rect.uvHeight : rect.uvY;
+        float uvWidth = runtimeFlipU ? -rect.uvWidth : rect.uvWidth;
+        float uvHeight = runtimeFlipV ? -rect.uvHeight : rect.uvHeight;
         Vector4 uvRect = new Vector4(uvX, uvY, uvWidth, uvHeight);
         Vector4 uvClamp = CalculateUvClamp(uvX, uvY, uvWidth, uvHeight);
-        float safeDisplayScale = Mathf.Max(0.0001f, displayScale);
+        float safeDisplayScale = Mathf.Max(0.0001f, GetDisplayScale());
         Vector4 frameTransform = new Vector4(
             rect.quadOffsetX * safeDisplayScale,
             rect.quadOffsetY * safeDisplayScale,
@@ -190,10 +204,13 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
         propertyBlock.SetVector(FrameUVRectId, uvRect);
         propertyBlock.SetVector(FrameUVClampId, uvClamp);
         propertyBlock.SetVector(FrameTransformId, frameTransform);
-        propertyBlock.SetColor(InstanceColorId, color);
-        if (atlas != null)
+        propertyBlock.SetVector(RenderTransId, GetRenderTransform());
+        propertyBlock.SetVector(RenderRotationId, GetRenderRotation());
+        propertyBlock.SetColor(InstanceColorId, GetColor());
+        Texture2D runtimeAtlas = GetAtlas();
+        if (runtimeAtlas != null)
         {
-            propertyBlock.SetTexture(MainTexId, atlas);
+            propertyBlock.SetTexture(MainTexId, runtimeAtlas);
         }
 
         ApplyPropertyBlock();
@@ -206,14 +223,15 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
         float minY = Mathf.Min(uvY, uvY + uvHeight);
         float maxY = Mathf.Max(uvY, uvY + uvHeight);
 
-        if (atlas == null)
+        Texture2D runtimeAtlas = GetAtlas();
+        if (runtimeAtlas == null)
         {
             return new Vector4(minX, minY, maxX, maxY);
         }
 
         // Bilinear 采样到 atlas 单元格边缘时会混到相邻帧，半 texel 内缩可以避免边界串帧。
-        float insetX = 0.5f / Mathf.Max(1, atlas.width);
-        float insetY = 0.5f / Mathf.Max(1, atlas.height);
+        float insetX = 0.5f / Mathf.Max(1, runtimeAtlas.width);
+        float insetY = 0.5f / Mathf.Max(1, runtimeAtlas.height);
         return new Vector4(
             Mathf.Min(minX + insetX, maxX),
             Mathf.Min(minY + insetY, maxY),
@@ -226,19 +244,86 @@ public sealed class BakedSequencePlayer : BakedTickPlayer
         EnsureRendererComponents();
         SetSharedMesh(GetQuadMesh());
 
-        if (material == null)
+        Material runtimeMaterial = GetMaterial();
+        if (runtimeMaterial == null)
         {
             SetSharedMaterial(null);
         }
         else
         {
-            if (atlas != null)
+            Texture2D runtimeAtlas = GetAtlas();
+            if (runtimeAtlas != null)
             {
-                atlas.wrapMode = TextureWrapMode.Clamp;
+                runtimeAtlas.wrapMode = TextureWrapMode.Clamp;
             }
 
-            SetSharedMaterial(material);
+            SetSharedMaterial(runtimeMaterial);
         }
+    }
+
+    private Texture2D GetAtlas()
+    {
+        return asset != null && asset.atlas != null ? asset.atlas : atlas;
+    }
+
+    private TextAsset GetMetadataJson()
+    {
+        return asset != null && asset.metadataJson != null ? asset.metadataJson : metadataJson;
+    }
+
+    private Material GetMaterial()
+    {
+        return asset != null && asset.material != null ? asset.material : material;
+    }
+
+    private bool GetPlayOnEnable()
+    {
+        return asset != null ? asset.playOnEnable : playOnEnable;
+    }
+
+    private bool GetLoop()
+    {
+        return asset != null ? asset.loop : loop;
+    }
+
+    private float GetSpeed()
+    {
+        return asset != null ? asset.speed : speed;
+    }
+
+    private float GetDisplayScale()
+    {
+        return asset != null ? asset.displayScale : displayScale;
+    }
+
+    private Color GetColor()
+    {
+        return asset != null ? asset.color : color;
+    }
+
+    private bool GetSkipEmptyFrames()
+    {
+        return asset != null ? asset.skipEmptyFrames : skipEmptyFrames;
+    }
+
+    private bool GetFlipU()
+    {
+        return asset != null ? asset.flipU : flipU;
+    }
+
+    private bool GetFlipV()
+    {
+        return asset != null ? asset.flipV : flipV;
+    }
+
+    private Vector4 GetRenderTransform()
+    {
+        return asset != null ? asset.RenderTransform : new Vector4(0f, 0f, 1f, 1f);
+    }
+
+    private Vector4 GetRenderRotation()
+    {
+        return asset != null ? asset.RenderRotation : new Vector4(1f, 0f, 0f, 0f);
     }
 
     private int FindNextVisibleFrame(int startFrame)

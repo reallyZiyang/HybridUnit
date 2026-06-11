@@ -67,14 +67,13 @@ namespace Game.Play.Battle.Tester
                 return 0;
             }
 
-            int multiplier = GetSpawnMultiplier(scenario);
             BattleTesterUnitEntry[] units = scenario.GetAllUnits();
             int count = 0;
             for (int i = 0; i < units.Length; i++)
             {
                 if (units[i] != null && units[i].enabled)
                 {
-                    count += multiplier;
+                    count += GetTemplateSpawnCount(units[i], scenario);
                 }
             }
 
@@ -88,7 +87,6 @@ namespace Game.Play.Battle.Tester
                 return System.Array.Empty<BattleTesterUnitEntry>();
             }
 
-            int multiplier = GetSpawnMultiplier(scenario);
             BattleTesterUnitEntry[] templates = scenario.GetAllUnits();
             BattleTesterUnitEntry[] expanded = new BattleTesterUnitEntry[CountExpandedUnits(scenario)];
             int cursor = 0;
@@ -100,10 +98,12 @@ namespace Game.Play.Battle.Tester
                     continue;
                 }
 
-                for (int j = 0; j < multiplier; j++)
+                int spawnCount = GetTemplateSpawnCount(template, scenario);
+                float spawnSpacing = GetTemplateSpawnSpacing(template, scenario.cellSize);
+                for (int j = 0; j < spawnCount; j++)
                 {
                     BattleTesterUnitEntry unit = CloneUnit(template);
-                    unit.position = GetExpandedPosition(template.position, j, multiplier, scenario.cellSize);
+                    unit.position = GetExpandedPositionBySpacing(template.position, j, spawnCount, spawnSpacing);
                     expanded[cursor++] = unit;
                 }
             }
@@ -112,6 +112,11 @@ namespace Game.Play.Battle.Tester
         }
 
         public static Vector2 GetExpandedPosition(Vector2 origin, int index, int count, float cellSize)
+        {
+            return GetExpandedPositionBySpacing(origin, index, count, GetDefaultSpawnSpacing(cellSize));
+        }
+
+        public static Vector2 GetExpandedPositionBySpacing(Vector2 origin, int index, int count, float spacing)
         {
             if (count <= 1)
             {
@@ -122,9 +127,24 @@ namespace Game.Play.Battle.Tester
             int rows = Mathf.CeilToInt(count / (float)columns);
             int x = index % columns;
             int y = index / columns;
-            float spacing = Mathf.Max(0.25f, cellSize * 0.35f);
+            spacing = Mathf.Max(0.01f, spacing);
             Vector2 centerOffset = new((columns - 1) * 0.5f, (rows - 1) * 0.5f);
             return origin + new Vector2((x - centerOffset.x) * spacing, (y - centerOffset.y) * spacing);
+        }
+
+        public static float GetDefaultSpawnSpacing(float cellSize)
+        {
+            return Mathf.Max(0.25f, Mathf.Max(0.01f, cellSize) * 0.35f) * 1.5f;
+        }
+
+        public static float GetTemplateSpawnSpacing(BattleTesterUnitEntry unit, float cellSize)
+        {
+            if (unit != null && unit.spawnSpacing > 0f)
+            {
+                return Mathf.Max(0.01f, unit.spawnSpacing);
+            }
+
+            return GetDefaultSpawnSpacing(cellSize);
         }
 
         private static BattleTesterUnitEntry CloneUnit(BattleTesterUnitEntry unit)
@@ -134,6 +154,8 @@ namespace Game.Play.Battle.Tester
                 enabled = unit.enabled,
                 label = unit.label,
                 unitCfgId = unit.unitCfgId,
+                spawnCount = Mathf.Max(1, unit.spawnCount),
+                spawnSpacing = Mathf.Max(0f, unit.spawnSpacing),
                 camp = unit.camp,
                 position = unit.position,
                 overrideRadius = unit.overrideRadius,
@@ -144,6 +166,21 @@ namespace Game.Play.Battle.Tester
                 skillIds = unit.skillIds != null ? (int[])unit.skillIds.Clone() : System.Array.Empty<int>(),
                 attrs = CloneAttrs(unit.attrs)
             };
+        }
+
+        private static int GetTemplateSpawnCount(BattleTesterUnitEntry unit, BattleTesterScenario scenario)
+        {
+            if (unit == null)
+            {
+                return 0;
+            }
+
+            if (unit.spawnCount > 0)
+            {
+                return Mathf.Max(1, unit.spawnCount);
+            }
+
+            return GetSpawnMultiplier(scenario);
         }
 
         private static BattleTesterAttributeOverride[] CloneAttrs(BattleTesterAttributeOverride[] attrs)

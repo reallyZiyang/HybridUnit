@@ -270,13 +270,13 @@ def battle_workbook_sheets() -> dict[str, list[list[object]]]:
             [1101, "小怪", 0.35, 2, 0, "102,300|105,300|101,20|103,3|104,220", "2101", "monster_melee"],
         ],
         "Skill": [
-            ["##var", "id", "name", "actionName", "castPreMs", "castBackMs", "cooldownMs", "targetType", "selectType", "shape", "effects"],
-            ["##type", "int", "string", "string", "int", "int", "int", "Battle.SkillTargetType", "Battle.TargetSelectType", "Battle.BattleShapeDesc", "(array#sep=|),Battle.EffectRef"],
-            ["##group", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c"],
+            ["##var", "id", "name", "actionName", "castPreMs", "castBackMs", "cooldownMs", "castRange", "targetType", "selectType", "shape", "effects"],
+            ["##type", "int", "string", "string", "int", "int", "int", "float", "Battle.SkillTargetType", "Battle.TargetSelectType", "Battle.BattleShapeDesc", "(array#sep=|),Battle.EffectRef"],
+            ["##group", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c", "c"],
             ["##", "技能id", "技能名", "动作名", "前摇毫秒", "后摇毫秒", "冷却毫秒", "目标类型", "选敌方式", "范围形状", "效果列表"],
-            [2001, "普攻", "attack", 300, 200, 1000, "Enemy", "Nearest", "Circle,1.2,0,0,0,0,0", "Damage,3001,10000"],
-            [2002, "火球术", "skill_1", 400, 300, 2000, "Enemy", "Nearest", "Null,0,0,0,0,0,0", "Projectile,6001,0"],
-            [2101, "怪物撕咬", "attack", 500, 200, 1500, "Enemy", "Nearest", "Circle,1,0,0,0,0,0", "Damage,3001,8000"],
+            [2001, "普攻", "attack", 300, 200, 1000, 1.2, "Enemy", "Nearest", "Circle,1.2,0,0,0,0,0", "Damage,3001,10000"],
+            [2002, "火球术", "skill_1", 400, 300, 2000, 8, "Enemy", "Nearest", "Null,0,0,0,0,0,0", "Projectile,6001,0"],
+            [2101, "怪物撕咬", "attack", 500, 200, 1500, 1, "Enemy", "Nearest", "Circle,1,0,0,0,0,0", "Damage,3001,8000"],
         ],
         "Buff": [
             ["##var", "id", "name", "durationMs", "maxStack", "stackMode", "tickMs", "attrs", "tickEffects", "beginEffects", "endEffects"],
@@ -312,11 +312,11 @@ def battle_workbook_sheets() -> dict[str, list[list[object]]]:
             [5002, "添加加速", 7002, 3000, 1],
         ],
         "ProjectileEffect": [
-            ["##var", "id", "name", "projectileKey", "speed", "radius", "lifetimeMs", "pierceCount", "hitIntervalMs", "hitEffects"],
-            ["##type", "int", "string", "string", "float", "float", "int", "int", "int", "(array#sep=|),Battle.EffectRef"],
+            ["##var", "id", "name", "projectileKey", "speed", "radius", "lifetimeMs", "pierceCount", "hitIntervalMs", "queryQuality", "hitEffects"],
+            ["##type", "int", "string", "string", "float", "float", "int", "int", "int", "Battle.QueryQuality", "(array#sep=|),Battle.EffectRef"],
             ["##group", "c", "c", "c", "c", "c", "c", "c", "c", "c"],
             ["##", "效果id", "效果名", "抛射物表现key", "速度", "碰撞半径", "存活毫秒", "穿透次数", "同目标命中间隔", "命中效果"],
-            [6001, "火球", "projectile_fireball", 8.0, 0.25, 3000, 1, 0, "Damage,3002,10000|AddBuff,5001,0"],
+            [6001, "火球", "projectile_fireball", 8.0, 0.25, 3000, 1, 0, "High", "Damage,3002,10000|AddBuff,5001,0"],
         ],
     }
 
@@ -399,6 +399,15 @@ def apply_battle() -> None:
                     ("Rect", "矩形", 2, "矩形"),
                     ("Sector", "扇形", 3, "扇形"),
                     ("Capsule", "胶囊", 4, "胶囊线段"),
+                ],
+            ),
+            (
+                "Battle.QueryQuality",
+                "Query quality",
+                [
+                    ("Low", "", 0, "Current position only"),
+                    ("Mid", "", 1, "Full path query"),
+                    ("High", "", 2, "Full path and nearest hit"),
                 ],
             ),
             (

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7638ae53812545919bf5780814a96f12, type: 3}
+  m_Name: FA_Consumable_Arrow_001_YellowWood_Atlas
+  m_EditorClassIdentifier: 
+  renderOffset: {x: 0, y: 0}
+  renderScale: {x: 1, y: 1}
+  renderRotationDeg: 0
+  spriteAtlas: {fileID: 100100200, guid: c7acbb161639421438535806caf682bb, type: 3}
+  spriteName: FA_Consumable_Arrow_001_YellowWood
+  sprite: {fileID: 0}
+  atlas: {fileID: 2800000, guid: dafa2dede8c39354da60a80a2b182288, type: 3}
+  material: {fileID: 2100000, guid: ffa1b785483e92f48adca78267e795a8, type: 2}
+  uvRect: {x: 0.04603769, y: 0.111854196, z: 0.91956747, w: 0.7471425}
+  size: {x: 0.88, y: 0.36}
+  color: {r: 1, g: 1, b: 1, a: 1}

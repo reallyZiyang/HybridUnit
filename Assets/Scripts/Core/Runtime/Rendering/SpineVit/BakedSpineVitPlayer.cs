@@ -7,6 +7,8 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public sealed class BakedSpineVitPlayer : BakedTickPlayer
 {
+    private static readonly int RenderTrans = Shader.PropertyToID("_RenderTrans");
+    private static readonly int RenderRotation = Shader.PropertyToID("_RenderRotation");
     private static readonly int FrameIndexId = Shader.PropertyToID("_FrameIndex");
     private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
     private static readonly int MainTexId = Shader.PropertyToID("_MainTex");
@@ -31,6 +33,14 @@ public sealed class BakedSpineVitPlayer : BakedTickPlayer
     public Color InstanceColor => color;
     protected override bool IsRuntimeTickActive => playing;
     protected override bool IsEditorTickActive => playing;
+
+    public void BindAsset(BakedSpineVitAsset renderAsset)
+    {
+        asset = renderAsset;
+        EnsureComponents();
+        ApplyDefaultClip();
+        ApplyFrame(previewFrame);
+    }
 
     private void Awake()
     {
@@ -181,6 +191,8 @@ public sealed class BakedSpineVitPlayer : BakedTickPlayer
         MaterialPropertyBlock propertyBlock = BeginPropertyBlock();
         propertyBlock.SetFloat(FrameIndexId, absoluteFrame);
         propertyBlock.SetColor(InstanceColorId, color);
+        propertyBlock.SetVector(RenderTrans, asset.RenderTransform);
+        propertyBlock.SetVector(RenderRotation, asset.RenderRotation);
         ApplyPropertyBlock();
     }
 

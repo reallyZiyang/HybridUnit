@@ -39,6 +39,10 @@ namespace Game.Play.Editor.Battle
         private readonly List<BattleRuntimeUnitSnapshot> unitStatus = new();
         private readonly List<string> eventLog = new();
         private readonly HashSet<string> attrFoldouts = new();
+        private readonly Dictionary<string, string> unitConfigSearchTexts = new();
+        private int[] unitConfigIds = System.Array.Empty<int>();
+        private string[] unitConfigLabels = System.Array.Empty<string>();
+        private string unitConfigCacheStatus = "Unit configs not loaded";
         private Tables tables;
         private BattleRuntimeDriver driver;
         private bool createdDriver;
@@ -46,6 +50,10 @@ namespace Game.Play.Editor.Battle
         private Vector2 leftScroll;
         private Vector2 rightScroll;
         private Vector2 statusScroll;
+        private bool draggingTemplate;
+        private int draggingTemplateSide;
+        private int draggingTemplateIndex;
+        private Vector2 dragTemplateOffset;
         private string configStatus = "Not loaded";
         private string runtimeStatus = "Stopped";
         private float elapsedSeconds;

@@ -355,6 +355,8 @@ public static class SpineVitBaker
         material.SetTexture("_MainTex", sourceTexture);
         material.SetTexture("_PositionTex", positionTexture);
         material.SetTexture("_ColorTex", colorTexture);
+        material.SetVector("_RenderTrans", new Vector4(0f, 0f, 1f, 1f));
+        material.SetVector("_RenderRotation", new Vector4(1f, 0f, 0f, 0f));
         return material;
     }
 
@@ -370,6 +372,9 @@ public static class SpineVitBaker
         asset.vertexCount = vertexCount;
         asset.totalFrameCount = totalFrameCount;
         asset.bounds = bounds;
+        asset.renderOffset = Vector2.zero;
+        asset.renderScale = Vector2.one;
+        asset.renderRotationDeg = 0f;
         asset.clips = clips;
         return asset;
     }

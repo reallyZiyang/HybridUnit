@@ -352,6 +352,7 @@ public static class AnimationVitBaker
         material.SetTexture("_PositionTex", positionTexture);
         material.SetTexture("_ColorTex", colorTexture);
         material.SetVector("_RenderTrans", new Vector4(0f, 0f, 1f, 1f));
+        material.SetVector("_RenderRotation", new Vector4(1f, 0f, 0f, 0f));
         return material;
     }
 
@@ -369,6 +370,7 @@ public static class AnimationVitBaker
         asset.bounds = bounds;
         asset.renderOffset = Vector2.zero;
         asset.renderScale = Vector2.one;
+        asset.renderRotationDeg = 0f;
         asset.clips = clips;
         return asset;
     }

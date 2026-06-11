@@ -1,9 +1,11 @@
 #if UNITY_EDITOR
 public readonly struct ParticleAtlasBakeResult
 {
-    public ParticleAtlasBakeResult(string atlasProjectPath, int requestedFrameCount, int outputFrameCount, int visiblePixelCount, int firstVisibleFrame, int lastVisibleFrame)
+    public ParticleAtlasBakeResult(string atlasProjectPath, string metadataProjectPath, string sequenceAssetProjectPath, int requestedFrameCount, int outputFrameCount, int visiblePixelCount, int firstVisibleFrame, int lastVisibleFrame)
     {
         AtlasProjectPath = atlasProjectPath;
+        MetadataProjectPath = metadataProjectPath;
+        SequenceAssetProjectPath = sequenceAssetProjectPath;
         RequestedFrameCount = requestedFrameCount;
         OutputFrameCount = outputFrameCount;
         VisiblePixelCount = visiblePixelCount;
@@ -12,6 +14,8 @@ public readonly struct ParticleAtlasBakeResult
     }
 
     public string AtlasProjectPath { get; }
+    public string MetadataProjectPath { get; }
+    public string SequenceAssetProjectPath { get; }
     public int RequestedFrameCount { get; }
     public int OutputFrameCount { get; }
     public int VisiblePixelCount { get; }

@@ -4,6 +4,8 @@ Shader "Hybrid/Battle DrawMesh Instance Unlit"
     {
         _BaseColor ("Base Color", Color) = (1, 1, 1, 1)
         _InstanceColor ("Instance Color", Color) = (1, 1, 1, 1)
+        _RenderTrans ("Render Transform", Vector) = (0, 0, 1, 1)
+        _RenderRotation ("Render Rotation", Vector) = (1, 0, 0, 0)
     }
 
     SubShader
@@ -38,6 +40,8 @@ Shader "Hybrid/Battle DrawMesh Instance Unlit"
 
             UNITY_INSTANCING_BUFFER_START(Props)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _InstanceColor)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _RenderTrans)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _RenderRotation)
             UNITY_INSTANCING_BUFFER_END(Props)
 
             struct Attributes
@@ -58,7 +62,14 @@ Shader "Hybrid/Battle DrawMesh Instance Unlit"
                 Varyings output;
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_TRANSFER_INSTANCE_ID(input, output);
-                output.positionCS = TransformObjectToHClip(input.positionOS);
+                float4 renderTrans = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderTrans);
+                float4 renderRotation = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderRotation);
+                float3 positionOS = input.positionOS;
+                float2 renderPosition = positionOS.xy * renderTrans.zw;
+                positionOS.xy = float2(
+                    renderPosition.x * renderRotation.x - renderPosition.y * renderRotation.y,
+                    renderPosition.x * renderRotation.y + renderPosition.y * renderRotation.x) + renderTrans.xy;
+                output.positionCS = TransformObjectToHClip(positionOS);
                 output.color = _BaseColor * UNITY_ACCESS_INSTANCED_PROP(Props, _InstanceColor);
                 return output;
             }
@@ -94,6 +105,8 @@ Shader "Hybrid/Battle DrawMesh Instance Unlit"
 
             UNITY_INSTANCING_BUFFER_START(Props)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _InstanceColor)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _RenderTrans)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _RenderRotation)
             UNITY_INSTANCING_BUFFER_END(Props)
 
             struct Attributes
@@ -114,7 +127,14 @@ Shader "Hybrid/Battle DrawMesh Instance Unlit"
                 Varyings output;
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_TRANSFER_INSTANCE_ID(input, output);
-                output.positionCS = TransformObjectToHClip(input.positionOS);
+                float4 renderTrans = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderTrans);
+                float4 renderRotation = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderRotation);
+                float3 positionOS = input.positionOS;
+                float2 renderPosition = positionOS.xy * renderTrans.zw;
+                positionOS.xy = float2(
+                    renderPosition.x * renderRotation.x - renderPosition.y * renderRotation.y,
+                    renderPosition.x * renderRotation.y + renderPosition.y * renderRotation.x) + renderTrans.xy;
+                output.positionCS = TransformObjectToHClip(positionOS);
                 output.color = _BaseColor * UNITY_ACCESS_INSTANCED_PROP(Props, _InstanceColor);
                 return output;
             }

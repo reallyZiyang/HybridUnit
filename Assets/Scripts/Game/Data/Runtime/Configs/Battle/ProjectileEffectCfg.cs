@@ -25,6 +25,7 @@ public sealed partial class ProjectileEffectCfg : Luban.BeanBase
         { if(!_buf["lifetimeMs"].IsNumber) { throw new SerializationException(); }  LifetimeMs = _buf["lifetimeMs"]; }
         { if(!_buf["pierceCount"].IsNumber) { throw new SerializationException(); }  PierceCount = _buf["pierceCount"]; }
         { if(!_buf["hitIntervalMs"].IsNumber) { throw new SerializationException(); }  HitIntervalMs = _buf["hitIntervalMs"]; }
+        { if(!_buf["queryQuality"].IsNumber) { throw new SerializationException(); }  QueryQuality = (Battle.QueryQuality)_buf["queryQuality"].AsInt; }
         { var __json0 = _buf["hitEffects"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; HitEffects = new Battle.EffectRef[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { Battle.EffectRef __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::Game.Data.Configs.Battle.EffectRef.DeserializeEffectRef(__e0);  }  HitEffects[__index0++] = __v0; }   }
     }
 
@@ -66,6 +67,10 @@ public sealed partial class ProjectileEffectCfg : Luban.BeanBase
     /// </summary>
     public readonly int HitIntervalMs;
     /// <summary>
+    /// ????
+    /// </summary>
+    public readonly Battle.QueryQuality QueryQuality;
+    /// <summary>
     /// 命中效果
     /// </summary>
     public readonly Battle.EffectRef[] HitEffects;
@@ -89,6 +94,7 @@ public sealed partial class ProjectileEffectCfg : Luban.BeanBase
         + "lifetimeMs:" + LifetimeMs + ","
         + "pierceCount:" + PierceCount + ","
         + "hitIntervalMs:" + HitIntervalMs + ","
+        + "queryQuality:" + QueryQuality + ","
         + "hitEffects:" + Luban.StringUtil.CollectionToString(HitEffects) + ","
         + "}";
     }

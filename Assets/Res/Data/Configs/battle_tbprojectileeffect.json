@@ -1,13 +1,32 @@
 [
   {
     "id": 6001,
-    "name": "火球",
-    "projectileKey": "projectile_fireball",
+    "name": "远程普攻",
+    "projectileKey": "FA_Consumable_Arrow_008_Blue_Atlas",
     "speed": 8,
     "radius": 0.25,
     "lifetimeMs": 3000,
     "pierceCount": 1,
     "hitIntervalMs": 0,
+    "queryQuality": 2,
+    "hitEffects": [
+      {
+        "type": 1,
+        "id": 3002,
+        "value": 10000
+      }
+    ]
+  },
+  {
+    "id": 6002,
+    "name": "远程普攻",
+    "projectileKey": "projectile_arrow",
+    "speed": 8,
+    "radius": 0.25,
+    "lifetimeMs": 3000,
+    "pierceCount": 1,
+    "hitIntervalMs": 0,
+    "queryQuality": 2,
     "hitEffects": [
       {
         "type": 1,

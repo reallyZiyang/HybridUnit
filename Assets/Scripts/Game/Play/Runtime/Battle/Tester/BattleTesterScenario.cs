@@ -35,6 +35,8 @@ namespace Game.Play.Battle.Tester
                 enabled = true,
                 label = "Player",
                 unitCfgId = 1001,
+                spawnCount = 1,
+                spawnSpacing = 0.525f,
                 camp = 1,
                 position = new Vector2(-1f, 0f)
             }
@@ -48,6 +50,8 @@ namespace Game.Play.Battle.Tester
                 enabled = true,
                 label = "Enemy",
                 unitCfgId = 1101,
+                spawnCount = 1,
+                spawnSpacing = 0.525f,
                 camp = 2,
                 position = new Vector2(1f, 0f)
             }
@@ -123,6 +127,8 @@ namespace Game.Play.Battle.Tester
         public bool enabled = true;
         public string label;
         public int unitCfgId;
+        public int spawnCount = 1;
+        public float spawnSpacing = 0.525f;
         public int camp;
         public Vector2 position;
         public bool overrideRadius;

@@ -157,6 +157,7 @@ namespace Game.Play.Battle.Runtime
                     cfg.CastPreMs,
                     cfg.CastBackMs,
                     cfg.CooldownMs,
+                    cfg.CastRange,
                     cfg.TargetType,
                     cfg.SelectType,
                     cfg.Shape,
@@ -243,6 +244,7 @@ namespace Game.Play.Battle.Runtime
                     cfg.LifetimeMs,
                     cfg.PierceCount,
                     cfg.HitIntervalMs,
+                    cfg.QueryQuality,
                     ToRuntimeEffects(cfg.HitEffects));
                 projectileEffectIndexById[cfg.Id] = i;
             }

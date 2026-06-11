@@ -46,18 +46,20 @@ namespace Game.Play.Battle.Runtime
         public readonly int castPreMs;
         public readonly int castBackMs;
         public readonly int cooldownMs;
+        public readonly float castRange;
         public readonly ConfigBattle.SkillTargetType targetType;
         public readonly ConfigBattle.TargetSelectType selectType;
         public readonly ConfigBattle.BattleShapeDesc shape;
         public readonly BattleEffectRef[] effects;
 
-        public BattleSkillRuntimeData(int id, string actionName, int castPreMs, int castBackMs, int cooldownMs, ConfigBattle.SkillTargetType targetType, ConfigBattle.TargetSelectType selectType, ConfigBattle.BattleShapeDesc shape, BattleEffectRef[] effects)
+        public BattleSkillRuntimeData(int id, string actionName, int castPreMs, int castBackMs, int cooldownMs, float castRange, ConfigBattle.SkillTargetType targetType, ConfigBattle.TargetSelectType selectType, ConfigBattle.BattleShapeDesc shape, BattleEffectRef[] effects)
         {
             this.id = id;
             this.actionName = actionName;
             this.castPreMs = castPreMs;
             this.castBackMs = castBackMs;
             this.cooldownMs = cooldownMs;
+            this.castRange = castRange;
             this.targetType = targetType;
             this.selectType = selectType;
             this.shape = shape;
@@ -158,9 +160,10 @@ namespace Game.Play.Battle.Runtime
         public readonly int lifetimeMs;
         public readonly int pierceCount;
         public readonly int hitIntervalMs;
+        public readonly ConfigBattle.QueryQuality queryQuality;
         public readonly BattleEffectRef[] hitEffects;
 
-        public BattleProjectileRuntimeData(int id, string projectileKey, float speed, float radius, int lifetimeMs, int pierceCount, int hitIntervalMs, BattleEffectRef[] hitEffects)
+        public BattleProjectileRuntimeData(int id, string projectileKey, float speed, float radius, int lifetimeMs, int pierceCount, int hitIntervalMs, ConfigBattle.QueryQuality queryQuality, BattleEffectRef[] hitEffects)
         {
             this.id = id;
             this.projectileKey = projectileKey;
@@ -169,6 +172,7 @@ namespace Game.Play.Battle.Runtime
             this.lifetimeMs = lifetimeMs;
             this.pierceCount = pierceCount;
             this.hitIntervalMs = hitIntervalMs;
+            this.queryQuality = queryQuality;
             this.hitEffects = hitEffects;
         }
     }

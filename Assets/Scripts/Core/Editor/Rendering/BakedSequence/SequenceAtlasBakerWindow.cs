@@ -251,6 +251,7 @@ public sealed class SequenceAtlasBakerWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
         settings.OutputName = EditorGUILayout.TextField(new GUIContent("File Name", "Leave empty to use prefab name."), settings.OutputName);
         settings.GenerateMetadata = EditorGUILayout.Toggle("Generate Metadata JSON", settings.GenerateMetadata);
+        settings.GenerateSequenceAsset = EditorGUILayout.Toggle("Generate Sequence Asset", settings.GenerateSequenceAsset);
         settings.ConfigureTextureImporter = EditorGUILayout.Toggle("Configure Importer", settings.ConfigureTextureImporter);
     }
 
@@ -322,8 +323,9 @@ public sealed class SequenceAtlasBakerWindow : EditorWindow
             }
             else
             {
-                EditorUtility.DisplayDialog("Particle Atlas Baker", "Atlas baked:\n" + result.AtlasProjectPath + "\nFrames: " + result.OutputFrameCount + " / " + result.RequestedFrameCount + "\nVisible pixels: " + result.VisiblePixelCount + "\nFirst visible frame: " + result.FirstVisibleFrame + "\nLast visible frame: " + result.LastVisibleFrame, "OK");
-                Debug.Log("Particle atlas baked: " + result.AtlasProjectPath + ", frames: " + result.OutputFrameCount + " / " + result.RequestedFrameCount + ", visible pixels: " + result.VisiblePixelCount + ", first visible frame: " + result.FirstVisibleFrame + ", last visible frame: " + result.LastVisibleFrame);
+                string assetLine = string.IsNullOrEmpty(result.SequenceAssetProjectPath) ? string.Empty : "\nAsset: " + result.SequenceAssetProjectPath;
+                EditorUtility.DisplayDialog("Particle Atlas Baker", "Atlas baked:\n" + result.AtlasProjectPath + assetLine + "\nFrames: " + result.OutputFrameCount + " / " + result.RequestedFrameCount + "\nVisible pixels: " + result.VisiblePixelCount + "\nFirst visible frame: " + result.FirstVisibleFrame + "\nLast visible frame: " + result.LastVisibleFrame, "OK");
+                Debug.Log("Particle atlas baked: " + result.AtlasProjectPath + assetLine + ", frames: " + result.OutputFrameCount + " / " + result.RequestedFrameCount + ", visible pixels: " + result.VisiblePixelCount + ", first visible frame: " + result.FirstVisibleFrame + ", last visible frame: " + result.LastVisibleFrame);
             }
         }
         catch (Exception exception)

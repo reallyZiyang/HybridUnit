@@ -141,6 +141,8 @@ namespace Game.Play.Editor.Battle
             playerUnits = CloneUnits(defaults.playerUnits);
             enemyUnits = CloneUnits(defaults.enemyUnits);
             DestroyImmediate(defaults);
+            NormalizeUnitTemplates(playerUnits, 1);
+            NormalizeUnitTemplates(enemyUnits, 2);
         }
 
         private void CopyScenarioToWindow()
@@ -169,6 +171,9 @@ namespace Game.Play.Editor.Battle
                 playerUnits = CloneUnits(scenario.playerUnits);
                 enemyUnits = CloneUnits(scenario.enemyUnits);
             }
+
+            NormalizeUnitTemplates(playerUnits, 1);
+            NormalizeUnitTemplates(enemyUnits, 2);
         }
 
         private void CopyWindowToScenario()
@@ -186,6 +191,8 @@ namespace Game.Play.Editor.Battle
             scenario.customSpawnMultiplier = Mathf.Max(1, customSpawnMultiplier);
             NormalizeCamp(playerUnits, 1);
             NormalizeCamp(enemyUnits, 2);
+            NormalizeUnitTemplates(playerUnits, 1);
+            NormalizeUnitTemplates(enemyUnits, 2);
             scenario.SetSideUnits(CloneUnits(playerUnits), CloneUnits(enemyUnits));
         }
 

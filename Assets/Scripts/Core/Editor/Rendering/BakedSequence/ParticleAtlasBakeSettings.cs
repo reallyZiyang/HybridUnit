@@ -37,6 +37,7 @@ public sealed class ParticleAtlasBakeSettings : ScriptableObject
     public bool TrimFrameRects = true;
     public int FrameRectPadding = 2;
     public bool GenerateMetadata = true;
+    public bool GenerateSequenceAsset = true;
     public bool ConfigureTextureImporter = true;
     public bool ForceRandomSeed = true;
     public uint RandomSeed = 1;

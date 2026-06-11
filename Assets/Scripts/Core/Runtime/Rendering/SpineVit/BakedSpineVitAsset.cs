@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "BakedSpineVitAsset", menuName = "Hybrid/Rendering/Baked Spine VIT Asset")]
-public sealed class BakedSpineVitAsset : ScriptableObject
+public sealed class BakedSpineVitAsset : BattleRenderAssetBase
 {
     public Mesh mesh;
     public Material material;

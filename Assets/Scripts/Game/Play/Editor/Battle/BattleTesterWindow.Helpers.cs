@@ -7,20 +7,14 @@ namespace Game.Play.Editor.Battle
 {
     public sealed partial class BattleTesterWindow
     {
-        private int GetCurrentMultiplier()
-        {
-            return spawnMultiplierPreset switch
-            {
-                BattleTesterSpawnMultiplierPreset.X5 => 5,
-                BattleTesterSpawnMultiplierPreset.X10 => 10,
-                BattleTesterSpawnMultiplierPreset.Custom => Mathf.Max(1, customSpawnMultiplier),
-                _ => 1
-            };
-        }
-
         private int GetPreviewUnitCount()
         {
-            return (CountEnabledTemplates(playerUnits) + CountEnabledTemplates(enemyUnits)) * GetCurrentMultiplier();
+            return CountExpandedTemplates(playerUnits) + CountExpandedTemplates(enemyUnits);
+        }
+
+        private float GetDefaultTemplateSpacing()
+        {
+            return BattleTesterScenarioRunner.GetDefaultSpawnSpacing(cellSize);
         }
 
         private static int CountEnabledTemplates(BattleTesterUnitEntry[] units)
@@ -42,6 +36,25 @@ namespace Game.Play.Editor.Battle
             return count;
         }
 
+        private static int CountExpandedTemplates(BattleTesterUnitEntry[] units)
+        {
+            if (units == null)
+            {
+                return 0;
+            }
+
+            int count = 0;
+            for (int i = 0; i < units.Length; i++)
+            {
+                if (units[i] != null && units[i].enabled)
+                {
+                    count += Mathf.Max(1, units[i].spawnCount);
+                }
+            }
+
+            return count;
+        }
+
         private void AddUnit(ref BattleTesterUnitEntry[] units, int defaultCamp, string sideLabel)
         {
             units ??= Array.Empty<BattleTesterUnitEntry>();
@@ -51,13 +64,15 @@ namespace Game.Play.Editor.Battle
             selectedTemplateIndex = units.Length - 1;
         }
 
-        private static BattleTesterUnitEntry CreateDefaultUnit(int camp, string label)
+        private BattleTesterUnitEntry CreateDefaultUnit(int camp, string label)
         {
             return new BattleTesterUnitEntry
             {
                 enabled = true,
                 label = label,
-                unitCfgId = camp == 2 ? 1101 : 1001,
+                unitCfgId = GetFirstUnitCfgId(),
+                spawnCount = 1,
+                spawnSpacing = GetDefaultTemplateSpacing(),
                 camp = camp,
                 position = camp == 2 ? new Vector2(1f, 0f) : new Vector2(-1f, 0f),
                 skillIds = Array.Empty<int>(),
@@ -115,6 +130,8 @@ namespace Game.Play.Editor.Battle
                 enabled = unit.enabled,
                 label = unit.label,
                 unitCfgId = unit.unitCfgId,
+                spawnCount = Mathf.Max(1, unit.spawnCount),
+                spawnSpacing = Mathf.Max(0f, unit.spawnSpacing),
                 camp = unit.camp,
                 position = unit.position,
                 overrideRadius = unit.overrideRadius,
@@ -151,7 +168,35 @@ namespace Game.Play.Editor.Battle
                 if (units[i] != null)
                 {
                     units[i].camp = camp;
+                    units[i].spawnCount = Mathf.Max(1, units[i].spawnCount);
                 }
+            }
+        }
+
+        private void NormalizeUnitTemplates(BattleTesterUnitEntry[] units, int camp)
+        {
+            EnsureUnitConfigOptions();
+            if (units == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < units.Length; i++)
+            {
+                BattleTesterUnitEntry unit = units[i];
+                if (unit == null)
+                {
+                    continue;
+                }
+
+                unit.camp = camp;
+                unit.spawnCount = Mathf.Max(1, unit.spawnCount);
+                if (unit.spawnSpacing <= 0f)
+                {
+                    unit.spawnSpacing = GetDefaultTemplateSpacing();
+                }
+
+                NormalizeUnitCfgId(unit);
             }
         }
 

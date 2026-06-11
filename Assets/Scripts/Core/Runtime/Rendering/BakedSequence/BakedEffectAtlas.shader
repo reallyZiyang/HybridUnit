@@ -7,6 +7,8 @@ Shader "Hybrid/Baked Effect Atlas"
         _FrameUVRect ("Frame UV Rect", Vector) = (0, 0, 1, 1)
         _FrameUVClamp ("Frame UV Clamp", Vector) = (0, 0, 1, 1)
         _FrameTransform ("Frame Transform", Vector) = (0, 0, 1, 1)
+        _RenderTrans ("Render Transform", Vector) = (0, 0, 1, 1)
+        _RenderRotation ("Render Rotation", Vector) = (1, 0, 0, 0)
         _InstanceColor ("Instance Color", Color) = (1, 1, 1, 1)
     }
 
@@ -47,6 +49,8 @@ Shader "Hybrid/Baked Effect Atlas"
                 UNITY_DEFINE_INSTANCED_PROP(float4, _FrameUVRect)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _FrameUVClamp)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _FrameTransform)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _RenderTrans)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _RenderRotation)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _InstanceColor)
             UNITY_INSTANCING_BUFFER_END(Props)
 
@@ -75,6 +79,12 @@ Shader "Hybrid/Baked Effect Atlas"
                 float4 frameTransform = UNITY_ACCESS_INSTANCED_PROP(Props, _FrameTransform);
                 float3 positionOS = input.positionOS.xyz;
                 positionOS.xy = positionOS.xy * frameTransform.zw + frameTransform.xy;
+                float4 renderTrans = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderTrans);
+                float4 renderRotation = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderRotation);
+                float2 renderPosition = positionOS.xy * renderTrans.zw;
+                positionOS.xy = float2(
+                    renderPosition.x * renderRotation.x - renderPosition.y * renderRotation.y,
+                    renderPosition.x * renderRotation.y + renderPosition.y * renderRotation.x) + renderTrans.xy;
 
                 float4 frameUVRect = UNITY_ACCESS_INSTANCED_PROP(Props, _FrameUVRect);
                 float4 frameUVClamp = UNITY_ACCESS_INSTANCED_PROP(Props, _FrameUVClamp);

@@ -130,13 +130,20 @@ public static class ParticleAtlasBaker
                 ConfigureImporter(atlasProjectPath, settings);
             }
 
+            string metadataProjectPath = null;
             if (settings.GenerateMetadata)
             {
-                SaveMetadata(settings, packing, requestedFrameCount, outputStartFrame, outputFrameCount, bakeDuration, effectiveDuration, frames);
+                metadataProjectPath = SaveMetadata(settings, packing, requestedFrameCount, outputStartFrame, outputFrameCount, bakeDuration, effectiveDuration, frames);
+            }
+
+            string sequenceAssetProjectPath = null;
+            if (settings.GenerateSequenceAsset)
+            {
+                sequenceAssetProjectPath = SaveSequenceAsset(settings, atlasProjectPath, metadataProjectPath);
             }
 
             AssetDatabase.Refresh();
-            return new ParticleAtlasBakeResult(atlasProjectPath, requestedFrameCount, outputFrameCount, frames.VisiblePixelCount, frames.FirstVisibleFrame, frames.LastVisibleFrame);
+            return new ParticleAtlasBakeResult(atlasProjectPath, metadataProjectPath, sequenceAssetProjectPath, requestedFrameCount, outputFrameCount, frames.VisiblePixelCount, frames.FirstVisibleFrame, frames.LastVisibleFrame);
         }
         finally
         {
@@ -498,7 +505,7 @@ public static class ParticleAtlasBaker
         return atlasProjectPath;
     }
 
-    private static void SaveMetadata(ParticleAtlasBakeSettings settings, ParticleAtlasPacking packing, int requestedFrameCount, int outputStartFrame, int outputFrameCount, float bakeDuration, float effectiveDuration, BakedFrameSet frames)
+    private static string SaveMetadata(ParticleAtlasBakeSettings settings, ParticleAtlasPacking packing, int requestedFrameCount, int outputStartFrame, int outputFrameCount, float bakeDuration, float effectiveDuration, BakedFrameSet frames)
     {
         ParticleAtlasLayout layout = packing.Layout;
         string fileBaseName = ParticleAtlasPathUtility.GetOutputBaseName(settings);
@@ -550,6 +557,97 @@ public static class ParticleAtlasBaker
 
         File.WriteAllText(jsonAbsolutePath, JsonUtility.ToJson(metadata, true));
         AssetDatabase.ImportAsset(jsonProjectPath);
+        return jsonProjectPath;
+    }
+
+    private static string SaveSequenceAsset(ParticleAtlasBakeSettings settings, string atlasProjectPath, string metadataProjectPath)
+    {
+        string fileBaseName = ParticleAtlasPathUtility.GetOutputBaseName(settings);
+        string materialProjectPath = ParticleAtlasPathUtility.CombineProjectPath(settings.OutputFolder, fileBaseName + ".mat");
+        string assetProjectPath = ParticleAtlasPathUtility.CombineProjectPath(settings.OutputFolder, fileBaseName + "_Sequence.asset");
+
+        Texture2D atlasTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(atlasProjectPath);
+        TextAsset metadataAsset = string.IsNullOrEmpty(metadataProjectPath) ? null : AssetDatabase.LoadAssetAtPath<TextAsset>(metadataProjectPath);
+        Material material = LoadOrCreateSequenceMaterial(materialProjectPath, atlasTexture);
+
+        BakedSequenceAsset asset = AssetDatabase.LoadAssetAtPath<BakedSequenceAsset>(assetProjectPath);
+        if (asset == null)
+        {
+            asset = ScriptableObject.CreateInstance<BakedSequenceAsset>();
+            AssetDatabase.CreateAsset(asset, assetProjectPath);
+        }
+
+        asset.atlas = atlasTexture;
+        asset.metadataJson = metadataAsset;
+        asset.material = material;
+        asset.playOnEnable = true;
+        asset.loop = settings.Loop;
+        asset.speed = 1f;
+        asset.displayScale = 1f;
+        asset.color = Color.white;
+        asset.skipEmptyFrames = true;
+        asset.flipU = false;
+        asset.flipV = false;
+
+        EditorUtility.SetDirty(asset);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.ImportAsset(assetProjectPath);
+        return assetProjectPath;
+    }
+
+    private static Material LoadOrCreateSequenceMaterial(string materialProjectPath, Texture2D atlasTexture)
+    {
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(materialProjectPath);
+        if (material == null)
+        {
+            Shader shader = Shader.Find("Hybrid/Baked Effect Atlas");
+            if (shader == null)
+            {
+                shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+            }
+            if (shader == null)
+            {
+                shader = Shader.Find("Sprites/Default");
+            }
+
+            material = new Material(shader)
+            {
+                name = Path.GetFileNameWithoutExtension(materialProjectPath),
+                enableInstancing = true
+            };
+            AssetDatabase.CreateAsset(material, materialProjectPath);
+        }
+
+        material.enableInstancing = true;
+        if (atlasTexture != null)
+        {
+            SetTextureIfExists(material, "_MainTex", atlasTexture);
+            SetTextureIfExists(material, "_BaseMap", atlasTexture);
+        }
+        SetColorIfExists(material, "_Tint", Color.white);
+        SetColorIfExists(material, "_BaseColor", Color.white);
+        SetColorIfExists(material, "_Color", Color.white);
+
+        EditorUtility.SetDirty(material);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.ImportAsset(materialProjectPath);
+        return material;
+    }
+
+    private static void SetTextureIfExists(Material material, string propertyName, Texture texture)
+    {
+        if (material != null && material.HasProperty(propertyName))
+        {
+            material.SetTexture(propertyName, texture);
+        }
+    }
+
+    private static void SetColorIfExists(Material material, string propertyName, Color color)
+    {
+        if (material != null && material.HasProperty(propertyName))
+        {
+            material.SetColor(propertyName, color);
+        }
     }
 
     private static ParticleAtlasFrameRect[] CreateFrameMetadata(ParticleAtlasBakeSettings settings, ParticleAtlasLayout layout, RectInt[] sourceRects, RectInt[] atlasRects, int outputStartFrame, int outputFrameCount)

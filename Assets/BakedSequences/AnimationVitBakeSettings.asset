@@ -12,16 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0db77acf6e40a9bbb9cb6857845ee0, type: 3}
   m_Name: AnimationVitBakeSettings
   m_EditorClassIdentifier: 
-  SourceRoot: {fileID: 8896642173588907156, guid: 4e0747b2f58f1124681a2a9688e70358, type: 3}
+  SourceRoot: {fileID: 3481391630212995604, guid: aff8eb26a701e7a4c975ea1e6af879fd, type: 3}
   Clips:
-  - {fileID: 7400000, guid: 643f04ef215a8564294768f7901fa2b6, type: 2}
-  - {fileID: 7400000, guid: 026e1e721a530bf4e9b05ee3fb26d55a, type: 2}
-  - {fileID: 7400000, guid: cd57147a3494e3548809f2d8f6105ab9, type: 2}
-  - {fileID: 7400000, guid: 03a586ef401d0894fb5adca0ac7754da, type: 2}
-  - {fileID: 7400000, guid: 575a048f001a65c489ed34a4736ad9a7, type: 2}
+  - {fileID: 7400000, guid: 9eb441b39e4e500409906422e5afee3d, type: 2}
+  - {fileID: 7400000, guid: d72aef4ede6edc5499ca56cc1e27c2e8, type: 2}
+  - {fileID: 7400000, guid: b134ded256a5c3848ba1451c842d24e9, type: 2}
+  - {fileID: 7400000, guid: 42366d2ae82df4246a3b513e498c9c7b, type: 2}
+  - {fileID: 7400000, guid: 4339387223e09f9409eb9cc470ed2985, type: 2}
+  - {fileID: 7400000, guid: 65057ab23e6ebd94d9a6602fbac10d7b, type: 2}
   ResolutionPreset: 1
   FrameRatePreset: 2
   SourceTextureMaxSize: 1024
   FrameRate: 30
-  OutputFolder: Assets/Res/Monster/Animal
+  OutputFolder: Assets/Res/Character
   OutputName: 

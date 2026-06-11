@@ -6,9 +6,9 @@
     "ratio": 10000,
     "fixedValue": 0,
     "damageElement": 0,
-    "canCrit": true,
+    "canCrit": false,
     "hitCount": 1,
-    "playHitReaction": true
+    "playHitReaction": false
   },
   {
     "id": 3002,
@@ -17,9 +17,9 @@
     "ratio": 12000,
     "fixedValue": 0,
     "damageElement": 0,
-    "canCrit": true,
+    "canCrit": false,
     "hitCount": 1,
-    "playHitReaction": true
+    "playHitReaction": false
   },
   {
     "id": 3003,

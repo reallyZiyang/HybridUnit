@@ -3,20 +3,27 @@ using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Unit;
 using UnityEngine;
+using ConfigBattle = Game.Data.Configs.Battle;
 
 namespace Game.Play.Battle.Projectile
 {
-    public sealed partial class BattleProjectileManager
+    public sealed partial class BattleProjectileManager : IBattleCollisionQueryVisitor
     {
+        private enum ProjectileVisitMode
+        {
+            Immediate,
+            NearestOnPath
+        }
+
         private readonly BattleRuntimeData data;
         private readonly BattleUnitManager units;
         private readonly BattleCollisionManager collisions;
         private readonly BattleEffectExecutor effects;
         private readonly IBattleRenderWorld renderWorld;
-        private readonly BattleCollisionQueryBuffer queryBuffer;
         private readonly int capacity;
         private readonly int hitRecordStride;
         private readonly Vector2[] positions;
+        private readonly Vector2[] previousPositions;
         private readonly Vector2[] directions;
         private readonly int[] projectileIds;
         private readonly int[] remainingMs;
@@ -33,6 +40,13 @@ namespace Game.Play.Battle.Projectile
 
         private int allocatedCount;
         private int freeCount;
+        private int visitProjectileIndex = -1;
+        private int nearestTargetIndex = -1;
+        private float nearestTargetT = float.MaxValue;
+        private Vector2 visitSegmentStart;
+        private Vector2 visitSegmentEnd;
+        private BattleProjectileRuntimeData visitProjectile;
+        private ProjectileVisitMode visitMode;
 
         public BattleProjectileManager(
             BattleRuntimeData data,
@@ -52,6 +66,7 @@ namespace Game.Play.Battle.Projectile
             this.capacity = Mathf.Max(1, capacity);
             this.hitRecordStride = Mathf.Max(1, hitRecordStride);
             positions = new Vector2[this.capacity];
+            previousPositions = new Vector2[this.capacity];
             directions = new Vector2[this.capacity];
             projectileIds = new int[this.capacity];
             remainingMs = new int[this.capacity];
@@ -65,7 +80,6 @@ namespace Game.Play.Battle.Projectile
             hitUnitIndices = new int[this.capacity * this.hitRecordStride];
             hitUnitGenerations = new int[this.capacity * this.hitRecordStride];
             hitCooldownMs = new int[this.capacity * this.hitRecordStride];
-            queryBuffer = new BattleCollisionQueryBuffer(Mathf.Max(1, queryCapacity));
 
             for (int i = 0; i < renderHandles.Length; i++)
             {
@@ -96,6 +110,7 @@ namespace Game.Play.Battle.Projectile
             projectileIds[index] = projectileId;
             sources[index] = source;
             positions[index] = position;
+            previousPositions[index] = position;
             directions[index] = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector2.right;
             remainingMs[index] = Mathf.Max(1, projectile.lifetimeMs);
             pierceRemaining[index] = Mathf.Max(1, projectile.pierceCount);
@@ -124,10 +139,12 @@ namespace Game.Play.Battle.Projectile
                 }
 
                 TickHitCooldowns(i, deltaMs);
+                Vector2 previousPosition = positions[i];
+                previousPositions[i] = previousPosition;
                 positions[i] += directions[i] * projectile.speed * dt;
                 remainingMs[i] -= deltaMs;
                 renderWorld?.SetPosition(renderHandles[i], positions[i]);
-                TryHitTargets(i, projectile);
+                TryHitTargets(i, projectile, previousPosition);
 
                 if (active[i] && remainingMs[i] <= 0)
                 {
@@ -147,32 +164,162 @@ namespace Game.Play.Battle.Projectile
             }
         }
 
-        private void TryHitTargets(int index, BattleProjectileRuntimeData projectile)
+        public bool Visit(int targetIndex)
         {
-            BattleCollisionShape shape = new()
+            if (visitProjectileIndex < 0 || !active[visitProjectileIndex])
             {
-                type = BattleCollisionShapeType.Circle,
-                center = positions[index],
-                radius = projectile.radius
-            };
-            collisions.Query(shape, EnemyOptions(index), queryBuffer);
-            for (int i = 0; i < queryBuffer.Count; i++)
+                return false;
+            }
+
+            BattleUnitHandle target = collisions.GetUnitHandle(targetIndex);
+            if (!CanHitTarget(visitProjectileIndex, target, visitProjectile))
             {
-                BattleUnitHandle target = collisions.GetUnitHandle(queryBuffer.TargetIndices[i]);
-                if (target.SameAs(sources[index]) || !units.IsAlive(target) || !CanHit(index, target, projectile.hitIntervalMs))
+                return true;
+            }
+
+            if (visitMode == ProjectileVisitMode.NearestOnPath)
+            {
+                float t = SegmentCircleEnterT(
+                    visitSegmentStart,
+                    visitSegmentEnd,
+                    units.GetPosition(target),
+                    visitProjectile.radius + units.GetRadius(target));
+                if (t < nearestTargetT)
                 {
-                    continue;
+                    nearestTargetT = t;
+                    nearestTargetIndex = targetIndex;
                 }
 
-                SetHitCooldown(index, target, projectile.hitIntervalMs);
-                effects.ExecuteEffects(projectile.hitEffects, sources[index], target, positions[index], directions[index]);
-                pierceRemaining[index]--;
-                if (pierceRemaining[index] <= 0)
+                return true;
+            }
+
+            ExecuteHit(visitProjectileIndex, target, visitProjectile);
+            return active[visitProjectileIndex] && pierceRemaining[visitProjectileIndex] > 0;
+        }
+
+        private void TryHitTargets(int index, BattleProjectileRuntimeData projectile, Vector2 previousPosition)
+        {
+            if (projectile.queryQuality == ConfigBattle.QueryQuality.Low)
+            {
+                BattleCollisionShape shape = new()
                 {
-                    DespawnAt(index);
-                    return;
+                    type = BattleCollisionShapeType.Circle,
+                    center = positions[index],
+                    radius = projectile.radius
+                };
+                VisitImmediate(index, projectile, shape, previousPosition, positions[index]);
+                return;
+            }
+
+            BattleCollisionShape pathShape = new()
+            {
+                type = BattleCollisionShapeType.CapsuleSegment,
+                start = previousPosition,
+                end = positions[index],
+                width = projectile.radius * 2f
+            };
+
+            if (projectile.queryQuality == ConfigBattle.QueryQuality.High)
+            {
+                VisitNearestOnPath(index, projectile, pathShape, previousPosition, positions[index]);
+            }
+            else
+            {
+                VisitImmediate(index, projectile, pathShape, previousPosition, positions[index]);
+            }
+        }
+
+        private void VisitImmediate(int index, BattleProjectileRuntimeData projectile, BattleCollisionShape shape, Vector2 start, Vector2 end)
+        {
+            BeginVisit(index, projectile, ProjectileVisitMode.Immediate, start, end);
+            collisions.QueryVisit(shape, EnemyOptions(index), this);
+            EndVisit();
+        }
+
+        private void VisitNearestOnPath(int index, BattleProjectileRuntimeData projectile, BattleCollisionShape shape, Vector2 start, Vector2 end)
+        {
+            BeginVisit(index, projectile, ProjectileVisitMode.NearestOnPath, start, end);
+            collisions.QueryVisit(shape, EnemyOptions(index), this);
+            int targetIndex = nearestTargetIndex;
+            EndVisit();
+
+            if (active[index] && targetIndex >= 0)
+            {
+                BattleUnitHandle target = collisions.GetUnitHandle(targetIndex);
+                if (CanHitTarget(index, target, projectile))
+                {
+                    ExecuteHit(index, target, projectile);
                 }
             }
+        }
+
+        private void BeginVisit(int index, BattleProjectileRuntimeData projectile, ProjectileVisitMode mode, Vector2 start, Vector2 end)
+        {
+            visitProjectileIndex = index;
+            visitProjectile = projectile;
+            visitMode = mode;
+            visitSegmentStart = start;
+            visitSegmentEnd = end;
+            nearestTargetIndex = -1;
+            nearestTargetT = float.MaxValue;
+        }
+
+        private void EndVisit()
+        {
+            visitProjectileIndex = -1;
+            nearestTargetIndex = -1;
+            nearestTargetT = float.MaxValue;
+        }
+
+        private bool CanHitTarget(int index, BattleUnitHandle target, BattleProjectileRuntimeData projectile)
+        {
+            return !target.SameAs(sources[index])
+                && units.IsAlive(target)
+                && CanHit(index, target, projectile.hitIntervalMs);
+        }
+
+        private void ExecuteHit(int index, BattleUnitHandle target, BattleProjectileRuntimeData projectile)
+        {
+            SetHitCooldown(index, target, projectile.hitIntervalMs);
+            effects.ExecuteEffects(projectile.hitEffects, sources[index], target, positions[index], directions[index]);
+            pierceRemaining[index]--;
+            if (pierceRemaining[index] <= 0)
+            {
+                DespawnAt(index);
+            }
+        }
+
+        private static float SegmentCircleEnterT(Vector2 start, Vector2 end, Vector2 center, float radius)
+        {
+            Vector2 segment = end - start;
+            float a = Vector2.Dot(segment, segment);
+            if (a <= 0.000001f)
+            {
+                return 0f;
+            }
+
+            Vector2 fromCenter = start - center;
+            float c = Vector2.Dot(fromCenter, fromCenter) - radius * radius;
+            if (c <= 0f)
+            {
+                return 0f;
+            }
+
+            float b = 2f * Vector2.Dot(fromCenter, segment);
+            float discriminant = b * b - 4f * a * c;
+            if (discriminant < 0f)
+            {
+                return Mathf.Clamp01(Vector2.Dot(center - start, segment) / a);
+            }
+
+            float sqrt = Mathf.Sqrt(discriminant);
+            float t = (-b - sqrt) / (2f * a);
+            if (t < 0f || t > 1f)
+            {
+                t = (-b + sqrt) / (2f * a);
+            }
+
+            return Mathf.Clamp01(t);
         }
 
         private BattleCollisionQueryOptions EnemyOptions(int index)

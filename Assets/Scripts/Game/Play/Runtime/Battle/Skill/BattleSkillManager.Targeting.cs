@@ -8,6 +8,8 @@ namespace Game.Play.Battle.Skill
 {
     public sealed partial class BattleSkillManager
     {
+        private static bool invalidCastRangeWarned;
+
         private void FireSkill(BattleUnitHandle caster, BattleUnitHandle target, BattleSkillRuntimeData skill)
         {
             if (!units.IsAlive(caster))
@@ -61,14 +63,26 @@ namespace Game.Play.Battle.Skill
                 return caster;
             }
 
-            float radius = skill.shape != null && skill.shape.Radius > 0f ? skill.shape.Radius : 100f;
+            float radius = ResolveCastRange(skill);
             BattleCollisionShape shape = new()
             {
                 type = BattleCollisionShapeType.Circle,
                 center = units.GetPosition(caster),
                 radius = radius
             };
-            collisions.Query(shape, EnemyOptions(caster, 0, true), queryBuffer);
+            BattleCollisionQueryOptions options = EnemyOptions(caster, 0, true);
+            if (skill.selectType == ConfigBattle.TargetSelectType.Nearest)
+            {
+                if (!collisions.QueryNearestCircle(shape.center, radius, options, out int nearestTargetIndex))
+                {
+                    return BattleUnitHandle.Invalid;
+                }
+
+                BattleUnitHandle nearestTarget = collisions.GetUnitHandle(nearestTargetIndex);
+                return !nearestTarget.SameAs(caster) && units.IsAlive(nearestTarget) ? nearestTarget : BattleUnitHandle.Invalid;
+            }
+
+            collisions.Query(shape, options, queryBuffer);
             for (int i = 0; i < queryBuffer.Count; i++)
             {
                 BattleUnitHandle target = collisions.GetUnitHandle(queryBuffer.TargetIndices[i]);
@@ -79,6 +93,22 @@ namespace Game.Play.Battle.Skill
             }
 
             return BattleUnitHandle.Invalid;
+        }
+
+        private static float ResolveCastRange(BattleSkillRuntimeData skill)
+        {
+            if (skill.castRange > 0f)
+            {
+                return skill.castRange;
+            }
+
+            if (!invalidCastRangeWarned)
+            {
+                invalidCastRangeWarned = true;
+                Debug.LogWarning($"[BattleSkill] Skill {skill.id} has invalid castRange {skill.castRange}. Fallback to 1.");
+            }
+
+            return 1f;
         }
 
         private BattleCollisionQueryOptions EnemyOptions(BattleUnitHandle caster, int maxHits, bool sortByDistance)

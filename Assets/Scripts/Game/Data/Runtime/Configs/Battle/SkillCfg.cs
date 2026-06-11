@@ -23,6 +23,7 @@ public sealed partial class SkillCfg : Luban.BeanBase
         { if(!_buf["castPreMs"].IsNumber) { throw new SerializationException(); }  CastPreMs = _buf["castPreMs"]; }
         { if(!_buf["castBackMs"].IsNumber) { throw new SerializationException(); }  CastBackMs = _buf["castBackMs"]; }
         { if(!_buf["cooldownMs"].IsNumber) { throw new SerializationException(); }  CooldownMs = _buf["cooldownMs"]; }
+        { if(!_buf["castRange"].IsNumber) { throw new SerializationException(); }  CastRange = _buf["castRange"]; }
         { if(!_buf["targetType"].IsNumber) { throw new SerializationException(); }  TargetType = (Battle.SkillTargetType)_buf["targetType"].AsInt; }
         { if(!_buf["selectType"].IsNumber) { throw new SerializationException(); }  SelectType = (Battle.TargetSelectType)_buf["selectType"].AsInt; }
         { if(!_buf["shape"].IsObject) { throw new SerializationException(); }  Shape = global::Game.Data.Configs.Battle.BattleShapeDesc.DeserializeBattleShapeDesc(_buf["shape"]);  }
@@ -59,6 +60,10 @@ public sealed partial class SkillCfg : Luban.BeanBase
     /// </summary>
     public readonly int CooldownMs;
     /// <summary>
+    /// ????
+    /// </summary>
+    public readonly float CastRange;
+    /// <summary>
     /// 目标类型
     /// </summary>
     public readonly Battle.SkillTargetType TargetType;
@@ -93,6 +98,7 @@ public sealed partial class SkillCfg : Luban.BeanBase
         + "castPreMs:" + CastPreMs + ","
         + "castBackMs:" + CastBackMs + ","
         + "cooldownMs:" + CooldownMs + ","
+        + "castRange:" + CastRange + ","
         + "targetType:" + TargetType + ","
         + "selectType:" + SelectType + ","
         + "shape:" + Shape + ","

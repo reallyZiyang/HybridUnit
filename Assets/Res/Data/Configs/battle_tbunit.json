@@ -1,8 +1,41 @@
 [
   {
     "id": 1001,
-    "name": "玩家",
-    "radius": 0.35,
+    "name": "弓箭手",
+    "radius": 0.5,
+    "camp": 1,
+    "layer": 0,
+    "attrs": [
+      {
+        "id": 102,
+        "value": 500
+      },
+      {
+        "id": 105,
+        "value": 500
+      },
+      {
+        "id": 101,
+        "value": 50
+      },
+      {
+        "id": 103,
+        "value": 10
+      },
+      {
+        "id": 104,
+        "value": 300
+      }
+    ],
+    "defaultSkills": [
+      2002
+    ],
+    "renderKey": "Character_1_AnimationVit"
+  },
+  {
+    "id": 1002,
+    "name": "野蛮人",
+    "radius": 0.5,
     "camp": 1,
     "layer": 0,
     "attrs": [
@@ -28,15 +61,14 @@
       }
     ],
     "defaultSkills": [
-      2001,
-      2002
+      2001
     ],
-    "renderKey": "Cat"
+    "renderKey": "Character_2_AnimationVit"
   },
   {
-    "id": 1101,
-    "name": "小怪",
-    "radius": 0.35,
+    "id": 2001,
+    "name": "野猫",
+    "radius": 0.5,
     "camp": 2,
     "layer": 0,
     "attrs": [
@@ -62,8 +94,41 @@
       }
     ],
     "defaultSkills": [
-      2101
+      2001
     ],
-    "renderKey": "Dog"
+    "renderKey": "Animal_Cat_AnimationVit"
+  },
+  {
+    "id": 2002,
+    "name": "野狗",
+    "radius": 0.5,
+    "camp": 2,
+    "layer": 0,
+    "attrs": [
+      {
+        "id": 102,
+        "value": 300
+      },
+      {
+        "id": 105,
+        "value": 300
+      },
+      {
+        "id": 101,
+        "value": 20
+      },
+      {
+        "id": 103,
+        "value": 3
+      },
+      {
+        "id": 104,
+        "value": 220
+      }
+    ],
+    "defaultSkills": [
+      2001
+    ],
+    "renderKey": "Animal_Dog_AnimationVit"
   }
 ]

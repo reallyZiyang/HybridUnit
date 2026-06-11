@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -28,6 +29,12 @@ namespace Game.Play.Rendering.Runtime
         public Quaternion rotation;
         public Vector3 scale;
         public Color color;
+        public Vector4 frameUvRect;
+        public Vector4 frameUvClamp;
+        public Vector4 frameTransform;
+        public float frameIndex;
+        public Vector4 renderTransform;
+        public Vector4 renderRotation;
         public int layer;
         public Bounds bounds;
     }
@@ -37,6 +44,12 @@ namespace Game.Play.Rendering.Runtime
         private const int DefaultCapacity = 128;
         private const int MaxBatchSize = 1023;
         private static readonly int InstanceColorId = Shader.PropertyToID("_InstanceColor");
+        private static readonly int FrameUvRectId = Shader.PropertyToID("_FrameUVRect");
+        private static readonly int FrameUvClampId = Shader.PropertyToID("_FrameUVClamp");
+        private static readonly int FrameTransformId = Shader.PropertyToID("_FrameTransform");
+        private static readonly int FrameIndexId = Shader.PropertyToID("_FrameIndex");
+        private static readonly int RenderTransId = Shader.PropertyToID("_RenderTrans");
+        private static readonly int RenderRotationId = Shader.PropertyToID("_RenderRotation");
         private static Mesh sharedQuadMesh;
 
         private readonly List<Slot> slots = new(DefaultCapacity);
@@ -45,6 +58,12 @@ namespace Game.Play.Rendering.Runtime
         private readonly List<BatchKey> batchKeys = new(32);
         private readonly Matrix4x4[] matrices = new Matrix4x4[MaxBatchSize];
         private readonly Vector4[] colors = new Vector4[MaxBatchSize];
+        private readonly Vector4[] frameUvRects = new Vector4[MaxBatchSize];
+        private readonly Vector4[] frameUvClamps = new Vector4[MaxBatchSize];
+        private readonly Vector4[] frameTransforms = new Vector4[MaxBatchSize];
+        private readonly float[] frameIndices = new float[MaxBatchSize];
+        private readonly Vector4[] renderTransforms = new Vector4[MaxBatchSize];
+        private readonly Vector4[] renderRotations = new Vector4[MaxBatchSize];
         private readonly MaterialPropertyBlock propertyBlock = new();
 
         private struct Slot
@@ -58,11 +77,17 @@ namespace Game.Play.Rendering.Runtime
             public Quaternion rotation;
             public Vector3 scale;
             public Color color;
+            public Vector4 frameUvRect;
+            public Vector4 frameUvClamp;
+            public Vector4 frameTransform;
+            public float frameIndex;
+            public Vector4 renderTransform;
+            public Vector4 renderRotation;
             public int layer;
             public Bounds bounds;
         }
 
-        private readonly struct BatchKey
+        private readonly struct BatchKey : IEquatable<BatchKey>
         {
             private readonly int meshId;
             private readonly int materialId;
@@ -73,6 +98,29 @@ namespace Game.Play.Rendering.Runtime
                 meshId = mesh != null ? mesh.GetInstanceID() : 0;
                 materialId = material != null ? material.GetInstanceID() : 0;
                 this.layer = layer;
+            }
+
+            public bool Equals(BatchKey other)
+            {
+                return meshId == other.meshId
+                    && materialId == other.materialId
+                    && layer == other.layer;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is BatchKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    int hash = meshId;
+                    hash = (hash * 397) ^ materialId;
+                    hash = (hash * 397) ^ layer;
+                    return hash;
+                }
             }
         }
 
@@ -104,6 +152,12 @@ namespace Game.Play.Rendering.Runtime
             slot.rotation = desc.rotation == default ? Quaternion.identity : desc.rotation;
             slot.scale = desc.scale == Vector3.zero ? Vector3.one : desc.scale;
             slot.color = desc.color == default ? Color.white : desc.color;
+            slot.frameUvRect = desc.frameUvRect == default ? new Vector4(0f, 0f, 1f, 1f) : desc.frameUvRect;
+            slot.frameUvClamp = desc.frameUvClamp == default ? new Vector4(0f, 0f, 1f, 1f) : desc.frameUvClamp;
+            slot.frameTransform = desc.frameTransform == default ? new Vector4(0f, 0f, 1f, 1f) : desc.frameTransform;
+            slot.frameIndex = Mathf.Max(0f, desc.frameIndex);
+            slot.renderTransform = desc.renderTransform == default ? new Vector4(0f, 0f, 1f, 1f) : desc.renderTransform;
+            slot.renderRotation = desc.renderRotation == default ? new Vector4(1f, 0f, 0f, 0f) : desc.renderRotation;
             slot.layer = desc.layer;
             slot.bounds = desc.bounds;
 
@@ -176,6 +230,45 @@ namespace Game.Play.Rendering.Runtime
             slots[handle.index] = slot;
         }
 
+        public void SetRenderTransform(BattleDrawMeshInstanceHandle handle, Vector4 renderTransform, Vector4 renderRotation)
+        {
+            if (!IsValid(handle))
+            {
+                return;
+            }
+
+            Slot slot = slots[handle.index];
+            slot.renderTransform = renderTransform == default ? new Vector4(0f, 0f, 1f, 1f) : renderTransform;
+            slot.renderRotation = renderRotation == default ? new Vector4(1f, 0f, 0f, 0f) : renderRotation;
+            slots[handle.index] = slot;
+        }
+
+        public void SetFrameData(BattleDrawMeshInstanceHandle handle, Vector4 frameUvRect, Vector4 frameUvClamp, Vector4 frameTransform)
+        {
+            if (!IsValid(handle))
+            {
+                return;
+            }
+
+            Slot slot = slots[handle.index];
+            slot.frameUvRect = frameUvRect == default ? new Vector4(0f, 0f, 1f, 1f) : frameUvRect;
+            slot.frameUvClamp = frameUvClamp == default ? new Vector4(0f, 0f, 1f, 1f) : frameUvClamp;
+            slot.frameTransform = frameTransform == default ? new Vector4(0f, 0f, 1f, 1f) : frameTransform;
+            slots[handle.index] = slot;
+        }
+
+        public void SetFrameIndex(BattleDrawMeshInstanceHandle handle, float frameIndex)
+        {
+            if (!IsValid(handle))
+            {
+                return;
+            }
+
+            Slot slot = slots[handle.index];
+            slot.frameIndex = Mathf.Max(0f, frameIndex);
+            slots[handle.index] = slot;
+        }
+
         public void SetVisible(BattleDrawMeshInstanceHandle handle, bool visible)
         {
             if (!IsValid(handle))
@@ -221,6 +314,7 @@ namespace Game.Play.Rendering.Runtime
             freeIndices.Clear();
             slots.Clear();
             batches.Clear();
+            batchKeys.Clear();
             ActiveCount = 0;
         }
 
@@ -236,7 +330,11 @@ namespace Game.Play.Rendering.Runtime
             for (int keyIndex = 0; keyIndex < batchKeys.Count; keyIndex++)
             {
                 BatchKey key = batchKeys[keyIndex];
-                List<int> indices = batches[key];
+                if (!batches.TryGetValue(key, out List<int> indices) || indices.Count == 0)
+                {
+                    continue;
+                }
+
                 drawCount += DrawBatch(indices, camera);
             }
 
@@ -276,8 +374,14 @@ namespace Game.Play.Rendering.Runtime
 
         private void BuildBatches()
         {
-            batches.Clear();
-            batchKeys.Clear();
+            for (int keyIndex = 0; keyIndex < batchKeys.Count; keyIndex++)
+            {
+                if (batches.TryGetValue(batchKeys[keyIndex], out List<int> indices))
+                {
+                    indices.Clear();
+                }
+            }
+
             for (int i = 0; i < slots.Count; i++)
             {
                 Slot slot = slots[i];
@@ -311,10 +415,22 @@ namespace Game.Play.Rendering.Runtime
                     Slot slot = slots[indices[cursor + i]];
                     matrices[i] = Matrix4x4.TRS(slot.position, slot.rotation, slot.scale);
                     colors[i] = slot.color;
+                    frameUvRects[i] = slot.frameUvRect;
+                    frameUvClamps[i] = slot.frameUvClamp;
+                    frameTransforms[i] = slot.frameTransform;
+                    frameIndices[i] = slot.frameIndex;
+                    renderTransforms[i] = slot.renderTransform;
+                    renderRotations[i] = slot.renderRotation;
                 }
 
                 propertyBlock.Clear();
                 propertyBlock.SetVectorArray(InstanceColorId, colors);
+                propertyBlock.SetVectorArray(FrameUvRectId, frameUvRects);
+                propertyBlock.SetVectorArray(FrameUvClampId, frameUvClamps);
+                propertyBlock.SetVectorArray(FrameTransformId, frameTransforms);
+                propertyBlock.SetFloatArray(FrameIndexId, frameIndices);
+                propertyBlock.SetVectorArray(RenderTransId, renderTransforms);
+                propertyBlock.SetVectorArray(RenderRotationId, renderRotations);
                 Graphics.DrawMeshInstanced(
                     first.mesh,
                     0,

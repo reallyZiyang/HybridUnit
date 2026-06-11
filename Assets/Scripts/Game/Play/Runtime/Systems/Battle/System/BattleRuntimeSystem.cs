@@ -71,7 +71,7 @@ namespace Game.Play.Systems.Battle.System
             Tables safeTables = tables ?? API.Tables;
             RuntimeData = BattleRuntimeData.Build(safeTables);
             this.logicStepMs = Mathf.Max(1, logicStepMs);
-            this.renderWorld = renderWorld ?? new GameObjectBattleRenderWorld();
+            this.renderWorld = renderWorld ?? new DrawMeshBattleRenderWorld();
             accumulatedMs = 0f;
             IsPaused = false;
 
