@@ -5,6 +5,14 @@ using UnityEngine;
 
 namespace Game.Play.Battle.Tester
 {
+    public enum BattleTesterSpawnMultiplierPreset
+    {
+        X1 = 0,
+        X5 = 1,
+        X10 = 2,
+        Custom = 3
+    }
+
     [CreateAssetMenu(menuName = "Game/Battle/Tester Scenario", fileName = "BattleTesterScenario")]
     public sealed class BattleTesterScenario : ScriptableObject
     {
@@ -17,11 +25,14 @@ namespace Game.Play.Battle.Tester
         public bool autoStart = true;
         public float defaultRunSeconds = 10f;
         public bool useNullRenderWorld;
+        public BattleTesterSpawnMultiplierPreset spawnMultiplierPreset = BattleTesterSpawnMultiplierPreset.X1;
+        public int customSpawnMultiplier = 1;
         [Header("Player Side")]
         public BattleTesterUnitEntry[] playerUnits =
         {
             new()
             {
+                enabled = true,
                 label = "Player",
                 unitCfgId = 1001,
                 camp = 1,
@@ -34,6 +45,7 @@ namespace Game.Play.Battle.Tester
         {
             new()
             {
+                enabled = true,
                 label = "Enemy",
                 unitCfgId = 1101,
                 camp = 2,
@@ -108,6 +120,7 @@ namespace Game.Play.Battle.Tester
     [Serializable]
     public sealed class BattleTesterUnitEntry
     {
+        public bool enabled = true;
         public string label;
         public int unitCfgId;
         public int camp;

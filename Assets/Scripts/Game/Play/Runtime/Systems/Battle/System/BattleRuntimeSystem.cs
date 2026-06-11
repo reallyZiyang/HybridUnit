@@ -180,6 +180,7 @@ namespace Game.Play.Systems.Battle.System
 
             if (IsPaused)
             {
+                renderWorld?.Tick(0f);
                 return;
             }
 

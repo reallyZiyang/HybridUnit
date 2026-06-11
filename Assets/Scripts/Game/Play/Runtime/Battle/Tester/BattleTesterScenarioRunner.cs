@@ -15,7 +15,7 @@ namespace Game.Play.Battle.Tester
                 return default;
             }
 
-            BattleTesterUnitEntry[] units = scenario.GetAllUnits();
+            BattleTesterUnitEntry[] units = ExpandUnits(scenario);
             int unitCount = units.Length;
             int unitCapacity = Mathf.Max(16, unitCount + 4);
             BattleRuntimeSystem battle = new();
@@ -41,7 +41,121 @@ namespace Game.Play.Battle.Tester
                     : battle.SpawnUnit(unit.unitCfgId, unit.position, unit.ToSpawnOverrides());
             }
 
-            return new BattleTesterRunResult(battle, handles);
+            return new BattleTesterRunResult(battle, handles, units);
+        }
+
+        public static int GetSpawnMultiplier(BattleTesterScenario scenario)
+        {
+            if (scenario == null)
+            {
+                return 1;
+            }
+
+            return scenario.spawnMultiplierPreset switch
+            {
+                BattleTesterSpawnMultiplierPreset.X5 => 5,
+                BattleTesterSpawnMultiplierPreset.X10 => 10,
+                BattleTesterSpawnMultiplierPreset.Custom => Mathf.Max(1, scenario.customSpawnMultiplier),
+                _ => 1
+            };
+        }
+
+        public static int CountExpandedUnits(BattleTesterScenario scenario)
+        {
+            if (scenario == null)
+            {
+                return 0;
+            }
+
+            int multiplier = GetSpawnMultiplier(scenario);
+            BattleTesterUnitEntry[] units = scenario.GetAllUnits();
+            int count = 0;
+            for (int i = 0; i < units.Length; i++)
+            {
+                if (units[i] != null && units[i].enabled)
+                {
+                    count += multiplier;
+                }
+            }
+
+            return count;
+        }
+
+        public static BattleTesterUnitEntry[] ExpandUnits(BattleTesterScenario scenario)
+        {
+            if (scenario == null)
+            {
+                return System.Array.Empty<BattleTesterUnitEntry>();
+            }
+
+            int multiplier = GetSpawnMultiplier(scenario);
+            BattleTesterUnitEntry[] templates = scenario.GetAllUnits();
+            BattleTesterUnitEntry[] expanded = new BattleTesterUnitEntry[CountExpandedUnits(scenario)];
+            int cursor = 0;
+            for (int i = 0; i < templates.Length; i++)
+            {
+                BattleTesterUnitEntry template = templates[i];
+                if (template == null || !template.enabled)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < multiplier; j++)
+                {
+                    BattleTesterUnitEntry unit = CloneUnit(template);
+                    unit.position = GetExpandedPosition(template.position, j, multiplier, scenario.cellSize);
+                    expanded[cursor++] = unit;
+                }
+            }
+
+            return expanded;
+        }
+
+        public static Vector2 GetExpandedPosition(Vector2 origin, int index, int count, float cellSize)
+        {
+            if (count <= 1)
+            {
+                return origin;
+            }
+
+            int columns = Mathf.CeilToInt(Mathf.Sqrt(count));
+            int rows = Mathf.CeilToInt(count / (float)columns);
+            int x = index % columns;
+            int y = index / columns;
+            float spacing = Mathf.Max(0.25f, cellSize * 0.35f);
+            Vector2 centerOffset = new((columns - 1) * 0.5f, (rows - 1) * 0.5f);
+            return origin + new Vector2((x - centerOffset.x) * spacing, (y - centerOffset.y) * spacing);
+        }
+
+        private static BattleTesterUnitEntry CloneUnit(BattleTesterUnitEntry unit)
+        {
+            return new BattleTesterUnitEntry
+            {
+                enabled = unit.enabled,
+                label = unit.label,
+                unitCfgId = unit.unitCfgId,
+                camp = unit.camp,
+                position = unit.position,
+                overrideRadius = unit.overrideRadius,
+                radius = unit.radius,
+                overrideLayer = unit.overrideLayer,
+                layer = unit.layer,
+                renderKey = unit.renderKey,
+                skillIds = unit.skillIds != null ? (int[])unit.skillIds.Clone() : System.Array.Empty<int>(),
+                attrs = CloneAttrs(unit.attrs)
+            };
+        }
+
+        private static BattleTesterAttributeOverride[] CloneAttrs(BattleTesterAttributeOverride[] attrs)
+        {
+            if (attrs == null || attrs.Length == 0)
+            {
+                return System.Array.Empty<BattleTesterAttributeOverride>();
+            }
+
+            BattleTesterAttributeOverride[] result = new BattleTesterAttributeOverride[attrs.Length];
+            System.Array.Copy(attrs, result, attrs.Length);
+            return result;
         }
     }
 
@@ -49,11 +163,13 @@ namespace Game.Play.Battle.Tester
     {
         public readonly BattleRuntimeSystem battle;
         public readonly BattleUnitHandle[] units;
+        public readonly BattleTesterUnitEntry[] sources;
 
-        public BattleTesterRunResult(BattleRuntimeSystem battle, BattleUnitHandle[] units)
+        public BattleTesterRunResult(BattleRuntimeSystem battle, BattleUnitHandle[] units, BattleTesterUnitEntry[] sources)
         {
             this.battle = battle;
             this.units = units;
+            this.sources = sources;
         }
     }
 }

@@ -15,6 +15,8 @@ namespace Game.Play.Tests.Battle
         public void ScenarioJson_RoundTripsUnitOverrides()
         {
             BattleTesterScenario scenario = CreateScenario();
+            scenario.spawnMultiplierPreset = BattleTesterSpawnMultiplierPreset.X10;
+            scenario.customSpawnMultiplier = 13;
 
             string json = BattleTesterScenarioJsonUtility.ToJson(scenario);
             BattleTesterScenario restored = BattleTesterScenarioJsonUtility.FromJson(json);
@@ -22,8 +24,11 @@ namespace Game.Play.Tests.Battle
             Assert.AreEqual(scenario.scenarioName, restored.scenarioName);
             Assert.AreEqual(1, restored.playerUnits.Length);
             Assert.AreEqual(1, restored.enemyUnits.Length);
+            Assert.AreEqual(BattleTesterSpawnMultiplierPreset.X10, restored.spawnMultiplierPreset);
+            Assert.AreEqual(13, restored.customSpawnMultiplier);
             Assert.AreEqual(999, restored.playerUnits[0].attrs[0].value);
             Assert.AreEqual(2002, restored.playerUnits[0].skillIds[0]);
+            Assert.IsTrue(restored.playerUnits[0].enabled);
             Assert.AreEqual(new Vector2(1f, 0f), restored.enemyUnits[0].position);
 
             Object.DestroyImmediate(scenario);
@@ -43,6 +48,44 @@ namespace Game.Play.Tests.Battle
             Assert.AreEqual(999, result.battle.UnitManager.GetAttr(player, AttributeType.Atk));
             Assert.AreEqual(777, result.battle.UnitManager.GetHp(player));
             Assert.AreEqual(1, result.battle.UnitManager.GetSkillSlotCount(player));
+
+            result.battle.DisposeBattle();
+            Object.DestroyImmediate(scenario);
+        }
+
+        [Test]
+        public void ScenarioRunner_ExpandsUnitsBySpawnMultiplier()
+        {
+            Tables tables = LoadTables();
+            BattleTesterScenario scenario = CreateScenario();
+            scenario.spawnMultiplierPreset = BattleTesterSpawnMultiplierPreset.X5;
+
+            BattleTesterRunResult result = BattleTesterScenarioRunner.Start(tables, scenario, new NullBattleRenderWorld());
+
+            Assert.AreEqual(10, result.units.Length);
+            Assert.AreEqual(10, result.sources.Length);
+            Assert.AreEqual(1001, result.sources[0].unitCfgId);
+            Assert.AreNotEqual(result.sources[0].position, result.sources[1].position);
+
+            result.battle.DisposeBattle();
+            Object.DestroyImmediate(scenario);
+        }
+
+        [Test]
+        public void ScenarioRunner_SkipsDisabledTemplates()
+        {
+            Tables tables = LoadTables();
+            BattleTesterScenario scenario = CreateScenario();
+            scenario.spawnMultiplierPreset = BattleTesterSpawnMultiplierPreset.X10;
+            scenario.enemyUnits[0].enabled = false;
+
+            BattleTesterRunResult result = BattleTesterScenarioRunner.Start(tables, scenario, new NullBattleRenderWorld());
+
+            Assert.AreEqual(10, result.units.Length);
+            for (int i = 0; i < result.sources.Length; i++)
+            {
+                Assert.AreEqual(1, result.sources[i].camp);
+            }
 
             result.battle.DisposeBattle();
             Object.DestroyImmediate(scenario);
@@ -85,6 +128,7 @@ namespace Game.Play.Tests.Battle
             {
                 new BattleTesterUnitEntry
                 {
+                    enabled = true,
                     label = "Player",
                     unitCfgId = 1001,
                     camp = 1,
@@ -102,6 +146,7 @@ namespace Game.Play.Tests.Battle
             {
                 new BattleTesterUnitEntry
                 {
+                    enabled = true,
                     label = "Enemy",
                     unitCfgId = 1101,
                     camp = 2,

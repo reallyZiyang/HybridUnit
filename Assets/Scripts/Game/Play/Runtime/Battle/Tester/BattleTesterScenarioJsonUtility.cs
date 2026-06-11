@@ -6,6 +6,8 @@ namespace Game.Play.Battle.Tester
 {
     public static class BattleTesterScenarioJsonUtility
     {
+        private const int CurrentSchemaVersion = 2;
+
         public static string ToJson(BattleTesterScenario scenario, bool prettyPrint = true)
         {
             return JsonUtility.ToJson(ToJsonData(scenario), prettyPrint);
@@ -28,6 +30,7 @@ namespace Game.Play.Battle.Tester
         {
             BattleTesterScenarioJson data = new()
             {
+                schemaVersion = CurrentSchemaVersion,
                 scenarioName = scenario.scenarioName,
                 logicStepMs = scenario.logicStepMs,
                 gridMinX = scenario.gridMin.x,
@@ -38,6 +41,8 @@ namespace Game.Play.Battle.Tester
                 autoStart = scenario.autoStart,
                 defaultRunSeconds = scenario.defaultRunSeconds,
                 useNullRenderWorld = scenario.useNullRenderWorld,
+                spawnMultiplierPreset = scenario.spawnMultiplierPreset.ToString(),
+                customSpawnMultiplier = scenario.customSpawnMultiplier,
                 playerUnits = ToJsonUnits(scenario.playerUnits),
                 enemyUnits = ToJsonUnits(scenario.enemyUnits),
                 units = ToJsonUnits(scenario.units)
@@ -58,6 +63,8 @@ namespace Game.Play.Battle.Tester
                 BattleTesterUnitEntry unit = units[i] ?? new BattleTesterUnitEntry();
                 result[i] = new BattleTesterUnitJson
                 {
+                    schemaVersion = CurrentSchemaVersion,
+                    enabled = unit.enabled,
                     label = unit.label,
                     unitCfgId = unit.unitCfgId,
                     camp = unit.camp,
@@ -112,6 +119,10 @@ namespace Game.Play.Battle.Tester
             scenario.autoStart = data.autoStart;
             scenario.defaultRunSeconds = data.defaultRunSeconds;
             scenario.useNullRenderWorld = data.useNullRenderWorld;
+            scenario.spawnMultiplierPreset = Enum.TryParse(data.spawnMultiplierPreset, out BattleTesterSpawnMultiplierPreset preset)
+                ? preset
+                : BattleTesterSpawnMultiplierPreset.X1;
+            scenario.customSpawnMultiplier = Mathf.Max(1, data.customSpawnMultiplier);
             BattleTesterUnitEntry[] players = FromJsonUnits(data.playerUnits);
             BattleTesterUnitEntry[] enemies = FromJsonUnits(data.enemyUnits);
             if ((players.Length == 0 && enemies.Length == 0) && data.units != null && data.units.Length > 0)
@@ -135,6 +146,7 @@ namespace Game.Play.Battle.Tester
                 BattleTesterUnitJson unit = units[i] ?? new BattleTesterUnitJson();
                 result[i] = new BattleTesterUnitEntry
                 {
+                    enabled = unit.enabled || unit.schemaVersion <= 0,
                     label = unit.label,
                     unitCfgId = unit.unitCfgId,
                     camp = unit.camp,
@@ -210,6 +222,7 @@ namespace Game.Play.Battle.Tester
     [Serializable]
     public sealed class BattleTesterScenarioJson
     {
+        public int schemaVersion;
         public string scenarioName;
         public int logicStepMs;
         public float gridMinX;
@@ -220,6 +233,8 @@ namespace Game.Play.Battle.Tester
         public bool autoStart;
         public float defaultRunSeconds;
         public bool useNullRenderWorld;
+        public string spawnMultiplierPreset;
+        public int customSpawnMultiplier;
         public BattleTesterUnitJson[] playerUnits;
         public BattleTesterUnitJson[] enemyUnits;
         public BattleTesterUnitJson[] units;
@@ -228,6 +243,8 @@ namespace Game.Play.Battle.Tester
     [Serializable]
     public sealed class BattleTesterUnitJson
     {
+        public int schemaVersion;
+        public bool enabled;
         public string label;
         public int unitCfgId;
         public int camp;

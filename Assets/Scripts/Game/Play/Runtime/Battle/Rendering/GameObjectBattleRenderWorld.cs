@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game.Play.Rendering.Runtime;
 using UniKit.Asset;
 using UniKit.Asset.Pooling;
 using UnityEngine;
@@ -28,6 +29,7 @@ namespace Game.Play.Battle.Rendering
             public BakedAnimationVitPlayer unitPlayer;
             public BakedSequencePlayer sequence;
             public ParticleSystem particle;
+            public BattleDrawMeshInstanceHandle instanceHandle;
             public int unitReturnIdleMs;
             public int unitDeathFadeDelayMs;
             public int unitDeathFadeElapsedMs;
@@ -43,17 +45,22 @@ namespace Game.Play.Battle.Rendering
         private const int MaxFloatTextValue = 99999999;
         private const int MaxPendingFloatTextCount = 64;
         private const int UnitDeathFadeMs = 1000;
-        private const float FallbackProjectileScale = 0.25f;
+        private const float FallbackProjectileSize = 0.2f;
 
         private readonly Dictionary<int, RenderEntry> entries = new();
+        private readonly BattleDrawMeshInstanceManager drawMeshInstances = new();
         private readonly List<FloatTextElement> activeFloatTexts = new();
         private readonly Stack<FloatTextElement> pooledFloatTexts = new();
         private readonly Queue<PendingFloatText> pendingFloatTexts = new();
         private readonly List<int> completedRenderHandles = new();
         private static Material fallbackProjectileMaterial;
+        private static readonly Color FallbackProjectileColor = new(1f, 0.45f, 0.05f, 1f);
         private static bool warnedMissingFloatTextFont;
+        private static bool warnedFallbackProjectileSpawnFailed;
         private GameObject floatTextRoot;
         private MeshPlayer floatTextMeshPlayer;
+        private GameObject drawMeshRoot;
+        private BattleDrawMeshInstanceRenderHost drawMeshRenderHost;
         private FloatTextFontAsset floatTextFontAsset;
         private bool requestedFloatTextFont;
         private bool paused;
@@ -176,6 +183,11 @@ namespace Game.Play.Battle.Rendering
             {
                 entry.gameObject.transform.position = new Vector3(position.x, position.y, entry.gameObject.transform.position.z);
             }
+
+            if (entry.fallback)
+            {
+                drawMeshInstances.SetPosition(entry.instanceHandle, new Vector3(position.x, position.y, 0f));
+            }
         }
 
         public void SetRotation(int renderHandle, float angleDeg)
@@ -190,6 +202,11 @@ namespace Game.Play.Battle.Rendering
             {
                 entry.gameObject.transform.rotation = Quaternion.Euler(0f, 0f, angleDeg);
             }
+
+            if (entry.fallback)
+            {
+                drawMeshInstances.SetRotation(entry.instanceHandle, Quaternion.Euler(0f, 0f, angleDeg));
+            }
         }
 
         public void SetVisible(int renderHandle, bool visible)
@@ -203,6 +220,11 @@ namespace Game.Play.Battle.Rendering
             if (entry.gameObject != null)
             {
                 entry.gameObject.SetActive(visible);
+            }
+
+            if (entry.fallback)
+            {
+                drawMeshInstances.SetVisible(entry.instanceHandle, visible);
             }
         }
 
@@ -221,6 +243,7 @@ namespace Game.Play.Battle.Rendering
         {
             if (paused)
             {
+                SubmitDrawMeshInstances();
                 return;
             }
 
@@ -228,7 +251,7 @@ namespace Game.Play.Battle.Rendering
             {
                 foreach (RenderEntry entry in entries.Values)
                 {
-                    if (entry.gameObject == null)
+                    if (entry.gameObject == null && !entry.fallback)
                     {
                         TryBind(entry);
                     }
@@ -241,6 +264,7 @@ namespace Game.Play.Battle.Rendering
 
             ReleaseCompletedRenderEntries();
             RecycleCompletedFloatTexts();
+            SubmitDrawMeshInstances();
         }
 
         public void Clear()
@@ -251,6 +275,10 @@ namespace Game.Play.Battle.Rendering
             }
 
             entries.Clear();
+            drawMeshInstances.Clear();
+            DestroyObject(drawMeshRoot);
+            drawMeshRoot = null;
+            drawMeshRenderHost = null;
             completedRenderHandles.Clear();
             activeFloatTexts.Clear();
             pooledFloatTexts.Clear();
@@ -270,7 +298,8 @@ namespace Game.Play.Battle.Rendering
                 kind = kind,
                 key = key,
                 position = position,
-                angleDeg = angleDeg
+                angleDeg = angleDeg,
+                instanceHandle = BattleDrawMeshInstanceHandle.Invalid
             };
             entries.Add(handle, entry);
             if (kind == RenderEntryKind.Effect && string.IsNullOrEmpty(key))
@@ -290,7 +319,7 @@ namespace Game.Play.Battle.Rendering
 
         private void TryBind(RenderEntry entry)
         {
-            if (entry == null || string.IsNullOrEmpty(entry.key))
+            if (entry == null || entry.fallback || string.IsNullOrEmpty(entry.key))
             {
                 return;
             }
@@ -365,7 +394,7 @@ namespace Game.Play.Battle.Rendering
             return poolObjects != null ? poolObjects : null;
         }
 
-        private static void Release(RenderEntry entry)
+        private void Release(RenderEntry entry)
         {
             if (entry == null)
             {
@@ -374,13 +403,18 @@ namespace Game.Play.Battle.Rendering
 
             GameObject go = entry.gameObject;
             BattleEffectRenderController effect = entry.effect;
-            bool fallback = entry.fallback;
+            if (entry.fallback)
+            {
+                drawMeshInstances.Despawn(entry.instanceHandle);
+            }
+
             entry.gameObject = null;
             entry.unit = null;
             entry.effect = null;
             entry.unitPlayer = null;
             entry.sequence = null;
             entry.particle = null;
+            entry.instanceHandle = BattleDrawMeshInstanceHandle.Invalid;
             entry.unitReturnIdleMs = 0;
             entry.unitDeathFadeDelayMs = 0;
             entry.unitDeathFadeElapsedMs = 0;
@@ -393,14 +427,7 @@ namespace Game.Play.Battle.Rendering
             }
 
             effect?.Stop();
-            if (fallback)
-            {
-                DestroyObject(go);
-            }
-            else
-            {
-                go.Dispose();
-            }
+            go.Dispose();
         }
 
         private static int PlayUnitEntryAction(RenderEntry entry, string actionName, bool loop)
@@ -567,34 +594,59 @@ namespace Game.Play.Battle.Rendering
             entry.particle?.Play(true);
         }
 
-        private static void CreateFallbackProjectile(RenderEntry entry)
+        private void CreateFallbackProjectile(RenderEntry entry)
         {
             if (entry == null || entry.kind != RenderEntryKind.Effect || entry.gameObject != null)
             {
                 return;
             }
 
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            go.name = "Battle Projectile Fallback";
-            go.hideFlags = HideFlags.DontSave;
-            go.transform.position = new Vector3(entry.position.x, entry.position.y, 0f);
-            go.transform.rotation = Quaternion.Euler(0f, 0f, entry.angleDeg);
-            go.transform.localScale = Vector3.one * FallbackProjectileScale;
-            Collider collider = go.GetComponent<Collider>();
-            if (collider != null)
+            entry.instanceHandle = drawMeshInstances.Spawn(new BattleDrawMeshInstanceDesc
             {
-                DestroyObject(collider);
-            }
-
-            MeshRenderer renderer = go.GetComponent<MeshRenderer>();
-            if (renderer != null)
-            {
-                renderer.sharedMaterial = GetFallbackProjectileMaterial();
-            }
-
-            go.SetActive(entry.visible);
-            entry.gameObject = go;
+                mesh = BattleDrawMeshInstanceManager.GetSharedQuadMesh(),
+                material = GetFallbackProjectileMaterial(),
+                position = new Vector3(entry.position.x, entry.position.y, 0f),
+                rotation = Quaternion.Euler(0f, 0f, entry.angleDeg),
+                scale = new Vector3(FallbackProjectileSize, FallbackProjectileSize, 1f),
+                color = FallbackProjectileColor,
+                layer = 0,
+                bounds = new Bounds(Vector3.zero, Vector3.one)
+            });
             entry.fallback = true;
+            if (!entry.instanceHandle.IsValid)
+            {
+                if (!warnedFallbackProjectileSpawnFailed)
+                {
+                    warnedFallbackProjectileSpawnFailed = true;
+                    Debug.LogWarning("[BattleRender] Fallback projectile draw instance spawn failed. Check fallback mesh/material/shader.");
+                }
+
+                return;
+            }
+
+            EnsureDrawMeshRenderHost();
+            drawMeshInstances.SetVisible(entry.instanceHandle, entry.visible);
+        }
+
+        private void EnsureDrawMeshRenderHost()
+        {
+            if (drawMeshRenderHost != null)
+            {
+                return;
+            }
+
+            drawMeshRoot = new GameObject("Battle DrawMesh Instance World")
+            {
+                hideFlags = HideFlags.DontSave
+            };
+            drawMeshRenderHost = drawMeshRoot.AddComponent<BattleDrawMeshInstanceRenderHost>();
+            drawMeshRenderHost.Bind(drawMeshInstances);
+        }
+
+        private void SubmitDrawMeshInstances()
+        {
+            int drawn = drawMeshInstances.Draw(null);
+            drawMeshRenderHost?.RecordDrawStats(drawMeshInstances.ActiveCount, drawn, "<all cameras>");
         }
 
         private void ShowFloatText(Vector2 worldPosition, long value, FloatTextStyleId style)
@@ -791,7 +843,18 @@ namespace Game.Play.Battle.Rendering
                 return fallbackProjectileMaterial;
             }
 
-            Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+            Shader shader = Shader.Find("Hybrid/Battle DrawMesh Instance Unlit");
+
+            if (shader == null)
+            {
+                shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+            }
+
+            if (shader == null)
+            {
+                shader = Shader.Find("Universal Render Pipeline/Unlit");
+            }
+
             if (shader == null)
             {
                 shader = Shader.Find("Sprites/Default");
@@ -802,12 +865,32 @@ namespace Game.Play.Battle.Rendering
                 shader = Shader.Find("Standard");
             }
 
+            if (shader == null)
+            {
+                return null;
+            }
+
             fallbackProjectileMaterial = new Material(shader)
             {
                 name = "Battle Projectile Fallback Material",
-                color = new Color(1f, 0.45f, 0.05f, 1f),
+                enableInstancing = true,
                 hideFlags = HideFlags.DontSave
             };
+            if (fallbackProjectileMaterial.HasProperty("_BaseColor"))
+            {
+                fallbackProjectileMaterial.SetColor("_BaseColor", Color.white);
+            }
+
+            if (fallbackProjectileMaterial.HasProperty("_Color"))
+            {
+                fallbackProjectileMaterial.SetColor("_Color", Color.white);
+            }
+
+            if (fallbackProjectileMaterial.HasProperty("_InstanceColor"))
+            {
+                fallbackProjectileMaterial.SetColor("_InstanceColor", Color.white);
+            }
+
             return fallbackProjectileMaterial;
         }
 
