@@ -18,6 +18,7 @@ namespace Game.Play.Systems.Battle.System
     public sealed class BattleRuntimeSystem : AbstractSystem, IBattleRuntimeSystem
     {
         private const int DefaultCommandFlushGuard = 8192;
+        private static readonly Vector2 FloatTextOffset = new(0f, 0.8f);
 
         private IBattleCollisionSystem collisionSystem;
         private BattleCollisionManager localCollisionManager;
@@ -137,6 +138,11 @@ namespace Game.Play.Systems.Battle.System
 
         public bool DespawnUnit(BattleUnitHandle unit)
         {
+            return DespawnUnit(unit, true);
+        }
+
+        private bool DespawnUnit(BattleUnitHandle unit, bool despawnRender)
+        {
             if (!IsInitialized || !UnitManager.IsValid(unit))
             {
                 return false;
@@ -146,7 +152,11 @@ namespace Game.Play.Systems.Battle.System
             buffs.RemoveUnitBuffs(unit);
             skills.ClearUnitSkills(unit);
             bool despawned = UnitManager.DespawnUnit(unit, CollisionManager);
-            renderWorld?.Despawn(renderHandle);
+            if (despawnRender)
+            {
+                renderWorld?.Despawn(renderHandle);
+            }
+
             return despawned;
         }
 
@@ -158,6 +168,7 @@ namespace Game.Play.Systems.Battle.System
         public void SetPaused(bool paused)
         {
             IsPaused = paused;
+            renderWorld?.SetPaused(paused);
         }
 
         public void OnUpdate(float deltaTime)
@@ -167,13 +178,13 @@ namespace Game.Play.Systems.Battle.System
                 return;
             }
 
-            renderWorld?.Tick(deltaTime);
-            SyncRenderPositions();
-
             if (IsPaused)
             {
                 return;
             }
+
+            renderWorld?.Tick(deltaTime);
+            SyncRenderPositions();
 
             accumulatedMs += Mathf.Max(0f, deltaTime) * 1000f;
             while (accumulatedMs >= logicStepMs)
@@ -238,14 +249,35 @@ namespace Game.Play.Systems.Battle.System
             switch (command.type)
             {
                 case BattleCommandType.Damage:
-                    UnitManager.ApplyDamage(command.target, command.value, CollisionManager);
+                    int hpBeforeDamage = UnitManager.GetHp(command.target);
+                    Vector2 damageTextPosition = UnitManager.GetPosition(command.target) + FloatTextOffset;
+                    bool damageApplied = UnitManager.ApplyDamage(command.target, command.value, CollisionManager);
+                    int damageDelta = Mathf.Max(0, hpBeforeDamage - UnitManager.GetHp(command.target));
+                    if (damageApplied && damageDelta > 0)
+                    {
+                        renderWorld?.ShowDamageText(damageTextPosition, damageDelta);
+                    }
+
                     if (!UnitManager.IsAlive(command.target))
                     {
-                        DespawnUnit(command.target);
+                        int renderHandle = UnitManager.GetRenderHandle(command.target);
+                        renderWorld?.PlayUnitDead(renderHandle);
+                        DespawnUnit(command.target, false);
+                    }
+                    else if (command.playHitReaction)
+                    {
+                        renderWorld?.PlayUnitHit(UnitManager.GetRenderHandle(command.target));
                     }
                     break;
                 case BattleCommandType.Heal:
-                    UnitManager.ApplyHeal(command.target, command.value);
+                    int hpBeforeHeal = UnitManager.GetHp(command.target);
+                    Vector2 healTextPosition = UnitManager.GetPosition(command.target) + FloatTextOffset;
+                    bool healApplied = UnitManager.ApplyHeal(command.target, command.value);
+                    int healDelta = Mathf.Max(0, UnitManager.GetHp(command.target) - hpBeforeHeal);
+                    if (healApplied && healDelta > 0)
+                    {
+                        renderWorld?.ShowHealText(healTextPosition, healDelta);
+                    }
                     break;
                 case BattleCommandType.AddBuff:
                     buffs.AddBuff(command.source, command.target, command.id, command.durationMs, command.stack);

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da0db77acf6e40a9bbb9cb6857845ee0, type: 3}
   m_Name: AnimationVitBakeSettings
   m_EditorClassIdentifier: 
-  SourceRoot: {fileID: 7560383200906015339, guid: c5281b1620563fd45a9b54357fb4ce70, type: 3}
+  SourceRoot: {fileID: 8896642173588907156, guid: 4e0747b2f58f1124681a2a9688e70358, type: 3}
   Clips:
   - {fileID: 7400000, guid: 643f04ef215a8564294768f7901fa2b6, type: 2}
   - {fileID: 7400000, guid: 026e1e721a530bf4e9b05ee3fb26d55a, type: 2}
@@ -23,5 +23,5 @@ MonoBehaviour:
   FrameRatePreset: 2
   SourceTextureMaxSize: 1024
   FrameRate: 30
-  OutputFolder: Assets/BakedSequences/Animation/Animal
+  OutputFolder: Assets/Res/Monster/Animal
   OutputName: 

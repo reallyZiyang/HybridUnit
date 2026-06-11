@@ -14,5 +14,10 @@ namespace Game.Play.Battle.Unit
         }
 
         public bool IsValid => index >= 0 && generation > 0;
+
+        public bool SameAs(BattleUnitHandle other)
+        {
+            return index == other.index && generation == other.generation;
+        }
     }
 }

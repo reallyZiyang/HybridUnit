@@ -23,13 +23,14 @@ public sealed class FloatTextElement : TickMeshElement
     private float elapsed;
     private float currentAlpha = 1f;
     private bool playing;
+    private bool paused;
     private bool editorPreviewVisible;
 
     public bool IsPlaying => playing;
     public FloatTextFontAsset FontAsset => fontAsset;
     public override bool CanWriteQuads => base.CanWriteQuads && fontAsset != null && quads.Count > 0 && (playing || editorPreviewVisible || !Application.isPlaying);
-    protected override bool IsRuntimeTickActive => playing;
-    protected override bool IsEditorTickActive => playing;
+    protected override bool IsRuntimeTickActive => playing && !paused;
+    protected override bool IsEditorTickActive => playing && !paused;
 
     protected override void OnElementEnable()
     {
@@ -124,6 +125,27 @@ public sealed class FloatTextElement : TickMeshElement
         ApplyMotion(0f);
     }
 
+    public void Bind(FloatTextFontAsset targetFontAsset, MeshPlayer targetMeshPlayer)
+    {
+        if (targetFontAsset != null)
+        {
+            fontAsset = targetFontAsset;
+        }
+
+        if (targetMeshPlayer != null)
+        {
+            SetMeshPlayer(targetMeshPlayer);
+        }
+
+        ConfigureMeshPlayer();
+        DisableLegacyRenderer();
+    }
+
+    public void SetPaused(bool value)
+    {
+        paused = value;
+    }
+
     public void Stop()
     {
         playing = false;
@@ -182,15 +204,15 @@ public sealed class FloatTextElement : TickMeshElement
 
     private void ApplyMotion(float normalizedTime)
     {
-        // float punch = 1f;
-        // if (punchDuration > 0f && elapsed < punchDuration)
-        // {
-        //     float punchT = Mathf.Clamp01(elapsed / punchDuration);
-        //     punch = Mathf.Lerp(punchScale, 1f, Smooth01(punchT));
-        // }
+        float punch = 1f;
+        if (punchDuration > 0f && elapsed < punchDuration)
+        {
+            float punchT = Mathf.Clamp01(elapsed / punchDuration);
+            punch = Mathf.Lerp(Mathf.Max(0.0001f, punchScale), 1f, Smooth01(punchT));
+        }
 
-        // transform.localScale = Vector3.one * punch;
-        // transform.localPosition = baseLocalPosition + Vector3.up * (floatDistance * Smooth01(normalizedTime));
+        transform.localScale = Vector3.one * punch;
+        transform.localPosition = baseLocalPosition + Vector3.up * (floatDistance * Smooth01(normalizedTime));
     }
 
     private float CalculateAlpha(float normalizedTime)

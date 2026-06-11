@@ -16,14 +16,15 @@ namespace Game.Play.Battle.Skill
             }
 
             Vector2 origin = units.GetPosition(caster);
-            Vector2 direction = units.IsValid(target) ? units.GetPosition(target) - origin : Vector2.right;
+            bool canUseTarget = units.IsValid(target) && (!target.SameAs(caster) || skill.targetType == ConfigBattle.SkillTargetType.Self);
+            Vector2 direction = canUseTarget ? units.GetPosition(target) - origin : Vector2.right;
             if (skill.shape != null && skill.shape.ShapeType == ConfigBattle.SkillShapeType.Circle && skill.shape.Radius > 0f)
             {
                 ExecuteAreaSkill(caster, skill, origin, direction);
                 return;
             }
 
-            if (units.IsAlive(target))
+            if (canUseTarget && units.IsAlive(target))
             {
                 effects.ExecuteEffects(skill.effects, caster, target, origin, direction);
             }
@@ -41,6 +42,11 @@ namespace Game.Play.Battle.Skill
             for (int i = 0; i < queryBuffer.Count; i++)
             {
                 BattleUnitHandle target = collisions.GetUnitHandle(queryBuffer.TargetIndices[i]);
+                if (target.SameAs(caster) && skill.targetType != ConfigBattle.SkillTargetType.Self)
+                {
+                    continue;
+                }
+
                 if (units.IsAlive(target))
                 {
                     effects.ExecuteEffects(skill.effects, caster, target, origin, direction);
@@ -62,8 +68,17 @@ namespace Game.Play.Battle.Skill
                 center = units.GetPosition(caster),
                 radius = radius
             };
-            collisions.Query(shape, EnemyOptions(caster, 1, true), queryBuffer);
-            return queryBuffer.Count > 0 ? collisions.GetUnitHandle(queryBuffer.TargetIndices[0]) : BattleUnitHandle.Invalid;
+            collisions.Query(shape, EnemyOptions(caster, 0, true), queryBuffer);
+            for (int i = 0; i < queryBuffer.Count; i++)
+            {
+                BattleUnitHandle target = collisions.GetUnitHandle(queryBuffer.TargetIndices[i]);
+                if (!target.SameAs(caster) && units.IsAlive(target))
+                {
+                    return target;
+                }
+            }
+
+            return BattleUnitHandle.Invalid;
         }
 
         private BattleCollisionQueryOptions EnemyOptions(BattleUnitHandle caster, int maxHits, bool sortByDistance)

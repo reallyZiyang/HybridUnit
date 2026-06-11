@@ -37,6 +37,12 @@ public abstract class BakedTickPlayer : BakedMeshPlayerBase
 
     protected void Update()
     {
+#if UNITY_EDITOR
+        if (EditorApplication.isPaused)
+        {
+            return;
+        }
+#endif
         if (Application.isPlaying && IsRuntimeTickActive)
         {
             Tick(Time.deltaTime);
@@ -65,7 +71,7 @@ public abstract class BakedTickPlayer : BakedMeshPlayerBase
 #if UNITY_EDITOR
     private void EditorUpdate()
     {
-        if (Application.isPlaying || !simulateInEditMode)
+        if (Application.isPlaying || EditorApplication.isPaused || !simulateInEditMode)
         {
             return;
         }

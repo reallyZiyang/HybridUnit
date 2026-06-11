@@ -159,7 +159,7 @@ namespace Game.Play.Battle.Projectile
             for (int i = 0; i < queryBuffer.Count; i++)
             {
                 BattleUnitHandle target = collisions.GetUnitHandle(queryBuffer.TargetIndices[i]);
-                if (!units.IsAlive(target) || !CanHit(index, target, projectile.hitIntervalMs))
+                if (target.SameAs(sources[index]) || !units.IsAlive(target) || !CanHit(index, target, projectile.hitIntervalMs))
                 {
                     continue;
                 }

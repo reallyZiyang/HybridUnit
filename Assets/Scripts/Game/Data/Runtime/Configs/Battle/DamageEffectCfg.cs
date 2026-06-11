@@ -25,6 +25,7 @@ public sealed partial class DamageEffectCfg : Luban.BeanBase
         { if(!_buf["damageElement"].IsNumber) { throw new SerializationException(); }  DamageElement = _buf["damageElement"]; }
         { if(!_buf["canCrit"].IsBoolean) { throw new SerializationException(); }  CanCrit = _buf["canCrit"]; }
         { if(!_buf["hitCount"].IsNumber) { throw new SerializationException(); }  HitCount = _buf["hitCount"]; }
+        { if(!_buf["playHitReaction"].IsBoolean) { throw new SerializationException(); }  PlayHitReaction = _buf["playHitReaction"]; }
     }
 
     public static DamageEffectCfg DeserializeDamageEffectCfg(JSONNode _buf)
@@ -64,6 +65,10 @@ public sealed partial class DamageEffectCfg : Luban.BeanBase
     /// 最大命中数
     /// </summary>
     public readonly int HitCount;
+    /// <summary>
+    /// 是否播放受击
+    /// </summary>
+    public readonly bool PlayHitReaction;
    
     public const int __ID__ = 940490030;
     public override int GetTypeId() => __ID__;
@@ -83,6 +88,7 @@ public sealed partial class DamageEffectCfg : Luban.BeanBase
         + "damageElement:" + DamageElement + ","
         + "canCrit:" + CanCrit + ","
         + "hitCount:" + HitCount + ","
+        + "playHitReaction:" + PlayHitReaction + ","
         + "}";
     }
 }

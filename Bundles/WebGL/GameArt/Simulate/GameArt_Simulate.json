@@ -10,7 +10,7 @@
     "BuildPipeline": "EditorSimulateBuildPipeline",
     "PackageName": "GameArt",
     "PackageVersion": "Simulate",
-    "PackageNote": "2026/6/11 1:47:55",
+    "PackageNote": "2026/6/11 14:37:23",
     "AssetList": [
         {
             "Address": "animal_tbanimal",
@@ -101,11 +101,43 @@
             "DependBundleIDs": []
         },
         {
+            "Address": "float_text_atlas_v1",
+            "AssetPath": "Assets/Res/FloatText/float_text_atlas_v1.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "float_text_atlas_v1_source",
+            "AssetPath": "Assets/Res/FloatText/float_text_atlas_v1_source.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FloatText",
+            "AssetPath": "Assets/Res/FloatText/FloatText.mat",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FloatTextFontAsset",
+            "AssetPath": "Assets/Res/FloatText/FloatTextFontAsset.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
             "Address": "Animal_Cat_AnimationVit",
             "AssetPath": "Assets/Res/Monster/Animal/Animal_Cat_AnimationVit.asset",
             "AssetGUID": "",
             "AssetTags": [],
-            "BundleID": 2,
+            "BundleID": 3,
             "DependBundleIDs": []
         },
         {
@@ -113,7 +145,7 @@
             "AssetPath": "Assets/Res/Monster/Animal/Animal_Dog_AnimationVit.asset",
             "AssetGUID": "",
             "AssetTags": [],
-            "BundleID": 2,
+            "BundleID": 3,
             "DependBundleIDs": []
         },
         {
@@ -121,7 +153,7 @@
             "AssetPath": "Assets/Res/Monster/Animal/AnimationVit_RuntimeAtlas_18c0b587c5afdb37.png",
             "AssetGUID": "",
             "AssetTags": [],
-            "BundleID": 2,
+            "BundleID": 3,
             "DependBundleIDs": []
         },
         {
@@ -129,7 +161,7 @@
             "AssetPath": "Assets/Res/Monster/Animal/Cat.prefab",
             "AssetGUID": "",
             "AssetTags": [],
-            "BundleID": 2,
+            "BundleID": 3,
             "DependBundleIDs": []
         },
         {
@@ -137,7 +169,7 @@
             "AssetPath": "Assets/Res/Monster/Animal/Dog.prefab",
             "AssetGUID": "",
             "AssetTags": [],
-            "BundleID": 2,
+            "BundleID": 3,
             "DependBundleIDs": []
         }
     ],
@@ -147,7 +179,7 @@
             "UnityCRC": 0,
             "FileHash": "00245fec3888b7861514533b7e1997a3",
             "FileCRC": 0,
-            "FileSize": 6409,
+            "FileSize": 6499,
             "Encrypted": false,
             "Tags": [],
             "DependBundleIDs": []
@@ -163,11 +195,21 @@
             "DependBundleIDs": []
         },
         {
+            "BundleName": "assets_res_floattext.bundle",
+            "UnityCRC": 0,
+            "FileHash": "39f2c79bb7d8d88a4a82e9c701d5cce2",
+            "FileCRC": 0,
+            "FileSize": 3117006,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
             "BundleName": "assets_res_monster_animal.bundle",
             "UnityCRC": 0,
             "FileHash": "996b5c793021fc9d86aeeff75cea8cff",
             "FileCRC": 0,
-            "FileSize": 933246,
+            "FileSize": 933387,
             "Encrypted": false,
             "Tags": [],
             "DependBundleIDs": []

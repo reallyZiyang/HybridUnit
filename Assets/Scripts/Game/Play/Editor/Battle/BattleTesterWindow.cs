@@ -114,6 +114,8 @@ namespace Game.Play.Editor.Battle
         protected override void OnEnable()
         {
             base.OnEnable();
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
             if (scenario == null)
             {
                 LoadFirstScenario();
@@ -129,6 +131,13 @@ namespace Game.Play.Editor.Battle
             }
         }
 
+        protected override void OnDisable()
+        {
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            StopBattle();
+            base.OnDisable();
+        }
+
         private void Update()
         {
             if (battle == null)
@@ -136,9 +145,20 @@ namespace Game.Play.Editor.Battle
                 return;
             }
 
+            if (EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying)
+            {
+                StopBattle();
+                return;
+            }
+
             double now = EditorApplication.timeSinceStartup;
             float deltaTime = Mathf.Max(0f, (float)(now - lastEditorTime));
             lastEditorTime = now;
+
+            if (EditorApplication.isPaused)
+            {
+                return;
+            }
 
             if (!isPaused)
             {
@@ -146,6 +166,14 @@ namespace Game.Play.Editor.Battle
                 elapsedSeconds += deltaTime;
                 SampleStatus();
                 Repaint();
+            }
+        }
+
+        private void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.ExitingPlayMode || state == PlayModeStateChange.EnteredEditMode)
+            {
+                StopBattle();
             }
         }
 

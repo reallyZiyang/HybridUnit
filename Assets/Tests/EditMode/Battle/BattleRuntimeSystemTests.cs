@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Game.Data.Configs;
 using Game.Play.Adapters;
 using Game.Play.Battle.Rendering;
@@ -50,7 +51,25 @@ namespace Game.Play.Tests.Battle
             Assert.Less(battle.UnitManager.GetHp(enemy), 240);
         }
 
-        private static BattleRuntimeSystem CreateBattle(Tables tables)
+        [Test]
+        public void BurnTick_DamagesWithoutHitReaction()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle player = battle.SpawnUnit(1001, Vector2.zero, 1);
+            BattleUnitHandle enemy = battle.SpawnUnit(1101, new Vector2(3f, 0f), 2);
+
+            Assert.IsTrue(battle.CastSkill(player, 2002));
+            Tick(battle, 55);
+
+            int enemyRenderHandle = battle.UnitManager.GetRenderHandle(enemy);
+            Assert.Less(battle.UnitManager.GetHp(enemy), 240);
+            Assert.AreEqual(1, renderWorld.GetHitCount(enemyRenderHandle));
+            Assert.GreaterOrEqual(renderWorld.DamageTextCount, 2);
+        }
+
+        private static BattleRuntimeSystem CreateBattle(Tables tables, IBattleRenderWorld renderWorld = null)
         {
             BattleRuntimeSystem battle = new();
             battle.InitializeBattle(
@@ -62,7 +81,7 @@ namespace Game.Play.Tests.Battle
                 gridWidth: 20,
                 gridHeight: 20,
                 cellSize: 1f,
-                renderWorld: new NullBattleRenderWorld(),
+                renderWorld: renderWorld ?? new NullBattleRenderWorld(),
                 logicStepMs: 33);
             return battle;
         }
@@ -79,6 +98,50 @@ namespace Game.Play.Tests.Battle
         {
             API.InitConfig().GetAwaiter().GetResult();
             return API.Tables;
+        }
+
+        private sealed class RecordingRenderWorld : IBattleRenderWorld
+        {
+            private readonly Dictionary<int, int> hitCounts = new();
+            private int nextHandle;
+
+            public int DamageTextCount { get; private set; }
+            public int HealTextCount { get; private set; }
+
+            public int SpawnUnit(string renderKey, Vector2 position)
+            {
+                return ++nextHandle;
+            }
+
+            public int SpawnProjectile(string projectileKey, Vector2 position, float angleDeg)
+            {
+                return ++nextHandle;
+            }
+
+            public int PlayUnitAction(int renderHandle, string actionName) => 0;
+            public void PlayUnitIdle(int renderHandle) { }
+
+            public void PlayUnitHit(int renderHandle)
+            {
+                hitCounts.TryGetValue(renderHandle, out int count);
+                hitCounts[renderHandle] = count + 1;
+            }
+
+            public void PlayUnitDead(int renderHandle) { }
+            public void ShowDamageText(Vector2 worldPosition, long value) => DamageTextCount++;
+            public void ShowHealText(Vector2 worldPosition, long value) => HealTextCount++;
+            public void SetPaused(bool paused) { }
+            public void SetPosition(int renderHandle, Vector2 position) { }
+            public void SetRotation(int renderHandle, float angleDeg) { }
+            public void SetVisible(int renderHandle, bool visible) { }
+            public void Despawn(int renderHandle) { }
+            public void Tick(float deltaTime) { }
+            public void Clear() { }
+
+            public int GetHitCount(int renderHandle)
+            {
+                return hitCounts.TryGetValue(renderHandle, out int count) ? count : 0;
+            }
         }
     }
 }

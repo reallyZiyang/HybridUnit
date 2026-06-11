@@ -100,8 +100,9 @@ namespace Game.Play.Battle.Runtime
         public readonly int damageElement;
         public readonly bool canCrit;
         public readonly int hitCount;
+        public readonly bool playHitReaction;
 
-        public BattleDamageEffectRuntimeData(int id, AttributeType attr, long ratio, long fixedValue, int damageElement, bool canCrit, int hitCount)
+        public BattleDamageEffectRuntimeData(int id, AttributeType attr, long ratio, long fixedValue, int damageElement, bool canCrit, int hitCount, bool playHitReaction)
         {
             this.id = id;
             this.attr = attr;
@@ -110,6 +111,7 @@ namespace Game.Play.Battle.Runtime
             this.damageElement = damageElement;
             this.canCrit = canCrit;
             this.hitCount = hitCount;
+            this.playHitReaction = playHitReaction;
         }
     }
 

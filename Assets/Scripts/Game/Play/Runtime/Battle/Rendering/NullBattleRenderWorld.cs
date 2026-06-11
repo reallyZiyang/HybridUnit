@@ -8,7 +8,13 @@ namespace Game.Play.Battle.Rendering
 
         public int SpawnUnit(string renderKey, Vector2 position) => nextHandle++;
         public int SpawnProjectile(string projectileKey, Vector2 position, float angleDeg) => nextHandle++;
-        public void PlayAction(int renderHandle, string actionName) { }
+        public int PlayUnitAction(int renderHandle, string actionName) => 0;
+        public void PlayUnitIdle(int renderHandle) { }
+        public void PlayUnitHit(int renderHandle) { }
+        public void PlayUnitDead(int renderHandle) { }
+        public void ShowDamageText(Vector2 worldPosition, long value) { }
+        public void ShowHealText(Vector2 worldPosition, long value) { }
+        public void SetPaused(bool paused) { }
         public void SetPosition(int renderHandle, Vector2 position) { }
         public void SetRotation(int renderHandle, float angleDeg) { }
         public void SetVisible(int renderHandle, bool visible) { }

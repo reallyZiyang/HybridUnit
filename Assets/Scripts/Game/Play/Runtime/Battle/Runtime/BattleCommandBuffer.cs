@@ -24,8 +24,9 @@ namespace Game.Play.Battle.Runtime
         public readonly int stack;
         public readonly Vector2 position;
         public readonly Vector2 direction;
+        public readonly bool playHitReaction;
 
-        private BattleCommand(BattleCommandType type, BattleUnitHandle source, BattleUnitHandle target, long value, int id, int durationMs, int stack, Vector2 position, Vector2 direction)
+        private BattleCommand(BattleCommandType type, BattleUnitHandle source, BattleUnitHandle target, long value, int id, int durationMs, int stack, Vector2 position, Vector2 direction, bool playHitReaction)
         {
             this.type = type;
             this.source = source;
@@ -36,22 +37,23 @@ namespace Game.Play.Battle.Runtime
             this.stack = stack;
             this.position = position;
             this.direction = direction;
+            this.playHitReaction = playHitReaction;
         }
 
-        public static BattleCommand Damage(BattleUnitHandle source, BattleUnitHandle target, long value)
-            => new(BattleCommandType.Damage, source, target, value, 0, 0, 0, default, default);
+        public static BattleCommand Damage(BattleUnitHandle source, BattleUnitHandle target, long value, bool playHitReaction)
+            => new(BattleCommandType.Damage, source, target, value, 0, 0, 0, default, default, playHitReaction);
 
         public static BattleCommand Heal(BattleUnitHandle source, BattleUnitHandle target, long value)
-            => new(BattleCommandType.Heal, source, target, value, 0, 0, 0, default, default);
+            => new(BattleCommandType.Heal, source, target, value, 0, 0, 0, default, default, false);
 
         public static BattleCommand AddBuff(BattleUnitHandle source, BattleUnitHandle target, int buffId, int durationMs, int stack)
-            => new(BattleCommandType.AddBuff, source, target, 0, buffId, durationMs, stack, default, default);
+            => new(BattleCommandType.AddBuff, source, target, 0, buffId, durationMs, stack, default, default, false);
 
         public static BattleCommand SpawnProjectile(BattleUnitHandle source, BattleUnitHandle target, int projectileId, Vector2 position, Vector2 direction)
-            => new(BattleCommandType.SpawnProjectile, source, target, 0, projectileId, 0, 0, position, direction);
+            => new(BattleCommandType.SpawnProjectile, source, target, 0, projectileId, 0, 0, position, direction, false);
 
         public static BattleCommand DespawnUnit(BattleUnitHandle target)
-            => new(BattleCommandType.DespawnUnit, BattleUnitHandle.Invalid, target, 0, 0, 0, 0, default, default);
+            => new(BattleCommandType.DespawnUnit, BattleUnitHandle.Invalid, target, 0, 0, 0, 0, default, default, false);
     }
 
     public sealed class BattleCommandBuffer
@@ -67,9 +69,9 @@ namespace Game.Play.Battle.Runtime
 
         public BattleCommand this[int index] => commands[index];
 
-        public void AddDamage(BattleUnitHandle source, BattleUnitHandle target, long value)
+        public void AddDamage(BattleUnitHandle source, BattleUnitHandle target, long value, bool playHitReaction)
         {
-            commands.Add(BattleCommand.Damage(source, target, value));
+            commands.Add(BattleCommand.Damage(source, target, value, playHitReaction));
         }
 
         public void AddHeal(BattleUnitHandle source, BattleUnitHandle target, long value)

@@ -1,3 +1,5 @@
+using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 [ExecuteAlways]
@@ -22,11 +24,12 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
     [SerializeField, Min(0)] private int previewFrame;
 
     [SerializeField]
-    private Vector2 renderOffset = new Vector2(0, 0);
-
+    [ReadOnly]
     private BakedAnimationVitClip currentClip;
     private float time;
     private bool playing;
+
+    public event Action<string> Completed;
 
     public BakedAnimationVitAsset Asset => asset;
     public bool IsPlaying => playing;
@@ -63,23 +66,42 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
         }
     }
 
-    public void Play(string clipName)
+    public float Play(string clipName)
+    {
+        return Play(clipName, loop);
+    }
+
+    public float Play(string clipName, bool loop)
     {
         if (asset == null)
         {
             playing = false;
-            return;
+            return 0f;
         }
 
-        if (!asset.TryGetClip(string.IsNullOrEmpty(clipName) ? defaultClip : clipName, out currentClip))
+        this.loop = loop;
+        if (!asset.TryGetClip(string.IsNullOrEmpty(clipName) ? defaultClip : clipName, out BakedAnimationVitClip clip))
         {
+            currentClip = null;
             playing = false;
-            return;
+            return 0f;
         }
 
+        currentClip = CreateRuntimeClip(clip, loop);
         time = 0f;
         playing = true;
         ApplyFrame(0);
+        return Mathf.Max(0f, currentClip.duration);
+    }
+
+    public float GetClipDuration(string clipName)
+    {
+        if (asset == null || !asset.TryGetClip(string.IsNullOrEmpty(clipName) ? defaultClip : clipName, out BakedAnimationVitClip clip))
+        {
+            return 0f;
+        }
+
+        return Mathf.Max(0f, clip.duration);
     }
 
     public void Stop()
@@ -96,6 +118,7 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
             return;
         }
 
+        currentClip = CreateRuntimeClip(currentClip, false);
         playing = false;
         ApplyFrame(frame);
     }
@@ -115,9 +138,11 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
 
         time += deltaTime * Mathf.Max(0f, speed);
         float duration = Mathf.Max(0.0001f, currentClip.duration);
+        bool completed = false;
+        string completedClipName = null;
         if (time >= duration)
         {
-            if (loop && currentClip.loop)
+            if (currentClip.loop)
             {
                 time %= duration;
             }
@@ -125,11 +150,17 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
             {
                 time = duration;
                 playing = false;
+                completed = true;
+                completedClipName = currentClip.name;
             }
         }
 
         int localFrame = Mathf.Clamp(Mathf.FloorToInt(time * Mathf.Max(1f, asset.frameRate)), 0, currentClip.frameCount - 1);
         ApplyFrame(localFrame);
+        if (completed)
+        {
+            Completed?.Invoke(completedClipName);
+        }
     }
 
     protected override void OnBeforeEditorTick()
@@ -152,8 +183,28 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
 
         if (currentClip == null || !string.IsNullOrEmpty(defaultClip) && currentClip.name != defaultClip)
         {
-            asset.TryGetClip(defaultClip, out currentClip);
+            if (asset.TryGetClip(defaultClip, out BakedAnimationVitClip clip))
+            {
+                currentClip = CreateRuntimeClip(clip, loop);
+            }
         }
+    }
+
+    private static BakedAnimationVitClip CreateRuntimeClip(BakedAnimationVitClip clip, bool loop)
+    {
+        if (clip == null)
+        {
+            return null;
+        }
+
+        return new BakedAnimationVitClip
+        {
+            name = clip.name,
+            startFrame = clip.startFrame,
+            frameCount = clip.frameCount,
+            duration = clip.duration,
+            loop = loop
+        };
     }
 
     private void ApplyFrame(int localFrame)
@@ -185,7 +236,7 @@ public sealed class BakedAnimationVitPlayer : BakedTickPlayer
         MaterialPropertyBlock propertyBlock = BeginPropertyBlock();
         propertyBlock.SetFloat(FrameIndexId, absoluteFrame);
         propertyBlock.SetColor(InstanceColorId, color);
-        //propertyBlock.SetVector(RenderTrans, renderTrans);
+        propertyBlock.SetVector(RenderTrans, asset.RenderTransform);
         ApplyPropertyBlock();
     }
 

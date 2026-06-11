@@ -85,6 +85,39 @@ def style_data_sheet(ws) -> None:
     autofit_columns(ws, max_width=64)
 
 
+def ensure_damage_effect_hit_reaction() -> None:
+    wb = openpyxl.load_workbook(BATTLE_WORKBOOK_PATH)
+    ws = wb["DamageEffect"]
+
+    header_by_name = {ws.cell(1, col).value: col for col in range(1, ws.max_column + 1)}
+    can_crit_col = header_by_name.get("canCrit")
+    hit_count_col = header_by_name.get("hitCount")
+    reaction_col = header_by_name.get("playHitReaction")
+
+    if reaction_col is None:
+        insert_at = (hit_count_col or ws.max_column) + 1
+        ws.insert_cols(insert_at)
+        reaction_col = insert_at
+        ws.cell(1, reaction_col, "playHitReaction")
+        ws.cell(2, reaction_col, "bool")
+        ws.cell(3, reaction_col, "c")
+        ws.cell(4, reaction_col, "是否播放受击")
+
+    id_col = header_by_name.get("id", 2)
+    for row in range(5, ws.max_row + 1):
+        effect_id = ws.cell(row, id_col).value
+        if effect_id is None:
+            continue
+
+        if can_crit_col is not None:
+            ws.cell(row, can_crit_col, effect_id in {3001, 3002})
+        ws.cell(row, reaction_col, effect_id != 3003)
+
+    style_data_sheet(ws)
+    wb.save(BATTLE_WORKBOOK_PATH)
+    print(f"Updated DamageEffect.playHitReaction: {BATTLE_WORKBOOK_PATH}")
+
+
 def style_enum_sheet(ws) -> None:
     if "H1:L1" not in [str(cell_range) for cell_range in ws.merged_cells.ranges]:
         ws.merge_cells("H1:L1")
@@ -254,13 +287,13 @@ def battle_workbook_sheets() -> dict[str, list[list[object]]]:
             [7002, "加速", 3000, 1, "Refresh", 0, "104,500", "", "", ""],
         ],
         "DamageEffect": [
-            ["##var", "id", "name", "attr", "ratio", "fixedValue", "damageElement", "canCrit", "hitCount"],
-            ["##type", "int", "string", "Attr.AttributeType", "long", "long", "int", "bool", "int"],
-            ["##group", "c", "c", "c", "c", "c", "c", "c", "c"],
-            ["##", "效果id", "效果名", "取值属性", "属性倍率", "固定伤害", "伤害元素", "是否暴击", "最大命中数"],
-            [3001, "普攻伤害", "Atk", 10000, 0, 0, True, 1],
-            [3002, "火球命中伤害", "Atk", 12000, 0, 0, True, 1],
-            [3003, "燃烧周期伤害", "Atk", 3000, 0, 1, False, 0],
+            ["##var", "id", "name", "attr", "ratio", "fixedValue", "damageElement", "canCrit", "hitCount", "playHitReaction"],
+            ["##type", "int", "string", "Attr.AttributeType", "long", "long", "int", "bool", "int", "bool"],
+            ["##group", "c", "c", "c", "c", "c", "c", "c", "c", "c"],
+            ["##", "效果id", "效果名", "取值属性", "属性倍率", "固定伤害", "伤害元素", "是否暴击", "最大命中数", "是否播放受击"],
+            [3001, "普攻伤害", "Atk", 10000, 0, 0, True, 1, True],
+            [3002, "火球命中伤害", "Atk", 12000, 0, 0, True, 1, True],
+            [3003, "燃烧周期伤害", "Atk", 3000, 0, 1, False, 0, False],
         ],
         "HealEffect": [
             ["##var", "id", "name", "attr", "ratio", "fixedValue", "canCrit"],
@@ -425,7 +458,7 @@ def generate() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Edit and generate Luban config workbooks.")
-    parser.add_argument("command", choices=["inspect", "apply-battle", "apply-spec", "generate"])
+    parser.add_argument("command", choices=["inspect", "apply-battle", "apply-battle-hit-reaction", "apply-spec", "generate"])
     parser.add_argument("spec", nargs="?", help="UTF-8 JSON spec path for apply-spec.")
     return parser.parse_args()
 
@@ -436,6 +469,8 @@ def main() -> None:
         inspect()
     elif args.command == "apply-battle":
         apply_battle()
+    elif args.command == "apply-battle-hit-reaction":
+        ensure_damage_effect_hit_reaction()
     elif args.command == "apply-spec":
         if not args.spec:
             raise SystemExit("apply-spec requires a spec path")

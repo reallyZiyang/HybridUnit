@@ -13,7 +13,18 @@ public sealed class BakedAnimationVitAsset : ScriptableObject
     public int vertexCount;
     public int totalFrameCount;
     public Bounds bounds;
+    public Vector2 renderOffset = Vector2.zero;
+    public Vector2 renderScale = Vector2.one;
     public BakedAnimationVitClip[] clips = Array.Empty<BakedAnimationVitClip>();
+
+    public Vector4 RenderTransform
+    {
+        get
+        {
+            Vector2 safeScale = renderScale == Vector2.zero ? Vector2.one : renderScale;
+            return new Vector4(renderOffset.x, renderOffset.y, safeScale.x, safeScale.y);
+        }
+    }
 
     public bool TryGetClip(string clipName, out BakedAnimationVitClip clip)
     {

@@ -8,6 +8,7 @@ Shader "Hybrid/Animation VIT"
         _Tint ("Tint", Color) = (1, 1, 1, 1)
         _FrameIndex ("Frame Index", Float) = 0
         _InstanceColor ("Instance Color", Color) = (1, 1, 1, 1)
+        _RenderTrans ("Render Transform", Vector) = (0, 0, 1, 1)
     }
 
     SubShader
@@ -48,6 +49,7 @@ Shader "Hybrid/Animation VIT"
             UNITY_INSTANCING_BUFFER_START(Props)
                 UNITY_DEFINE_INSTANCED_PROP(float, _FrameIndex)
                 UNITY_DEFINE_INSTANCED_PROP(float4, _InstanceColor)
+                UNITY_DEFINE_INSTANCED_PROP(float4, _RenderTrans)
             UNITY_INSTANCING_BUFFER_END(Props)
 
             struct Attributes
@@ -74,6 +76,8 @@ Shader "Hybrid/Animation VIT"
                 int frameIndex = max(0, (int)round(UNITY_ACCESS_INSTANCED_PROP(Props, _FrameIndex)));
                 float4 bakedPosition = LOAD_TEXTURE2D(_PositionTex, int2(input.vertexID, frameIndex));
                 float4 bakedColor = LOAD_TEXTURE2D(_ColorTex, int2(input.vertexID, frameIndex));
+                float4 renderTrans = UNITY_ACCESS_INSTANCED_PROP(Props, _RenderTrans);
+                bakedPosition.xy = bakedPosition.xy * renderTrans.zw + renderTrans.xy;
 
                 output.positionCS = TransformObjectToHClip(float3(bakedPosition.xyz));
                 output.uv = input.uv;

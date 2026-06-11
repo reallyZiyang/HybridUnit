@@ -199,7 +199,7 @@ namespace Game.Play.Battle.Runtime
             for (int i = 0; i < list.Count; i++)
             {
                 ConfigBattle.DamageEffectCfg cfg = list[i];
-                DamageEffects[i] = new BattleDamageEffectRuntimeData(cfg.Id, cfg.Attr, cfg.Ratio, cfg.FixedValue, cfg.DamageElement, cfg.CanCrit, cfg.HitCount);
+                DamageEffects[i] = new BattleDamageEffectRuntimeData(cfg.Id, cfg.Attr, cfg.Ratio, cfg.FixedValue, cfg.DamageElement, cfg.CanCrit, cfg.HitCount, cfg.PlayHitReaction);
                 damageEffectIndexById[cfg.Id] = i;
             }
         }

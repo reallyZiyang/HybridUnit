@@ -351,6 +351,7 @@ public static class AnimationVitBaker
         material.SetTexture("_MainTex", sourceTexture);
         material.SetTexture("_PositionTex", positionTexture);
         material.SetTexture("_ColorTex", colorTexture);
+        material.SetVector("_RenderTrans", new Vector4(0f, 0f, 1f, 1f));
         return material;
     }
 
@@ -366,6 +367,8 @@ public static class AnimationVitBaker
         asset.vertexCount = vertexCount;
         asset.totalFrameCount = totalFrameCount;
         asset.bounds = bounds;
+        asset.renderOffset = Vector2.zero;
+        asset.renderScale = Vector2.one;
         asset.clips = clips;
         return asset;
     }

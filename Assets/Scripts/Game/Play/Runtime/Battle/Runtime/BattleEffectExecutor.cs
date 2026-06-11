@@ -38,7 +38,7 @@ namespace Game.Play.Battle.Runtime
                 case ConfigBattle.EffectType.Damage:
                     if (data.TryGetDamageEffect(effect.id, out BattleDamageEffectRuntimeData damage))
                     {
-                        commands.AddDamage(source, target, CalculateValue(source, damage.attr, damage.ratio, damage.fixedValue, effect.value));
+                        commands.AddDamage(source, target, CalculateValue(source, damage.attr, damage.ratio, damage.fixedValue, effect.value), damage.playHitReaction);
                     }
                     break;
                 case ConfigBattle.EffectType.Heal:

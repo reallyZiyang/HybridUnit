@@ -28,7 +28,7 @@
   {
     "id": 2002,
     "name": "火球术",
-    "actionName": "skill_1",
+    "actionName": "attack",
     "castPreMs": 400,
     "castBackMs": 300,
     "cooldownMs": 2000,

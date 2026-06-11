@@ -11,8 +11,8 @@ namespace Game.Play.Battle.Skill
         private enum CastPhase
         {
             Idle,
-            PreCast,
-            BackSwing
+            WaitingTrigger,
+            WaitingEnd
         }
 
         private readonly BattleRuntimeData data;
@@ -26,6 +26,7 @@ namespace Game.Play.Battle.Skill
         private readonly int[] skillIds;
         private readonly int[] cooldownMs;
         private readonly int[] phaseRemainingMs;
+        private readonly int[] castDurationMs;
         private readonly CastPhase[] phases;
         private readonly BattleUnitHandle[] owners;
         private readonly BattleUnitHandle[] targets;
@@ -52,6 +53,7 @@ namespace Game.Play.Battle.Skill
             skillIds = new int[capacity];
             cooldownMs = new int[capacity];
             phaseRemainingMs = new int[capacity];
+            castDurationMs = new int[capacity];
             phases = new CastPhase[capacity];
             owners = new BattleUnitHandle[capacity];
             targets = new BattleUnitHandle[capacity];
@@ -76,6 +78,7 @@ namespace Game.Play.Battle.Skill
                 skillIds[slot] = i < count ? defaultSkills[i] : 0;
                 cooldownMs[slot] = 0;
                 phaseRemainingMs[slot] = 0;
+                castDurationMs[slot] = 0;
                 phases[slot] = CastPhase.Idle;
             }
         }
@@ -92,6 +95,7 @@ namespace Game.Play.Battle.Skill
                 skillIds[slot] = 0;
                 cooldownMs[slot] = 0;
                 phaseRemainingMs[slot] = 0;
+                castDurationMs[slot] = 0;
                 phases[slot] = CastPhase.Idle;
             }
         }
@@ -193,16 +197,24 @@ namespace Game.Play.Battle.Skill
                 return;
             }
 
-            if (phases[slot] == CastPhase.PreCast)
+            if (phases[slot] == CastPhase.WaitingTrigger)
             {
                 FireSkill(owners[slot], targets[slot], skill);
-                phases[slot] = skill.castBackMs > 0 ? CastPhase.BackSwing : CastPhase.Idle;
-                phaseRemainingMs[slot] = Mathf.Max(0, skill.castBackMs);
+                int castDurationMs = ResolveCastDurationMs(slot, skill);
+                int remainingCastMs = Mathf.Max(0, castDurationMs - Mathf.Max(0, skill.castPreMs));
+                if (remainingCastMs > 0)
+                {
+                    phases[slot] = CastPhase.WaitingEnd;
+                    phaseRemainingMs[slot] = remainingCastMs;
+                }
+                else
+                {
+                    FinishCast(slot);
+                }
             }
-            else if (phases[slot] == CastPhase.BackSwing)
+            else if (phases[slot] == CastPhase.WaitingEnd)
             {
-                phases[slot] = CastPhase.Idle;
-                targets[slot] = BattleUnitHandle.Invalid;
+                FinishCast(slot);
             }
         }
 
@@ -210,18 +222,44 @@ namespace Game.Play.Battle.Skill
         {
             cooldownMs[slot] = Mathf.Max(0, skill.cooldownMs);
             targets[slot] = target;
-            renderWorld?.PlayAction(units.GetRenderHandle(owners[slot]), skill.actionName);
+            int animationMs = renderWorld?.PlayUnitAction(units.GetRenderHandle(owners[slot]), skill.actionName) ?? 0;
+            castDurationMs[slot] = Mathf.Max(animationMs, Mathf.Max(0, skill.castPreMs));
+            phaseRemainingMs[slot] = castDurationMs[slot];
 
             if (skill.castPreMs <= 0)
             {
                 FireSkill(owners[slot], target, skill);
-                phases[slot] = skill.castBackMs > 0 ? CastPhase.BackSwing : CastPhase.Idle;
-                phaseRemainingMs[slot] = Mathf.Max(0, skill.castBackMs);
+                if (phaseRemainingMs[slot] > 0)
+                {
+                    phases[slot] = CastPhase.WaitingEnd;
+                }
+                else
+                {
+                    FinishCast(slot);
+                }
             }
             else
             {
-                phases[slot] = CastPhase.PreCast;
+                phases[slot] = CastPhase.WaitingTrigger;
                 phaseRemainingMs[slot] = skill.castPreMs;
+            }
+        }
+
+        private int ResolveCastDurationMs(int slot, BattleSkillRuntimeData skill)
+        {
+            return Mathf.Max(castDurationMs[slot], Mathf.Max(0, skill.castPreMs));
+        }
+
+        private void FinishCast(int slot)
+        {
+            phases[slot] = CastPhase.Idle;
+            phaseRemainingMs[slot] = 0;
+            castDurationMs[slot] = 0;
+            BattleUnitHandle owner = owners[slot];
+            targets[slot] = BattleUnitHandle.Invalid;
+            if (units.IsAlive(owner))
+            {
+                renderWorld?.PlayUnitIdle(units.GetRenderHandle(owner));
             }
         }
 

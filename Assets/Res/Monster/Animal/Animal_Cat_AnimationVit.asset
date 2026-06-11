@@ -1,6 +1,49 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!28 &-5394883059742768342
+--- !u!21 &-4320546514898480775
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Animal_Cat_Material
+  m_Shader: {fileID: 4800000, guid: 0d97937e3f7242bebe0064e9c3e7b095, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _ColorTex:
+        m_Texture: {fileID: -2475599538896734501}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 6644b830e9c57b7478c2f90759221283, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PositionTex:
+        m_Texture: {fileID: 3382367247922027618}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _FrameIndex: 0
+    m_Colors:
+    - _InstanceColor: {r: 1, g: 1, b: 1, a: 1}
+    - _RenderTrans: {r: 0, g: 0, b: 1, a: 1}
+    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+--- !u!28 &-2475599538896734501
 Texture2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -48,49 +91,58 @@ Texture2D:
     offset: 0
     size: 0
     path: 
---- !u!21 &-1368549048672395609
-Material:
-  serializedVersion: 8
+--- !u!114 &11400000
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Animal_Cat_Material
-  m_Shader: {fileID: 4800000, guid: 0d97937e3f7242bebe0064e9c3e7b095, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 1
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _ColorTex:
-        m_Texture: {fileID: -5394883059742768342}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 6644b830e9c57b7478c2f90759221283, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _PositionTex:
-        m_Texture: {fileID: -1003214862039872939}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _FrameIndex: 0
-    m_Colors:
-    - _InstanceColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Tint: {r: 1, g: 1, b: 1, a: 1}
-  m_BuildTextureStacks: []
---- !u!28 &-1003214862039872939
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19aaa67546384906913016370d7cc274, type: 3}
+  m_Name: Animal_Cat_AnimationVit
+  m_EditorClassIdentifier: 
+  mesh: {fileID: 5947644862609087270}
+  material: {fileID: -4320546514898480775}
+  sourceTexture: {fileID: 2800000, guid: 6644b830e9c57b7478c2f90759221283, type: 3}
+  positionTexture: {fileID: 3382367247922027618}
+  colorTexture: {fileID: -2475599538896734501}
+  frameRate: 30
+  vertexCount: 85
+  totalFrameCount: 151
+  bounds:
+    m_Center: {x: 0.12214935, y: 1.3625649, z: 0}
+    m_Extent: {x: 1.4048994, y: 2.1675649, z: 0}
+  renderOffset: {x: 0, y: 0}
+  renderScale: {x: 0.3, y: 0.3}
+  clips:
+  - name: idle
+    startFrame: 0
+    frameCount: 40
+    duration: 1.3333334
+    loop: 1
+  - name: walk
+    startFrame: 40
+    frameCount: 20
+    duration: 0.6666667
+    loop: 1
+  - name: hit
+    startFrame: 60
+    frameCount: 18
+    duration: 0.6
+    loop: 1
+  - name: attack
+    startFrame: 78
+    frameCount: 28
+    duration: 0.93333334
+    loop: 1
+  - name: dead
+    startFrame: 106
+    frameCount: 45
+    duration: 1.5
+    loop: 1
+--- !u!28 &3382367247922027618
 Texture2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -138,56 +190,7 @@ Texture2D:
     offset: 0
     size: 0
     path: 
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19aaa67546384906913016370d7cc274, type: 3}
-  m_Name: Animal_Cat_AnimationVit
-  m_EditorClassIdentifier: 
-  mesh: {fileID: 1085069412258153505}
-  material: {fileID: -1368549048672395609}
-  sourceTexture: {fileID: 2800000, guid: 6644b830e9c57b7478c2f90759221283, type: 3}
-  positionTexture: {fileID: -1003214862039872939}
-  colorTexture: {fileID: -5394883059742768342}
-  frameRate: 30
-  vertexCount: 85
-  totalFrameCount: 151
-  bounds:
-    m_Center: {x: 0.12214935, y: 1.3625649, z: 0}
-    m_Extent: {x: 1.4048994, y: 2.1675649, z: 0}
-  clips:
-  - name: Animal_Idle
-    startFrame: 0
-    frameCount: 40
-    duration: 1.3333334
-    loop: 1
-  - name: Animal_Walk
-    startFrame: 40
-    frameCount: 20
-    duration: 0.6666667
-    loop: 1
-  - name: Animal_Hit
-    startFrame: 60
-    frameCount: 18
-    duration: 0.6
-    loop: 1
-  - name: Animal_Attack
-    startFrame: 78
-    frameCount: 28
-    duration: 0.93333334
-    loop: 1
-  - name: Animal_Dead
-    startFrame: 106
-    frameCount: 45
-    duration: 1.5
-    loop: 1
---- !u!43 &1085069412258153505
+--- !u!43 &5947644862609087270
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

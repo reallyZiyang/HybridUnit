@@ -7,7 +7,8 @@
     "fixedValue": 0,
     "damageElement": 0,
     "canCrit": true,
-    "hitCount": 1
+    "hitCount": 1,
+    "playHitReaction": true
   },
   {
     "id": 3002,
@@ -17,7 +18,8 @@
     "fixedValue": 0,
     "damageElement": 0,
     "canCrit": true,
-    "hitCount": 1
+    "hitCount": 1,
+    "playHitReaction": true
   },
   {
     "id": 3003,
@@ -27,6 +29,7 @@
     "fixedValue": 0,
     "damageElement": 1,
     "canCrit": false,
-    "hitCount": 0
+    "hitCount": 0,
+    "playHitReaction": false
   }
 ]
