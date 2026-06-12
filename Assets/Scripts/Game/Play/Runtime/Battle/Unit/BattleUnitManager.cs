@@ -7,17 +7,22 @@ namespace Game.Play.Battle.Unit
 {
     public sealed partial class BattleUnitManager
     {
+        public const float DefaultPushRadius = 0.25f;
+
         private readonly int capacity;
         private readonly int attrStride;
         private readonly Vector2[] positions;
         private readonly Vector2[] previousPositions;
         private readonly float[] radii;
+        private readonly float[] pushRadii;
         private readonly int[] camps;
         private readonly int[] states;
         private readonly int[] layers;
         private readonly int[] unitCfgIds;
         private readonly int[] hp;
         private readonly int[] hitLockRemainingMs;
+        private readonly bool[] canPushOthers;
+        private readonly bool[] canBePushed;
         private readonly bool[] active;
         private readonly int[] generations;
         private readonly int[] renderHandles;
@@ -32,6 +37,7 @@ namespace Game.Play.Battle.Unit
         private int allocatedCount;
         private int activeCount;
         private int freeCount;
+        private float maxPushRadius;
 
         public BattleUnitManager(int capacity, int attrStride = 0)
         {
@@ -40,12 +46,15 @@ namespace Game.Play.Battle.Unit
             positions = new Vector2[this.capacity];
             previousPositions = new Vector2[this.capacity];
             radii = new float[this.capacity];
+            pushRadii = new float[this.capacity];
             camps = new int[this.capacity];
             states = new int[this.capacity];
             layers = new int[this.capacity];
             unitCfgIds = new int[this.capacity];
             hp = new int[this.capacity];
             hitLockRemainingMs = new int[this.capacity];
+            canPushOthers = new bool[this.capacity];
+            canBePushed = new bool[this.capacity];
             active = new bool[this.capacity];
             generations = new int[this.capacity];
             renderHandles = new int[this.capacity];
@@ -106,6 +115,11 @@ namespace Game.Play.Battle.Unit
             hp[index] = ResolveSpawnHp(index, desc.hp);
             hitLockRemainingMs[index] = 0;
             SetBaseAttrByIndex(index, AttributeType.Hp, hp[index]);
+            SetPushPropertiesByIndex(
+                index,
+                desc.hasPushRadius ? desc.pushRadius : DefaultPushRadius,
+                desc.hasCanPushOthers ? desc.canPushOthers : true,
+                desc.hasCanBePushed ? desc.canBePushed : true);
             active[index] = true;
             activeCount++;
 
@@ -125,11 +139,15 @@ namespace Game.Play.Battle.Unit
             unitCfgIds[index] = 0;
             hp[index] = 0;
             hitLockRemainingMs[index] = 0;
+            pushRadii[index] = 0f;
+            canPushOthers[index] = false;
+            canBePushed[index] = false;
             states[index] = 0;
             renderHandles[index] = -1;
             skillSlotStarts[index] = -1;
             skillSlotCounts[index] = 0;
             ClearAttributes(index);
+            RecalculateMaxPushRadius();
             freeStack[freeCount++] = index;
             activeCount--;
             return true;
@@ -303,6 +321,17 @@ namespace Game.Play.Battle.Unit
         public Vector2 GetInterpolatedPosition(BattleUnitHandle unit, float alpha)
         {
             return IsValid(unit) ? Vector2.Lerp(previousPositions[unit.index], positions[unit.index], Mathf.Clamp01(alpha)) : default;
+        }
+
+        public bool HasMovedSincePreviousCapture(BattleUnitHandle unit, float epsilon = 0.0001f)
+        {
+            if (!IsValid(unit))
+            {
+                return false;
+            }
+
+            float safeEpsilon = Mathf.Max(0f, epsilon);
+            return (positions[unit.index] - previousPositions[unit.index]).sqrMagnitude > safeEpsilon * safeEpsilon;
         }
 
         public float GetRadius(BattleUnitHandle unit)

@@ -5,6 +5,7 @@ using Game.Play.Battle.AI;
 using Game.Play.Battle.Buff;
 using Game.Play.Battle.Collision;
 using Game.Play.Battle.Projectile;
+using Game.Play.Battle.Push;
 using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Skill;
@@ -25,7 +26,9 @@ namespace Game.Play.Systems.Battle.System
         private BattleCollisionManager localCollisionManager;
         private BattleCommandBuffer commands;
         private BattleEffectExecutor effects;
+        private BattleUnitFacingController facing;
         private BattleAISystem ai;
+        private BattlePushSystem push;
         private BattleSkillManager skills;
         private BattleBuffManager buffs;
         private BattleProjectileManager projectiles;
@@ -91,9 +94,11 @@ namespace Game.Play.Systems.Battle.System
 
             commands = new BattleCommandBuffer();
             effects = new BattleEffectExecutor(RuntimeData, UnitManager, commands);
+            facing = new BattleUnitFacingController(UnitManager, this.renderWorld, unitCapacity);
             int slotsPerUnit = Mathf.Max(1, RuntimeData.MaxDefaultSkillCount, skillSlotsPerUnit);
-            skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, effects, this.renderWorld, unitCapacity, slotsPerUnit, unitCapacity);
-            ai = new BattleAISystem(UnitManager, CollisionManager, skills, this.renderWorld, unitCapacity);
+            skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, effects, this.renderWorld, facing, unitCapacity, slotsPerUnit, unitCapacity);
+            ai = new BattleAISystem(UnitManager, CollisionManager, skills, this.renderWorld, facing, unitCapacity);
+            push = new BattlePushSystem(UnitManager, CollisionManager, skills, unitCapacity, unitCapacity);
             buffs = new BattleBuffManager(RuntimeData, UnitManager, effects, buffCapacity);
             projectiles = new BattleProjectileManager(RuntimeData, UnitManager, CollisionManager, effects, this.renderWorld, projectileCapacity, unitCapacity);
         }
@@ -124,7 +129,13 @@ namespace Game.Play.Systems.Battle.System
                 layer = overrides.hasLayer ? overrides.layer : unitData.layer,
                 renderHandle = renderHandle,
                 skillSlotCount = skillIds.Length,
-                attrs = attrs
+                attrs = attrs,
+                hasPushRadius = overrides.hasPushRadius,
+                pushRadius = overrides.pushRadius,
+                hasCanPushOthers = overrides.hasCanPushOthers,
+                canPushOthers = overrides.canPushOthers,
+                hasCanBePushed = overrides.hasCanBePushed,
+                canBePushed = overrides.canBePushed
             };
 
             BattleUnitHandle unit = UnitManager.SpawnUnit(desc);
@@ -136,6 +147,7 @@ namespace Game.Play.Systems.Battle.System
 
             skills.BindUnitSkills(unit, skillIds);
             UnitManager.SetSkillSlots(unit, skills.GetSlotStart(unit), Mathf.Min(skills.SlotsPerUnit, skillIds.Length));
+            facing.ResetUnit(unit);
             UnitManager.RegisterCollisionTarget(unit, CollisionManager);
             return unit;
         }
@@ -208,7 +220,9 @@ namespace Game.Play.Systems.Battle.System
             RuntimeData = null;
             commands = null;
             effects = null;
+            facing = null;
             ai = null;
+            push = null;
             skills = null;
             buffs = null;
             projectiles = null;
@@ -236,6 +250,9 @@ namespace Game.Play.Systems.Battle.System
             UnitManager.SyncCollisionTargets(CollisionManager);
             CollisionManager.RebuildGrid();
             ai.Tick(deltaMs);
+            UnitManager.SyncCollisionTargets(CollisionManager);
+            CollisionManager.RebuildGrid();
+            push.Tick();
             UnitManager.SyncCollisionTargets(CollisionManager);
             CollisionManager.RebuildGrid();
             skills.Tick(deltaMs);

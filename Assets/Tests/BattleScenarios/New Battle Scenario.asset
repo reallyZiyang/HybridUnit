@@ -26,11 +26,11 @@ MonoBehaviour:
   playerUnits:
   - enabled: 1
     label: Player
-    unitCfgId: 1001
+    unitCfgId: 1002
     spawnCount: 80
-    spawnSpacing: 0.5
+    spawnSpacing: 0.05
     camp: 1
-    position: {x: -5.759576, y: -0.03404333}
+    position: {x: -8.482981, y: 8.13617}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0
@@ -42,9 +42,9 @@ MonoBehaviour:
     label: Player 2
     unitCfgId: 1002
     spawnCount: 80
-    spawnSpacing: 0.525
+    spawnSpacing: 0.05
     camp: 1
-    position: {x: -2.7702117, y: 7.557447}
+    position: {x: -2.2595708, y: 6.5702133}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0
@@ -54,11 +54,11 @@ MonoBehaviour:
     attrs: []
   - enabled: 1
     label: Player 3
-    unitCfgId: 1001
+    unitCfgId: 1002
     spawnCount: 80
-    spawnSpacing: 0.525
+    spawnSpacing: 0.05
     camp: 1
-    position: {x: 4.072341, y: -7.080852}
+    position: {x: -4.608505, y: 4.629784}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0
@@ -71,7 +71,7 @@ MonoBehaviour:
     label: Enemy
     unitCfgId: 1001
     spawnCount: 250
-    spawnSpacing: 0.5
+    spawnSpacing: 0.56
     camp: 2
     position: {x: 4.5, y: -0.1021274}
     overrideRadius: 0

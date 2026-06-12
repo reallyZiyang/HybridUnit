@@ -14,31 +14,36 @@ namespace Game.Play.Battle.AI
         private const int CacheClearIntervalMs = 2000;
         private const int MaxCampCount = 32;
         private const float SpeedScale = 0.01f;
-        private const float FlipEpsilon = 0.001f;
 
         private readonly BattleUnitManager units;
         private readonly BattleCollisionManager collisions;
         private readonly BattleSkillManager skills;
         private readonly IBattleRenderWorld renderWorld;
+        private readonly BattleUnitFacingController facing;
         private readonly BattleUnitHandle[] targets;
         private readonly int[] searchRemainingMs;
         private readonly bool[] moving;
-        private readonly bool[] flipX;
         private readonly BattleUnitHandle[] cachedTargets;
 
         private int cacheClearRemainingMs = CacheClearIntervalMs;
 
-        public BattleAISystem(BattleUnitManager units, BattleCollisionManager collisions, BattleSkillManager skills, IBattleRenderWorld renderWorld, int unitCapacity)
+        public BattleAISystem(
+            BattleUnitManager units,
+            BattleCollisionManager collisions,
+            BattleSkillManager skills,
+            IBattleRenderWorld renderWorld,
+            BattleUnitFacingController facing,
+            int unitCapacity)
         {
             this.units = units;
             this.collisions = collisions;
             this.skills = skills;
             this.renderWorld = renderWorld;
+            this.facing = facing;
             int capacity = Mathf.Max(1, unitCapacity);
             targets = new BattleUnitHandle[capacity];
             searchRemainingMs = new int[capacity];
             moving = new bool[capacity];
-            flipX = new bool[capacity];
             cachedTargets = new BattleUnitHandle[Mathf.Max(1, collisions.GridCellCount * MaxCampCount)];
 
             ClearTargets();
@@ -209,16 +214,7 @@ namespace Game.Play.Battle.AI
             }
 
             int index = unit.index;
-            if (direction.x < -FlipEpsilon && !flipX[index])
-            {
-                flipX[index] = true;
-                renderWorld?.SetUnitFlipX(units.GetRenderHandle(unit), true);
-            }
-            else if (direction.x > FlipEpsilon && flipX[index])
-            {
-                flipX[index] = false;
-                renderWorld?.SetUnitFlipX(units.GetRenderHandle(unit), false);
-            }
+            facing?.FaceDirection(unit, direction);
 
             if (!moving[index])
             {
@@ -285,7 +281,6 @@ namespace Game.Play.Battle.AI
             targets[index] = BattleUnitHandle.Invalid;
             searchRemainingMs[index] = 0;
             moving[index] = false;
-            flipX[index] = false;
         }
 
         private void ClearTargets()

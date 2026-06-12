@@ -6,11 +6,11 @@
     "castPreMs": 1000,
     "castBackMs": 200,
     "cooldownMs": 1000,
-    "castRange": 1.2,
+    "castRange": 0.7,
     "targetType": 2,
     "selectType": 1,
     "shape": {
-      "shapeType": 1,
+      "shapeType": 0,
       "radius": 1.2,
       "width": 0,
       "length": 0,

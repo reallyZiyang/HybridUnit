@@ -10,7 +10,7 @@
     "BuildPipeline": "EditorSimulateBuildPipeline",
     "PackageName": "GameArt",
     "PackageVersion": "Simulate",
-    "PackageNote": "2026/6/12 15:43:36",
+    "PackageNote": "2026/6/13 1:30:45",
     "AssetList": [
         {
             "Address": "Character_1_AnimationVit",
@@ -355,6 +355,22 @@
             "AssetTags": [],
             "BundleID": 7,
             "DependBundleIDs": []
+        },
+        {
+            "Address": "ShaderVariants",
+            "AssetPath": "Assets/Res/Shader/ShaderVariants.shadervariants",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 9,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "ShaderVariantsJson",
+            "AssetPath": "Assets/Res/Shader/ShaderVariantsJson.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 8,
+            "DependBundleIDs": []
         }
     ],
     "BundleList": [
@@ -373,7 +389,7 @@
             "UnityCRC": 0,
             "FileHash": "00245fec3888b7861514533b7e1997a3",
             "FileCRC": 0,
-            "FileSize": 8144,
+            "FileSize": 8026,
             "Encrypted": false,
             "Tags": [],
             "DependBundleIDs": []
@@ -434,6 +450,26 @@
             "FileHash": "1de6e507998718b6f2cc2920da1eddbb",
             "FileCRC": 0,
             "FileSize": 38923,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_res_shader.bundle",
+            "UnityCRC": 0,
+            "FileHash": "dc26d8883eadd58462e52284acaf746d",
+            "FileCRC": 0,
+            "FileSize": 5757,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "unityshaders.bundle",
+            "UnityCRC": 0,
+            "FileHash": "5e41744143261af11451887272f6eb26",
+            "FileCRC": 0,
+            "FileSize": 2281,
             "Encrypted": false,
             "Tags": [],
             "DependBundleIDs": []

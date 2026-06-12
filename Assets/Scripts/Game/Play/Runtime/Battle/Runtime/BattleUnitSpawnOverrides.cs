@@ -13,6 +13,12 @@ namespace Game.Play.Battle.Runtime
         public readonly string renderKey;
         public readonly int[] skillIds;
         public readonly BattleAttributeValue[] attrs;
+        public readonly bool hasPushRadius;
+        public readonly float pushRadius;
+        public readonly bool hasCanPushOthers;
+        public readonly bool canPushOthers;
+        public readonly bool hasCanBePushed;
+        public readonly bool canBePushed;
 
         public BattleUnitSpawnOverrides(
             bool hasCamp = false,
@@ -23,7 +29,13 @@ namespace Game.Play.Battle.Runtime
             int layer = 0,
             string renderKey = null,
             int[] skillIds = null,
-            BattleAttributeValue[] attrs = null)
+            BattleAttributeValue[] attrs = null,
+            bool hasPushRadius = false,
+            float pushRadius = 0f,
+            bool hasCanPushOthers = false,
+            bool canPushOthers = true,
+            bool hasCanBePushed = false,
+            bool canBePushed = true)
         {
             this.hasCamp = hasCamp;
             this.camp = camp;
@@ -34,6 +46,12 @@ namespace Game.Play.Battle.Runtime
             this.renderKey = renderKey;
             this.skillIds = skillIds;
             this.attrs = attrs;
+            this.hasPushRadius = hasPushRadius;
+            this.pushRadius = pushRadius;
+            this.hasCanPushOthers = hasCanPushOthers;
+            this.canPushOthers = canPushOthers;
+            this.hasCanBePushed = hasCanBePushed;
+            this.canBePushed = canBePushed;
         }
 
         public static BattleUnitSpawnOverrides FromCampOverride(int campOverride)

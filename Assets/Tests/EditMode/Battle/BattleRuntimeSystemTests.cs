@@ -143,6 +143,150 @@ namespace Game.Play.Tests.Battle
             Assert.IsFalse(battle.UnitManager.IsHitLocked(enemy));
         }
 
+        [Test]
+        public void SkillCooldown_StartsAfterCastFinishes()
+        {
+            Tables tables = LoadTables();
+            BattleRuntimeSystem battle = CreateBattle(tables);
+            BattleUnitHandle caster = battle.SpawnUnit(
+                1002,
+                Vector2.zero,
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new[] { 2001 }));
+            BattleUnitHandle enemy = battle.SpawnUnit(
+                2001,
+                new Vector2(0.8f, 0f),
+                new BattleUnitSpawnOverrides(
+                    hasCamp: true,
+                    camp: 2,
+                    skillIds: new int[0],
+                    attrs: new[]
+                    {
+                        new BattleAttributeValue(AttributeType.HpMax, 1000),
+                        new BattleAttributeValue(AttributeType.Hp, 1000)
+                    }));
+
+            Assert.IsTrue(battle.CastSkill(caster, 2001));
+            Tick(battle, 31);
+            int hpAfterFirstHit = battle.UnitManager.GetHp(enemy);
+
+            Tick(battle, 30);
+
+            Assert.AreEqual(hpAfterFirstHit, battle.UnitManager.GetHp(enemy));
+
+            Tick(battle, 32);
+
+            Assert.Less(battle.UnitManager.GetHp(enemy), hpAfterFirstHit);
+        }
+
+        [Test]
+        public void SkillCast_EndureUsesPreAndBackWindowDuringLongAnimation()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new()
+            {
+                ActionDurationMs = 3000
+            };
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle caster = battle.SpawnUnit(
+                1002,
+                Vector2.zero,
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new[] { 2001 }));
+            BattleUnitHandle enemy = battle.SpawnUnit(
+                2001,
+                new Vector2(0.8f, 0f),
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new int[0]));
+            int enemyHp = battle.UnitManager.GetHp(enemy);
+
+            Assert.IsTrue(battle.CastSkill(caster, 2001));
+            Assert.AreEqual(1, battle.UnitManager.GetAttr(caster, AttributeType.Endure));
+
+            Tick(battle, 30);
+
+            Assert.AreEqual(1, battle.UnitManager.GetAttr(caster, AttributeType.Endure));
+            Assert.AreEqual(enemyHp, battle.UnitManager.GetHp(enemy));
+
+            Tick(battle, 1);
+
+            Assert.AreEqual(1, battle.UnitManager.GetAttr(caster, AttributeType.Endure));
+            Assert.Less(battle.UnitManager.GetHp(enemy), enemyHp);
+
+            Tick(battle, 6);
+
+            Assert.AreEqual(0, battle.UnitManager.GetAttr(caster, AttributeType.Endure));
+            Assert.IsFalse(battle.CastSkill(caster, 2001));
+        }
+
+        [Test]
+        public void SkillCast_FinishCastReleasesEndureBeforeBackWindowEnds()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new()
+            {
+                ActionDurationMs = 300
+            };
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle caster = battle.SpawnUnit(
+                1002,
+                Vector2.zero,
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new[] { 2001 }));
+            BattleUnitHandle enemy = battle.SpawnUnit(
+                2001,
+                new Vector2(0.8f, 0f),
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new int[0]));
+            int enemyHp = battle.UnitManager.GetHp(enemy);
+
+            Assert.IsTrue(battle.CastSkill(caster, 2001));
+            Tick(battle, 31);
+
+            Assert.Less(battle.UnitManager.GetHp(enemy), enemyHp);
+            Assert.AreEqual(0, battle.UnitManager.GetAttr(caster, AttributeType.Endure));
+        }
+
+        [Test]
+        public void Push_AIMovingUnitPushesSameCampUnit()
+        {
+            Tables tables = LoadTables();
+            BattleRuntimeSystem battle = CreateBattle(tables);
+            BattleUnitHandle staticUnit = battle.SpawnUnit(
+                1001,
+                Vector2.zero,
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new int[0]));
+            BattleUnitHandle mover = battle.SpawnUnit(
+                1001,
+                new Vector2(0.3f, 0f),
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new int[0]));
+            battle.SpawnUnit(2001, new Vector2(-0.8f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new int[0]));
+
+            battle.OnUpdate(0.033f);
+
+            Assert.Greater(battle.UnitManager.GetPosition(staticUnit).sqrMagnitude, 0f);
+            Assert.Greater(Vector2.Distance(battle.UnitManager.GetPosition(staticUnit), battle.UnitManager.GetPosition(mover)), 0.3f);
+        }
+
+        [Test]
+        public void Push_CastingUnit_IsNotMovedWhenMovingUnitAvoidsIt()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new()
+            {
+                ActionDurationMs = 300
+            };
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle caster = battle.SpawnUnit(1001, Vector2.zero, new BattleUnitSpawnOverrides(hasCamp: true, camp: 1));
+            BattleUnitHandle mover = battle.SpawnUnit(
+                1001,
+                new Vector2(0.2f, 0f),
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new int[0]));
+            battle.SpawnUnit(2001, new Vector2(-0.8f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new int[0]));
+
+            Assert.IsTrue(battle.CastSkill(caster, 2001));
+            battle.OnUpdate(0.033f);
+
+            Assert.AreEqual(Vector2.zero, battle.UnitManager.GetPosition(caster));
+            Assert.Greater(battle.UnitManager.GetPosition(mover).x, 0.12f);
+            Assert.Less(battle.UnitManager.GetPosition(mover).x, 0.2f);
+        }
+
         private static BattleRuntimeSystem CreateBattle(Tables tables, IBattleRenderWorld renderWorld = null)
         {
             BattleRuntimeSystem battle = new();
@@ -183,6 +327,7 @@ namespace Game.Play.Tests.Battle
 
             public int DamageTextCount { get; private set; }
             public int HealTextCount { get; private set; }
+            public int ActionDurationMs { get; set; }
 
             public int SpawnUnit(string renderKey, Vector2 position)
             {
@@ -194,7 +339,7 @@ namespace Game.Play.Tests.Battle
                 return ++nextHandle;
             }
 
-            public int PlayUnitAction(int renderHandle, string actionName) => 0;
+            public int PlayUnitAction(int renderHandle, string actionName) => ActionDurationMs;
             public void PlayUnitIdle(int renderHandle) { }
 
             public void PlayUnitWalk(int renderHandle)

@@ -45,6 +45,26 @@ namespace Game.Play.Battle.Unit
             return true;
         }
 
+        public bool AddEndure(BattleUnitHandle unit, long delta)
+        {
+            if (!IsValid(unit) || !BattleAttributeRegistry.TryGetIndex(AttributeType.Endure, out int attrIndex))
+            {
+                return false;
+            }
+
+            int offset = AttrOffset(unit.index, attrIndex);
+            long finalValue = baseAttrs[offset] + modifierAttrs[offset];
+            long safeDelta = delta;
+            if (safeDelta < 0 && finalValue + safeDelta < 0)
+            {
+                safeDelta = -finalValue;
+            }
+
+            modifierAttrs[offset] += safeDelta;
+            finalAttrs[offset] = System.Math.Max(0L, baseAttrs[offset] + modifierAttrs[offset]);
+            return true;
+        }
+
         private void ClearAttributes(int index)
         {
             int offset = index * attrStride;

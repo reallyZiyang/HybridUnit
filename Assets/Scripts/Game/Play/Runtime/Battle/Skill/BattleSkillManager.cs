@@ -21,15 +21,18 @@ namespace Game.Play.Battle.Skill
         private readonly BattleCollisionQueryBuffer queryBuffer;
         private readonly BattleEffectExecutor effects;
         private readonly IBattleRenderWorld renderWorld;
+        private readonly BattleUnitFacingController facing;
         private readonly int unitCapacity;
         private readonly int slotsPerUnit;
         private readonly int[] skillIds;
         private readonly int[] cooldownMs;
         private readonly int[] phaseRemainingMs;
         private readonly int[] castDurationMs;
+        private readonly int[] endureRemainingMs;
         private readonly CastPhase[] phases;
         private readonly BattleUnitHandle[] owners;
         private readonly BattleUnitHandle[] targets;
+        private readonly bool[] castEndureGranted;
         private readonly bool[] active;
 
         public BattleSkillManager(
@@ -38,6 +41,7 @@ namespace Game.Play.Battle.Skill
             BattleCollisionManager collisions,
             BattleEffectExecutor effects,
             IBattleRenderWorld renderWorld,
+            BattleUnitFacingController facing,
             int unitCapacity,
             int slotsPerUnit,
             int queryCapacity)
@@ -47,6 +51,7 @@ namespace Game.Play.Battle.Skill
             this.collisions = collisions;
             this.effects = effects;
             this.renderWorld = renderWorld;
+            this.facing = facing;
             this.unitCapacity = Mathf.Max(1, unitCapacity);
             this.slotsPerUnit = Mathf.Max(1, slotsPerUnit);
             int capacity = this.unitCapacity * this.slotsPerUnit;
@@ -54,9 +59,11 @@ namespace Game.Play.Battle.Skill
             cooldownMs = new int[capacity];
             phaseRemainingMs = new int[capacity];
             castDurationMs = new int[capacity];
+            endureRemainingMs = new int[capacity];
             phases = new CastPhase[capacity];
             owners = new BattleUnitHandle[capacity];
             targets = new BattleUnitHandle[capacity];
+            castEndureGranted = new bool[capacity];
             active = new bool[capacity];
             queryBuffer = new BattleCollisionQueryBuffer(Mathf.Max(1, queryCapacity));
         }
@@ -106,9 +113,11 @@ namespace Game.Play.Battle.Skill
                     continue;
                 }
 
+                ReleaseCastEndure(slot);
                 phases[slot] = CastPhase.Idle;
                 phaseRemainingMs[slot] = 0;
                 castDurationMs[slot] = 0;
+                endureRemainingMs[slot] = 0;
                 targets[slot] = BattleUnitHandle.Invalid;
             }
         }
@@ -136,6 +145,7 @@ namespace Game.Play.Battle.Skill
             for (int i = 0; i < slotsPerUnit; i++)
             {
                 int slot = start + i;
+                ReleaseCastEndure(slot);
                 active[slot] = i < count;
                 owners[slot] = unit;
                 targets[slot] = BattleUnitHandle.Invalid;
@@ -143,6 +153,7 @@ namespace Game.Play.Battle.Skill
                 cooldownMs[slot] = 0;
                 phaseRemainingMs[slot] = 0;
                 castDurationMs[slot] = 0;
+                endureRemainingMs[slot] = 0;
                 phases[slot] = CastPhase.Idle;
             }
         }
@@ -153,6 +164,7 @@ namespace Game.Play.Battle.Skill
             for (int i = 0; i < slotsPerUnit; i++)
             {
                 int slot = start + i;
+                ReleaseCastEndure(slot);
                 active[slot] = false;
                 owners[slot] = BattleUnitHandle.Invalid;
                 targets[slot] = BattleUnitHandle.Invalid;
@@ -160,6 +172,7 @@ namespace Game.Play.Battle.Skill
                 cooldownMs[slot] = 0;
                 phaseRemainingMs[slot] = 0;
                 castDurationMs[slot] = 0;
+                endureRemainingMs[slot] = 0;
                 phases[slot] = CastPhase.Idle;
             }
         }
@@ -273,6 +286,7 @@ namespace Game.Play.Battle.Skill
 
         private void TickCast(int slot, int deltaMs)
         {
+            TickCastEndure(slot, deltaMs);
             phaseRemainingMs[slot] = Mathf.Max(0, phaseRemainingMs[slot] - deltaMs);
             if (phaseRemainingMs[slot] > 0 || !data.TryGetSkill(skillIds[slot], out BattleSkillRuntimeData skill))
             {
@@ -302,11 +316,13 @@ namespace Game.Play.Battle.Skill
 
         private void StartCast(int slot, BattleSkillRuntimeData skill, BattleUnitHandle target)
         {
-            cooldownMs[slot] = Mathf.Max(0, skill.cooldownMs);
+            ReleaseCastEndure(slot);
             targets[slot] = target;
+            facing?.FaceTarget(owners[slot], target);
             int animationMs = renderWorld?.PlayUnitAction(units.GetRenderHandle(owners[slot]), skill.actionName) ?? 0;
             castDurationMs[slot] = Mathf.Max(animationMs, Mathf.Max(0, skill.castPreMs));
             phaseRemainingMs[slot] = castDurationMs[slot];
+            GrantCastEndure(slot, skill);
 
             if (skill.castPreMs <= 0)
             {
@@ -334,6 +350,12 @@ namespace Game.Play.Battle.Skill
 
         private void FinishCast(int slot)
         {
+            ReleaseCastEndure(slot);
+            if (data.TryGetSkill(skillIds[slot], out BattleSkillRuntimeData skill))
+            {
+                cooldownMs[slot] = Mathf.Max(0, skill.cooldownMs);
+            }
+
             phases[slot] = CastPhase.Idle;
             phaseRemainingMs[slot] = 0;
             castDurationMs[slot] = 0;
@@ -343,6 +365,46 @@ namespace Game.Play.Battle.Skill
             {
                 renderWorld?.PlayUnitIdle(units.GetRenderHandle(owner));
             }
+        }
+
+        private void GrantCastEndure(int slot, BattleSkillRuntimeData skill)
+        {
+            int durationMs = Mathf.Max(0, skill.castPreMs) + Mathf.Max(0, skill.castBackMs);
+            if (durationMs <= 0 || !units.AddEndure(owners[slot], 1))
+            {
+                endureRemainingMs[slot] = 0;
+                castEndureGranted[slot] = false;
+                return;
+            }
+
+            endureRemainingMs[slot] = durationMs;
+            castEndureGranted[slot] = true;
+        }
+
+        private void TickCastEndure(int slot, int deltaMs)
+        {
+            if (!castEndureGranted[slot])
+            {
+                return;
+            }
+
+            endureRemainingMs[slot] = Mathf.Max(0, endureRemainingMs[slot] - Mathf.Max(0, deltaMs));
+            if (endureRemainingMs[slot] <= 0)
+            {
+                ReleaseCastEndure(slot);
+            }
+        }
+
+        private void ReleaseCastEndure(int slot)
+        {
+            endureRemainingMs[slot] = 0;
+            if (!castEndureGranted[slot])
+            {
+                return;
+            }
+
+            castEndureGranted[slot] = false;
+            units.AddEndure(owners[slot], -1);
         }
 
         private int FindSlot(BattleUnitHandle caster, int skillId)

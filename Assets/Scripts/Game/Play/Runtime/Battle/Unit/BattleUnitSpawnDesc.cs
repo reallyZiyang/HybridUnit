@@ -16,5 +16,11 @@ namespace Game.Play.Battle.Unit
         public int skillSlotStart;
         public int skillSlotCount;
         public BattleAttributeValue[] attrs;
+        public bool hasPushRadius;
+        public float pushRadius;
+        public bool hasCanPushOthers;
+        public bool canPushOthers;
+        public bool hasCanBePushed;
+        public bool canBePushed;
     }
 }
