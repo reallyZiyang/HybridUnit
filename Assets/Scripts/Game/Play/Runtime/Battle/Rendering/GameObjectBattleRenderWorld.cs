@@ -56,6 +56,11 @@ namespace Game.Play.Battle.Rendering
             inner.SetPaused(paused);
         }
 
+        public void SetSortingGrid(float gridMinY, float cellSize)
+        {
+            inner.SetSortingGrid(gridMinY, cellSize);
+        }
+
         public void SetPosition(int renderHandle, Vector2 position)
         {
             inner.SetPosition(renderHandle, position);

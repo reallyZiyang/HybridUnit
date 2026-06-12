@@ -4,11 +4,11 @@
     "name": "远程普攻",
     "projectileKey": "FA_Consumable_Arrow_008_Blue_Atlas",
     "speed": 8,
-    "radius": 0.25,
+    "radius": 0.1,
     "lifetimeMs": 3000,
     "pierceCount": 1,
     "hitIntervalMs": 0,
-    "queryQuality": 2,
+    "queryQuality": 0,
     "hitEffects": [
       {
         "type": 1,
@@ -26,7 +26,7 @@
     "lifetimeMs": 3000,
     "pierceCount": 1,
     "hitIntervalMs": 0,
-    "queryQuality": 2,
+    "queryQuality": 0,
     "hitEffects": [
       {
         "type": 1,

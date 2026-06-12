@@ -18,6 +18,6 @@ MonoBehaviour:
   m_Environment: Dev
   m_EnvironmentsSettings:
   - name: Dev
-    playMode: 0
+    playMode: 3
     cdnUrl: 
     cdnFallbackUrl: 

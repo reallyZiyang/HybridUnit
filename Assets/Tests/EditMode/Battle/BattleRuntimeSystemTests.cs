@@ -214,6 +214,7 @@ namespace Game.Play.Tests.Battle
             public void ShowDamageText(Vector2 worldPosition, long value) => DamageTextCount++;
             public void ShowHealText(Vector2 worldPosition, long value) => HealTextCount++;
             public void SetPaused(bool paused) { }
+            public void SetSortingGrid(float gridMinY, float cellSize) { }
             public void SetPosition(int renderHandle, Vector2 position) { }
             public void SetRotation(int renderHandle, float angleDeg) { }
             public void SetUnitFlipX(int renderHandle, bool value) => flipX[renderHandle] = value;

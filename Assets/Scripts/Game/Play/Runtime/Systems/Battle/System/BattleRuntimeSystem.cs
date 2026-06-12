@@ -74,6 +74,7 @@ namespace Game.Play.Systems.Battle.System
             RuntimeData = BattleRuntimeData.Build(safeTables);
             this.logicStepMs = Mathf.Max(1, logicStepMs);
             this.renderWorld = renderWorld ?? new DrawMeshBattleRenderWorld();
+            this.renderWorld.SetSortingGrid(gridMin.y, cellSize);
             accumulatedMs = 0f;
             IsPaused = false;
 

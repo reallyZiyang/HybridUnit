@@ -47,6 +47,7 @@ namespace Game.Play.Battle.Rendering
                 color = Color.white,
                 renderTransform = asset.RenderTransform,
                 renderRotation = asset.RenderRotation,
+                renderLayer = entry.renderLayer,
                 layer = 0,
                 bounds = asset.bounds
             });
@@ -82,6 +83,7 @@ namespace Game.Play.Battle.Rendering
                 color = Color.white,
                 renderTransform = asset.RenderTransform,
                 renderRotation = asset.RenderRotation,
+                renderLayer = entry.renderLayer,
                 layer = 0,
                 bounds = asset.bounds
             });

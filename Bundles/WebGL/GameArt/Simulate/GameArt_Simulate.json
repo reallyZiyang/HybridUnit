@@ -10,7 +10,7 @@
     "BuildPipeline": "EditorSimulateBuildPipeline",
     "PackageName": "GameArt",
     "PackageVersion": "Simulate",
-    "PackageNote": "2026/6/12 15:07:56",
+    "PackageNote": "2026/6/12 15:43:36",
     "AssetList": [
         {
             "Address": "Character_1_AnimationVit",
@@ -363,7 +363,7 @@
             "UnityCRC": 0,
             "FileHash": "d9ec8e3f151dee6dae73b09131c132bc",
             "FileCRC": 0,
-            "FileSize": 1422281,
+            "FileSize": 1422383,
             "Encrypted": false,
             "Tags": [],
             "DependBundleIDs": []
@@ -373,7 +373,7 @@
             "UnityCRC": 0,
             "FileHash": "00245fec3888b7861514533b7e1997a3",
             "FileCRC": 0,
-            "FileSize": 8145,
+            "FileSize": 8144,
             "Encrypted": false,
             "Tags": [],
             "DependBundleIDs": []

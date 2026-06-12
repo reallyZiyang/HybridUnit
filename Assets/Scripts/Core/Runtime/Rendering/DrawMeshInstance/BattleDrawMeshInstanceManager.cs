@@ -5,6 +5,15 @@ using UnityEngine.Rendering;
 
 namespace Game.Play.Rendering.Runtime
 {
+    public enum BattleDrawMeshRenderLayer
+    {
+        Effect = 0,
+        GroundEffect = 1,
+        Unit = 2,
+        Projectile = 3,
+        MeshElement = 4
+    }
+
     public readonly struct BattleDrawMeshInstanceHandle
     {
         public static readonly BattleDrawMeshInstanceHandle Invalid = new(-1, 0);
@@ -35,6 +44,7 @@ namespace Game.Play.Rendering.Runtime
         public float frameIndex;
         public Vector4 renderTransform;
         public Vector4 renderRotation;
+        public BattleDrawMeshRenderLayer renderLayer;
         public int layer;
         public Bounds bounds;
     }
@@ -50,6 +60,15 @@ namespace Game.Play.Rendering.Runtime
         private static readonly int FrameIndexId = Shader.PropertyToID("_FrameIndex");
         private static readonly int RenderTransId = Shader.PropertyToID("_RenderTrans");
         private static readonly int RenderRotationId = Shader.PropertyToID("_RenderRotation");
+        private static readonly BattleDrawMeshRenderLayer[] DrawOrder =
+        {
+            BattleDrawMeshRenderLayer.GroundEffect,
+            BattleDrawMeshRenderLayer.Unit,
+            BattleDrawMeshRenderLayer.Projectile,
+            BattleDrawMeshRenderLayer.Effect,
+            BattleDrawMeshRenderLayer.MeshElement
+        };
+
         private static Mesh sharedQuadMesh;
 
         private readonly List<Slot> slots = new(DefaultCapacity);
@@ -65,6 +84,8 @@ namespace Game.Play.Rendering.Runtime
         private readonly Vector4[] renderTransforms = new Vector4[MaxBatchSize];
         private readonly Vector4[] renderRotations = new Vector4[MaxBatchSize];
         private readonly MaterialPropertyBlock propertyBlock = new();
+        private float sortingGridMinY;
+        private float unitSortingStep;
 
         private struct Slot
         {
@@ -83,18 +104,23 @@ namespace Game.Play.Rendering.Runtime
             public float frameIndex;
             public Vector4 renderTransform;
             public Vector4 renderRotation;
+            public BattleDrawMeshRenderLayer renderLayer;
             public int layer;
             public Bounds bounds;
         }
 
         private readonly struct BatchKey : IEquatable<BatchKey>
         {
+            public readonly BattleDrawMeshRenderLayer renderLayer;
+            public readonly int sortBucket;
             private readonly int meshId;
             private readonly int materialId;
             private readonly int layer;
 
-            public BatchKey(Mesh mesh, Material material, int layer)
+            public BatchKey(Mesh mesh, Material material, int layer, BattleDrawMeshRenderLayer renderLayer, int sortBucket)
             {
+                this.renderLayer = renderLayer;
+                this.sortBucket = sortBucket;
                 meshId = mesh != null ? mesh.GetInstanceID() : 0;
                 materialId = material != null ? material.GetInstanceID() : 0;
                 this.layer = layer;
@@ -102,7 +128,9 @@ namespace Game.Play.Rendering.Runtime
 
             public bool Equals(BatchKey other)
             {
-                return meshId == other.meshId
+                return renderLayer == other.renderLayer
+                    && sortBucket == other.sortBucket
+                    && meshId == other.meshId
                     && materialId == other.materialId
                     && layer == other.layer;
             }
@@ -116,7 +144,9 @@ namespace Game.Play.Rendering.Runtime
             {
                 unchecked
                 {
-                    int hash = meshId;
+                    int hash = (int)renderLayer;
+                    hash = (hash * 397) ^ sortBucket;
+                    hash = (hash * 397) ^ meshId;
                     hash = (hash * 397) ^ materialId;
                     hash = (hash * 397) ^ layer;
                     return hash;
@@ -125,6 +155,12 @@ namespace Game.Play.Rendering.Runtime
         }
 
         public int ActiveCount { get; private set; }
+
+        public void SetUnitSortingGrid(float gridMinY, float cellSize)
+        {
+            sortingGridMinY = gridMinY;
+            unitSortingStep = Mathf.Max(0f, cellSize) * 0.5f;
+        }
 
         public BattleDrawMeshInstanceHandle Spawn(in BattleDrawMeshInstanceDesc desc)
         {
@@ -158,6 +194,7 @@ namespace Game.Play.Rendering.Runtime
             slot.frameIndex = Mathf.Max(0f, desc.frameIndex);
             slot.renderTransform = desc.renderTransform == default ? new Vector4(0f, 0f, 1f, 1f) : desc.renderTransform;
             slot.renderRotation = desc.renderRotation == default ? new Vector4(1f, 0f, 0f, 0f) : desc.renderRotation;
+            slot.renderLayer = desc.renderLayer == default ? BattleDrawMeshRenderLayer.Effect : desc.renderLayer;
             slot.layer = desc.layer;
             slot.bounds = desc.bounds;
 
@@ -327,15 +364,9 @@ namespace Game.Play.Rendering.Runtime
 
             int drawCount = 0;
             BuildBatches();
-            for (int keyIndex = 0; keyIndex < batchKeys.Count; keyIndex++)
+            for (int layerIndex = 0; layerIndex < DrawOrder.Length; layerIndex++)
             {
-                BatchKey key = batchKeys[keyIndex];
-                if (!batches.TryGetValue(key, out List<int> indices) || indices.Count == 0)
-                {
-                    continue;
-                }
-
-                drawCount += DrawBatch(indices, camera);
+                drawCount += DrawLayer(DrawOrder[layerIndex], camera);
             }
 
             return drawCount;
@@ -390,7 +421,9 @@ namespace Game.Play.Rendering.Runtime
                     continue;
                 }
 
-                BatchKey key = new(slot.mesh, slot.material, slot.layer);
+                BattleDrawMeshRenderLayer renderLayer = slot.renderLayer;
+                int sortBucket = ResolveSortBucket(slot);
+                BatchKey key = new(slot.mesh, slot.material, slot.layer, renderLayer, sortBucket);
                 if (!batches.TryGetValue(key, out List<int> indices))
                 {
                     indices = new List<int>(MaxBatchSize);
@@ -400,6 +433,86 @@ namespace Game.Play.Rendering.Runtime
 
                 indices.Add(i);
             }
+        }
+
+        private int DrawLayer(BattleDrawMeshRenderLayer renderLayer, Camera camera)
+        {
+            return renderLayer == BattleDrawMeshRenderLayer.Unit
+                ? DrawUnitLayer(camera)
+                : DrawFlatLayer(renderLayer, camera);
+        }
+
+        private int DrawFlatLayer(BattleDrawMeshRenderLayer renderLayer, Camera camera)
+        {
+            int drawCount = 0;
+            for (int keyIndex = 0; keyIndex < batchKeys.Count; keyIndex++)
+            {
+                BatchKey key = batchKeys[keyIndex];
+                if (key.renderLayer != renderLayer
+                    || !batches.TryGetValue(key, out List<int> indices)
+                    || indices.Count == 0)
+                {
+                    continue;
+                }
+
+                drawCount += DrawBatch(indices, camera);
+            }
+
+            return drawCount;
+        }
+
+        private int DrawUnitLayer(Camera camera)
+        {
+            int drawCount = 0;
+            int maxBucket = int.MinValue;
+            int minBucket = int.MaxValue;
+            for (int keyIndex = 0; keyIndex < batchKeys.Count; keyIndex++)
+            {
+                BatchKey key = batchKeys[keyIndex];
+                if (key.renderLayer != BattleDrawMeshRenderLayer.Unit
+                    || !batches.TryGetValue(key, out List<int> indices)
+                    || indices.Count == 0)
+                {
+                    continue;
+                }
+
+                maxBucket = Mathf.Max(maxBucket, key.sortBucket);
+                minBucket = Mathf.Min(minBucket, key.sortBucket);
+            }
+
+            if (maxBucket == int.MinValue)
+            {
+                return 0;
+            }
+
+            for (int bucket = maxBucket; bucket >= minBucket; bucket--)
+            {
+                for (int keyIndex = 0; keyIndex < batchKeys.Count; keyIndex++)
+                {
+                    BatchKey key = batchKeys[keyIndex];
+                    if (key.renderLayer != BattleDrawMeshRenderLayer.Unit
+                        || key.sortBucket != bucket
+                        || !batches.TryGetValue(key, out List<int> indices)
+                        || indices.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    drawCount += DrawBatch(indices, camera);
+                }
+            }
+
+            return drawCount;
+        }
+
+        private int ResolveSortBucket(in Slot slot)
+        {
+            if (slot.renderLayer != BattleDrawMeshRenderLayer.Unit || unitSortingStep <= 0f)
+            {
+                return 0;
+            }
+
+            return Mathf.FloorToInt((slot.position.y - sortingGridMinY) / unitSortingStep);
         }
 
         private int DrawBatch(List<int> indices, Camera camera)

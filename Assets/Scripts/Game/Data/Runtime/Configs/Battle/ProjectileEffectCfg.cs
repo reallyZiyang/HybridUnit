@@ -67,7 +67,7 @@ public sealed partial class ProjectileEffectCfg : Luban.BeanBase
     /// </summary>
     public readonly int HitIntervalMs;
     /// <summary>
-    /// ????
+    /// 碰撞检测质量
     /// </summary>
     public readonly Battle.QueryQuality QueryQuality;
     /// <summary>

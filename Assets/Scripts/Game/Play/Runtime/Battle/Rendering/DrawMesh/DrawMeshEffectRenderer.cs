@@ -46,6 +46,7 @@ namespace Game.Play.Battle.Rendering
                 color = asset.color,
                 renderTransform = asset.RenderTransform,
                 renderRotation = asset.RenderRotation,
+                renderLayer = entry.renderLayer,
                 layer = 0,
                 bounds = new Bounds(Vector3.zero, Vector3.one)
             });
@@ -86,6 +87,7 @@ namespace Game.Play.Battle.Rendering
                 frameTransform = new Vector4(0f, 0f, 1f, 1f),
                 renderTransform = asset.RenderTransform,
                 renderRotation = asset.RenderRotation,
+                renderLayer = entry.renderLayer,
                 layer = 0,
                 bounds = new Bounds(Vector3.zero, Vector3.one)
             });
@@ -121,6 +123,7 @@ namespace Game.Play.Battle.Rendering
                 color = unit ? FallbackUnitColor : FallbackProjectileColor,
                 renderTransform = new Vector4(0f, 0f, 1f, 1f),
                 renderRotation = new Vector4(1f, 0f, 0f, 0f),
+                renderLayer = entry.renderLayer,
                 layer = 0,
                 bounds = new Bounds(Vector3.zero, Vector3.one)
             });

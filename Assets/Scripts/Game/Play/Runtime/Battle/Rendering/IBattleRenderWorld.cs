@@ -14,6 +14,7 @@ namespace Game.Play.Battle.Rendering
         void ShowDamageText(Vector2 worldPosition, long value);
         void ShowHealText(Vector2 worldPosition, long value);
         void SetPaused(bool paused);
+        void SetSortingGrid(float gridMinY, float cellSize);
         void SetPosition(int renderHandle, Vector2 position);
         void SetRotation(int renderHandle, float angleDeg);
         void SetUnitFlipX(int renderHandle, bool flipX);

@@ -225,7 +225,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19aaa67546384906913016370d7cc274, type: 3}
   m_Name: Character_1_AnimationVit
   m_EditorClassIdentifier: 
-  renderOffset: {x: 0, y: 0}
+  renderOffset: {x: 0, y: -0.3}
   renderScale: {x: 1, y: 1}
   renderRotationDeg: 0
   mesh: {fileID: -6254109426742111191}
@@ -358,6 +358,7 @@ Material:
     - _FrameIndex: 0
     m_Colors:
     - _InstanceColor: {r: 1, g: 1, b: 1, a: 1}
+    - _RenderRotation: {r: 1, g: 0, b: 0, a: 0}
     - _RenderTrans: {r: 0, g: 0, b: 1, a: 1}
     - _Tint: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

@@ -42,6 +42,7 @@ namespace Game.Play.Battle.Rendering
         public BattleRenderSegment segment;
         public BattleRenderEntryKind kind;
         public string key;
+        public BattleDrawMeshRenderLayer renderLayer;
         public BattleRenderBackend backend;
         public Vector2 position;
         public float angleDeg;
@@ -59,6 +60,7 @@ namespace Game.Play.Battle.Rendering
             BattleRenderSegment segment,
             BattleRenderEntryKind kind,
             string key,
+            BattleDrawMeshRenderLayer renderLayer,
             Vector2 position,
             float angleDeg)
         {
@@ -69,6 +71,7 @@ namespace Game.Play.Battle.Rendering
             this.segment = segment;
             this.kind = kind;
             this.key = key;
+            this.renderLayer = renderLayer;
             backend = BattleRenderBackend.None;
             this.position = position;
             this.angleDeg = angleDeg;
@@ -85,6 +88,7 @@ namespace Game.Play.Battle.Rendering
             active = false;
             handle = -1;
             key = null;
+            renderLayer = BattleDrawMeshRenderLayer.Effect;
             backend = BattleRenderBackend.None;
             position = default;
             angleDeg = 0f;

@@ -29,7 +29,7 @@ MonoBehaviour:
     MemorySize: 256
     HideAfterCallMain: 1
     preloadFiles: 
-    Orientation: 0
+    Orientation: 1
     bgImageSrc: Assets/WX-WASM-SDK-V2/Runtime/wechat-default/images/background.jpg
     dataFileSubPrefix: 
     maxStorage: 200
@@ -48,14 +48,14 @@ MonoBehaviour:
     PreloadWXFont: 0
     disableMultiTouch: 0
   CompileOptions:
-    DevelopBuild: 1
-    AutoProfile: 1
+    DevelopBuild: 0
+    AutoProfile: 0
     ScriptOnly: 0
     Il2CppOptimizeSize: 1
     profilingFuncs: 1
     Webgl2: 1
     fbslim: 0
-    DeleteStreamingAssets: 1
+    DeleteStreamingAssets: 0
     ProfilingMemory: 0
     CleanBuild: 0
     CustomNodePath: 

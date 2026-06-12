@@ -50,14 +50,14 @@ namespace Game.Play.Battle.Rendering
 
         public int SpawnUnit(string renderKey, Vector2 position)
         {
-            int handle = Spawn(BattleRenderEntryKind.Unit, renderKey, position, 0f);
+            int handle = Spawn(BattleRenderEntryKind.Unit, renderKey, BattleDrawMeshRenderLayer.Unit, position, 0f);
             PlayUnitIdle(handle);
             return handle;
         }
 
         public int SpawnProjectile(string projectileKey, Vector2 position, float angleDeg)
         {
-            return Spawn(BattleRenderEntryKind.Effect, projectileKey, position, angleDeg);
+            return Spawn(BattleRenderEntryKind.Effect, projectileKey, BattleDrawMeshRenderLayer.Projectile, position, angleDeg);
         }
 
         public int PlayUnitAction(int renderHandle, string actionName)
@@ -139,6 +139,11 @@ namespace Game.Play.Battle.Rendering
         {
             this.paused = paused;
             floatTextRenderer.SetPaused(paused);
+        }
+
+        public void SetSortingGrid(float gridMinY, float cellSize)
+        {
+            drawMeshInstances.SetUnitSortingGrid(gridMinY, cellSize);
         }
 
         public void SetPosition(int renderHandle, Vector2 position)
@@ -232,13 +237,13 @@ namespace Game.Play.Battle.Rendering
             floatTextRenderer.Clear();
         }
 
-        private int Spawn(BattleRenderEntryKind kind, string key, Vector2 position, float angleDeg)
+        private int Spawn(BattleRenderEntryKind kind, string key, BattleDrawMeshRenderLayer renderLayer, Vector2 position, float angleDeg)
         {
             BattleRenderSegment segment = kind == BattleRenderEntryKind.Unit
                 ? BattleRenderSegment.UnitVit
                 : BattleRenderSegment.Effect2D;
 
-            if (!TryAllocateEntry(segment, kind, key, position, angleDeg, out BattleRenderEntry entry))
+            if (!TryAllocateEntry(segment, kind, key, renderLayer, position, angleDeg, out BattleRenderEntry entry))
             {
                 WarnCapacityExceeded(segment, key);
                 return InvalidHandle;
@@ -438,6 +443,7 @@ namespace Game.Play.Battle.Rendering
             BattleRenderSegment segment,
             BattleRenderEntryKind kind,
             string key,
+            BattleDrawMeshRenderLayer renderLayer,
             Vector2 position,
             float angleDeg,
             out BattleRenderEntry entry)
@@ -452,7 +458,7 @@ namespace Game.Play.Battle.Rendering
             entry = entries[slot];
             int generation = entry.generation <= 0 ? 1 : entry.generation;
             int handle = EncodeHandle(segment, slot, generation);
-            entry.ResetForSpawn(handle, slot, generation, segment, kind, key, position, angleDeg);
+            entry.ResetForSpawn(handle, slot, generation, segment, kind, key, renderLayer, position, angleDeg);
             activeCount++;
             return true;
         }
