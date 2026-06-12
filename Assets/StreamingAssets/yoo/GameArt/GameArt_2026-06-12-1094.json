@@ -1,0 +1,605 @@
+{
+    "FileVersion": "2025.9.30",
+    "EnableAddressable": true,
+    "SupportExtensionless": true,
+    "LocationToLower": false,
+    "IncludeAssetGUID": false,
+    "ReplaceAssetPathWithAddress": false,
+    "OutputNameStyle": 2,
+    "BuildBundleType": 2,
+    "BuildPipeline": "ScriptableBuildPipeline",
+    "PackageName": "GameArt",
+    "PackageVersion": "2026-06-12-1094",
+    "PackageNote": "2026/6/12 18:18:50",
+    "AssetList": [
+        {
+            "Address": "Character_1_AnimationVit",
+            "AssetPath": "Assets/Res/Character/Character_1_AnimationVit.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": [
+                10,
+                12
+            ]
+        },
+        {
+            "Address": "Character_2_AnimationVit",
+            "AssetPath": "Assets/Res/Character/Character_2_AnimationVit.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 0,
+            "DependBundleIDs": [
+                11,
+                12
+            ]
+        },
+        {
+            "Address": "animal_tbanimal",
+            "AssetPath": "Assets/Res/Data/Configs/animal_tbanimal.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbaddbuffeffect",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbaddbuffeffect.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbbuff",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbbuff.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbdamageeffect",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbdamageeffect.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbhealeffect",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbhealeffect.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbprojectileeffect",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbprojectileeffect.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbskill",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbskill.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "battle_tbunit",
+            "AssetPath": "Assets/Res/Data/Configs/battle_tbunit.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "global_tbglobal",
+            "AssetPath": "Assets/Res/Data/Configs/global_tbglobal.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "global_tblocalization",
+            "AssetPath": "Assets/Res/Data/Configs/global_tblocalization.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 1,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "UI_Palette",
+            "AssetPath": "Assets/Res/Data/Settings/UI_Palette.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 2,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "float_text_atlas_v1",
+            "AssetPath": "Assets/Res/FloatText/float_text_atlas_v1.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 3,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "float_text_atlas_v1_source",
+            "AssetPath": "Assets/Res/FloatText/float_text_atlas_v1_source.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 3,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "FloatText",
+            "AssetPath": "Assets/Res/FloatText/FloatText.mat",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 3,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "FloatTextFontAsset",
+            "AssetPath": "Assets/Res/FloatText/FloatTextFontAsset.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 3,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "Animal_Cat_AnimationVit",
+            "AssetPath": "Assets/Res/Monster/Animal_Cat_AnimationVit.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 4,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "Animal_Dog_AnimationVit",
+            "AssetPath": "Assets/Res/Monster/Animal_Dog_AnimationVit.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 4,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "AnimationVit_RuntimeAtlas_18c0b587c5afdb37",
+            "AssetPath": "Assets/Res/Monster/AnimationVit_RuntimeAtlas_18c0b587c5afdb37.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 4,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "Cat",
+            "AssetPath": "Assets/Res/Monster/Cat.prefab",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 4,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "Dog",
+            "AssetPath": "Assets/Res/Monster/Dog.prefab",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 4,
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_001_YellowWood_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_001_YellowWood_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_002_SilverBlue_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_002_SilverBlue_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_002_SilverGreen_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_002_SilverGreen_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_003_GoldRed_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_003_GoldRed_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_003_Gray_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_003_Gray_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_004_Brown_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_004_Brown_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_005_SilverGreen_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_005_SilverGreen_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_006_Red_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_006_Red_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_007_GrayBlue_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_007_GrayBlue_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_008_Blue_Atlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Assets/FA_Consumable_Arrow_008_Blue_Atlas.asset",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 6,
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "Address": "ProjectileAtlas",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/ProjectileAtlas.spriteatlasv2",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 5,
+            "DependBundleIDs": [
+                7
+            ]
+        },
+        {
+            "Address": "FA_Consumable_Arrow_001_YellowWood",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_001_YellowWood.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_002_SilverBlue",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_002_SilverBlue.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_002_SilverGreen",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_002_SilverGreen.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_003_GoldRed",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_003_GoldRed.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_003_Gray",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_003_Gray.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_004_Brown",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_004_Brown.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_005_SilverGreen",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_005_SilverGreen.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_006_Red",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_006_Red.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_007_GrayBlue",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_007_GrayBlue.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "FA_Consumable_Arrow_008_Blue",
+            "AssetPath": "Assets/Res/Projectile/AtlasRender/Sprites/FA_Consumable_Arrow_008_Blue.png",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 7,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "ShaderVariants",
+            "AssetPath": "Assets/Res/Shader/ShaderVariants.shadervariants",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 12,
+            "DependBundleIDs": []
+        },
+        {
+            "Address": "ShaderVariantsJson",
+            "AssetPath": "Assets/Res/Shader/ShaderVariantsJson.json",
+            "AssetGUID": "",
+            "AssetTags": [],
+            "BundleID": 8,
+            "DependBundleIDs": []
+        }
+    ],
+    "BundleList": [
+        {
+            "BundleName": "assets_res_character.bundle",
+            "UnityCRC": 1797026193,
+            "FileHash": "e29e6445cf45e4a159168adaa45e8c79",
+            "FileCRC": 1358738303,
+            "FileSize": 186386,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": [
+                10,
+                11,
+                12
+            ]
+        },
+        {
+            "BundleName": "assets_res_data_configs.bundle",
+            "UnityCRC": 1311378352,
+            "FileHash": "5b4291b8d6c077494bb866c9f669806d",
+            "FileCRC": 794594533,
+            "FileSize": 3264,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_res_data_settings.bundle",
+            "UnityCRC": 1174593243,
+            "FileHash": "af778ea4fd76ef002b763aa80545a70e",
+            "FileCRC": 846610013,
+            "FileSize": 2052,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "assets_res_floattext.bundle",
+            "UnityCRC": 1009727032,
+            "FileHash": "0f3a96e9bdc876c1862a7463dfc5113d",
+            "FileCRC": 474234654,
+            "FileSize": 3837344,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "BundleName": "assets_res_monster.bundle",
+            "UnityCRC": 2068783246,
+            "FileHash": "b30b110cbb969e6d48f18998a6232e53",
+            "FileCRC": 1300611240,
+            "FileSize": 177276,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": [
+                12
+            ]
+        },
+        {
+            "BundleName": "assets_res_projectile_atlasrender.bundle",
+            "UnityCRC": 2784033324,
+            "FileHash": "c147b3a96643fe4001bcc17f82f1cb6a",
+            "FileCRC": 940483967,
+            "FileSize": 9969,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": [
+                7
+            ]
+        },
+        {
+            "BundleName": "assets_res_projectile_atlasrender_assets.bundle",
+            "UnityCRC": 1152400992,
+            "FileHash": "5301515e155ba74141152f8ec4153b51",
+            "FileCRC": 1611145143,
+            "FileSize": 3334,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": [
+                5,
+                7,
+                9,
+                12
+            ]
+        },
+        {
+            "BundleName": "assets_res_projectile_atlasrender_sprites.bundle",
+            "UnityCRC": 4016312496,
+            "FileHash": "634c90035601b95b01d64e89912a3b94",
+            "FileCRC": 505582290,
+            "FileSize": 11469,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": [
+                5
+            ]
+        },
+        {
+            "BundleName": "assets_res_shader.bundle",
+            "UnityCRC": 3631470529,
+            "FileHash": "4807927a8293264f59775ba9733a2ec4",
+            "FileCRC": 3223773626,
+            "FileSize": 1813,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "share_assets_bakedsequences_atlasrenderassets.bundle",
+            "UnityCRC": 2638572577,
+            "FileHash": "b95fbbd075c83552aa6bc2ffc03f241a",
+            "FileCRC": 2468391404,
+            "FileSize": 2471,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": [
+                5,
+                7,
+                12
+            ]
+        },
+        {
+            "BundleName": "share_assets_characterprefabs_character_1.bundle",
+            "UnityCRC": 1544313279,
+            "FileHash": "1b89c56ae7bec5ee00053df1736ef358",
+            "FileCRC": 1798335143,
+            "FileSize": 31975,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "share_assets_characterprefabs_character_2.bundle",
+            "UnityCRC": 2872576000,
+            "FileHash": "a54d3fe26a44a9f7925359b435bc9384",
+            "FileCRC": 1870497259,
+            "FileSize": 31553,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        },
+        {
+            "BundleName": "unityshaders.bundle",
+            "UnityCRC": 3522945299,
+            "FileHash": "b1e230d127bd773aa9f99c899073e4fc",
+            "FileCRC": 3906843696,
+            "FileSize": 138468,
+            "Encrypted": false,
+            "Tags": [],
+            "DependBundleIDs": []
+        }
+    ]
+}

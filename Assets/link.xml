@@ -1,0 +1,16 @@
+<linker>
+  <assembly fullname="YooAsset">
+    <type fullname="YooAsset.IFileSystem" preserve="all"/>
+    <type fullname="YooAsset.DefaultWebServerFileSystem" preserve="all"/>
+    <type fullname="YooAsset.DefaultWebRemoteFileSystem" preserve="all"/>
+    <type fullname="YooAsset.DefaultBuildinFileSystem" preserve="all"/>
+    <type fullname="YooAsset.DefaultCacheFileSystem" preserve="all"/>
+    <type fullname="YooAsset.DefaultUnpackFileSystem" preserve="all"/>
+    <type fullname="YooAsset.FSInitializeFileSystemOperation" preserve="all"/>
+    <type fullname="YooAsset.FSLoadPackageManifestOperation" preserve="all"/>
+    <type fullname="YooAsset.FSRequestPackageVersionOperation" preserve="all"/>
+    <type fullname="YooAsset.FSDownloadFileOperation" preserve="all"/>
+    <type fullname="YooAsset.FSLoadBundleOperation" preserve="all"/>
+  </assembly>
+  <assembly fullname="YooAsset.MiniGame" preserve="all"/>
+</linker>

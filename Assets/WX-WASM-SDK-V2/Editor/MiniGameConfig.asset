@@ -55,7 +55,7 @@ MonoBehaviour:
     profilingFuncs: 1
     Webgl2: 1
     fbslim: 0
-    DeleteStreamingAssets: 0
+    DeleteStreamingAssets: 1
     ProfilingMemory: 0
     CleanBuild: 0
     CustomNodePath: 

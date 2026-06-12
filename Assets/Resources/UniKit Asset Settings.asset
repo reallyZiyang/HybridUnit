@@ -19,5 +19,5 @@ MonoBehaviour:
   m_EnvironmentsSettings:
   - name: Dev
     playMode: 3
-    cdnUrl: 
-    cdnFallbackUrl: 
+    cdnUrl: https://a.unity.cn/client_api/v1/buckets/c09c197e-411a-4193-a323-2a8c23dbe739/content
+    cdnFallbackUrl: https://a.unity.cn/client_api/v1/buckets/c09c197e-411a-4193-a323-2a8c23dbe739/content
