@@ -79,6 +79,7 @@ namespace Game.Play.Battle.Collision
         public int Capacity => capacity;
         public int ActiveCount => activeCount;
         public bool IsGridDirty => gridDirty;
+        public int GridCellCount => gridWidth * gridHeight;
 
         public BattleCollisionTargetHandle RegisterTarget(
             Vector2 position,
@@ -402,6 +403,69 @@ namespace Game.Play.Battle.Collision
             return targetIndex >= 0;
         }
 
+        public bool TryGetCellIndex(Vector2 position, out int cellIndex)
+        {
+            if (TryGetCell(position, out int x, out int y))
+            {
+                cellIndex = CellIndex(x, y);
+                return true;
+            }
+
+            cellIndex = -1;
+            return false;
+        }
+
+        public Vector2 GetCellCenter(int cellIndex)
+        {
+            if (cellIndex < 0)
+            {
+                return gridMin;
+            }
+
+            int x = cellIndex % gridWidth;
+            int y = cellIndex / gridWidth;
+            x = Mathf.Clamp(x, 0, gridWidth - 1);
+            y = Mathf.Clamp(y, 0, gridHeight - 1);
+            return new Vector2(
+                gridMin.x + (x + 0.5f) * cellSize,
+                gridMin.y + (y + 0.5f) * cellSize);
+        }
+
+        public bool QueryNearestByCellRings(Vector2 origin, in BattleCollisionQueryOptions options, out int targetIndex)
+        {
+            targetIndex = -1;
+            if (activeCount == 0)
+            {
+                return false;
+            }
+
+            if (gridDirty)
+            {
+                RebuildGrid();
+            }
+
+            if (!gridUsable || !TryGetCell(origin, out int centerX, out int centerY))
+            {
+                return QueryNearestAll(origin, options, out targetIndex);
+            }
+
+            int maxRing = Mathf.Max(centerX, centerY, gridWidth - 1 - centerX, gridHeight - 1 - centerY);
+            for (int ring = 0; ring <= maxRing; ring++)
+            {
+                float bestDistanceSqr = float.MaxValue;
+                int bestTargetIndex = -1;
+                BeginQueryStamp();
+                VisitNearestRing(origin, options, centerX, centerY, ring, ref bestTargetIndex, ref bestDistanceSqr);
+                if (bestTargetIndex >= 0)
+                {
+                    targetIndex = bestTargetIndex;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public int BruteForceQuery(in BattleCollisionShape shape, in BattleCollisionQueryOptions options, BattleCollisionQueryBuffer buffer)
         {
             if (buffer == null)
@@ -496,6 +560,28 @@ namespace Game.Play.Battle.Collision
                 }
 
                 if (!BattleCollisionMath.CircleHitsCircle(origin, radius, positions[i], radii[i]))
+                {
+                    continue;
+                }
+
+                float distanceSqr = (positions[i] - origin).sqrMagnitude;
+                if (distanceSqr < bestDistanceSqr)
+                {
+                    bestDistanceSqr = distanceSqr;
+                    targetIndex = i;
+                }
+            }
+
+            return targetIndex >= 0;
+        }
+
+        private bool QueryNearestAll(Vector2 origin, in BattleCollisionQueryOptions options, out int targetIndex)
+        {
+            targetIndex = -1;
+            float bestDistanceSqr = float.MaxValue;
+            for (int i = 0; i < allocatedCount; i++)
+            {
+                if (!PassFilter(i, options))
                 {
                     continue;
                 }
@@ -690,6 +776,69 @@ namespace Game.Play.Battle.Collision
             }
         }
 
+        private void VisitNearestRing(
+            Vector2 origin,
+            in BattleCollisionQueryOptions options,
+            int centerX,
+            int centerY,
+            int ring,
+            ref int targetIndex,
+            ref float bestDistanceSqr)
+        {
+            if (ring == 0)
+            {
+                if (centerX >= 0 && centerY >= 0 && centerX < gridWidth && centerY < gridHeight)
+                {
+                    VisitNearestCell(origin, options, centerX, centerY, ref targetIndex, ref bestDistanceSqr);
+                }
+
+                return;
+            }
+
+            int minX = Mathf.Max(0, centerX - ring);
+            int maxX = Mathf.Min(gridWidth - 1, centerX + ring);
+            int minY = Mathf.Max(0, centerY - ring);
+            int maxY = Mathf.Min(gridHeight - 1, centerY + ring);
+            int topY = centerY + ring;
+            int bottomY = centerY - ring;
+            int leftX = centerX - ring;
+            int rightX = centerX + ring;
+
+            if (bottomY >= 0 && bottomY < gridHeight)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    VisitNearestCell(origin, options, x, bottomY, ref targetIndex, ref bestDistanceSqr);
+                }
+            }
+
+            if (topY != bottomY && topY >= 0 && topY < gridHeight)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    VisitNearestCell(origin, options, x, topY, ref targetIndex, ref bestDistanceSqr);
+                }
+            }
+
+            int innerMinY = Mathf.Max(minY, bottomY + 1);
+            int innerMaxY = Mathf.Min(maxY, topY - 1);
+            if (leftX >= 0 && leftX < gridWidth)
+            {
+                for (int y = innerMinY; y <= innerMaxY; y++)
+                {
+                    VisitNearestCell(origin, options, leftX, y, ref targetIndex, ref bestDistanceSqr);
+                }
+            }
+
+            if (rightX != leftX && rightX >= 0 && rightX < gridWidth)
+            {
+                for (int y = innerMinY; y <= innerMaxY; y++)
+                {
+                    VisitNearestCell(origin, options, rightX, y, ref targetIndex, ref bestDistanceSqr);
+                }
+            }
+        }
+
         private void VisitNearestCell(
             Vector2 origin,
             float radius,
@@ -717,6 +866,40 @@ namespace Game.Play.Battle.Collision
                 }
 
                 if (!BattleCollisionMath.CircleHitsCircle(origin, radius, positions[candidate], radii[candidate]))
+                {
+                    continue;
+                }
+
+                float distanceSqr = (positions[candidate] - origin).sqrMagnitude;
+                if (distanceSqr < bestDistanceSqr)
+                {
+                    bestDistanceSqr = distanceSqr;
+                    targetIndex = candidate;
+                }
+            }
+        }
+
+        private void VisitNearestCell(
+            Vector2 origin,
+            in BattleCollisionQueryOptions options,
+            int cellX,
+            int cellY,
+            ref int targetIndex,
+            ref float bestDistanceSqr)
+        {
+            int link = cellHeads[CellIndex(cellX, cellY)];
+            while (link >= 0)
+            {
+                int candidate = linkTargets[link];
+                link = linkNext[link];
+
+                if (queryStamp[candidate] == currentQueryId)
+                {
+                    continue;
+                }
+
+                queryStamp[candidate] = currentQueryId;
+                if (!PassFilter(candidate, options))
                 {
                     continue;
                 }

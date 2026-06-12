@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using Game.Data.Configs;
+using Game.Data.Configs.Attr;
 using Game.Play.Adapters;
 using Game.Play.Battle.Rendering;
+using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Unit;
 using Game.Play.Systems.Battle.System;
 using NUnit.Framework;
@@ -69,6 +71,78 @@ namespace Game.Play.Tests.Battle
             Assert.GreaterOrEqual(renderWorld.DamageTextCount, 2);
         }
 
+        [Test]
+        public void AI_MovingUnitPlaysWalkAndFlipsLeft()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle mover = battle.SpawnUnit(1001, new Vector2(3f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new[] { 2001 }));
+            battle.SpawnUnit(1101, Vector2.zero, new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new int[0]));
+
+            battle.OnUpdate(0.033f);
+
+            int moverRenderHandle = battle.UnitManager.GetRenderHandle(mover);
+            Assert.Less(battle.UnitManager.GetPosition(mover).x, 3f);
+            Assert.Greater(renderWorld.GetWalkCount(moverRenderHandle), 0);
+            Assert.IsTrue(renderWorld.GetFlipX(moverRenderHandle));
+        }
+
+        [Test]
+        public void AI_StopsByFirstSkillRangeNotOtherSkillRange()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle mover = battle.SpawnUnit(1001, new Vector2(2f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new[] { 2001, 2002 }));
+            battle.SpawnUnit(1101, Vector2.zero, new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new int[0]));
+
+            battle.OnUpdate(0.033f);
+
+            Assert.Less(battle.UnitManager.GetPosition(mover).x, 2f);
+        }
+
+        [Test]
+        public void HitLock_PreventsMovement()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle mover = battle.SpawnUnit(1001, new Vector2(3f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new[] { 2001 }));
+            battle.SpawnUnit(1101, Vector2.zero, new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new int[0]));
+
+            battle.UnitManager.ApplyHitLock(mover, 300);
+            battle.OnUpdate(0.033f);
+
+            int moverRenderHandle = battle.UnitManager.GetRenderHandle(mover);
+            Assert.AreEqual(3f, battle.UnitManager.GetPosition(mover).x);
+            Assert.AreEqual(0, renderWorld.GetWalkCount(moverRenderHandle));
+        }
+
+        [Test]
+        public void Endure_PreventsHitReactionButStillTakesDamage()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            battle.SpawnUnit(1001, Vector2.zero, new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new[] { 2001 }));
+            BattleUnitHandle enemy = battle.SpawnUnit(
+                1101,
+                new Vector2(0.8f, 0f),
+                new BattleUnitSpawnOverrides(
+                    hasCamp: true,
+                    camp: 2,
+                    skillIds: new int[0],
+                    attrs: new[] { new BattleAttributeValue(AttributeType.Endure, 1) }));
+
+            Tick(battle, 11);
+
+            int enemyRenderHandle = battle.UnitManager.GetRenderHandle(enemy);
+            Assert.Less(battle.UnitManager.GetHp(enemy), 300);
+            Assert.AreEqual(0, renderWorld.GetHitCount(enemyRenderHandle));
+            Assert.IsFalse(battle.UnitManager.IsHitLocked(enemy));
+        }
+
         private static BattleRuntimeSystem CreateBattle(Tables tables, IBattleRenderWorld renderWorld = null)
         {
             BattleRuntimeSystem battle = new();
@@ -103,6 +177,8 @@ namespace Game.Play.Tests.Battle
         private sealed class RecordingRenderWorld : IBattleRenderWorld
         {
             private readonly Dictionary<int, int> hitCounts = new();
+            private readonly Dictionary<int, int> walkCounts = new();
+            private readonly Dictionary<int, bool> flipX = new();
             private int nextHandle;
 
             public int DamageTextCount { get; private set; }
@@ -121,10 +197,17 @@ namespace Game.Play.Tests.Battle
             public int PlayUnitAction(int renderHandle, string actionName) => 0;
             public void PlayUnitIdle(int renderHandle) { }
 
-            public void PlayUnitHit(int renderHandle)
+            public void PlayUnitWalk(int renderHandle)
+            {
+                walkCounts.TryGetValue(renderHandle, out int count);
+                walkCounts[renderHandle] = count + 1;
+            }
+
+            public int PlayUnitHit(int renderHandle)
             {
                 hitCounts.TryGetValue(renderHandle, out int count);
                 hitCounts[renderHandle] = count + 1;
+                return 300;
             }
 
             public void PlayUnitDead(int renderHandle) { }
@@ -133,6 +216,7 @@ namespace Game.Play.Tests.Battle
             public void SetPaused(bool paused) { }
             public void SetPosition(int renderHandle, Vector2 position) { }
             public void SetRotation(int renderHandle, float angleDeg) { }
+            public void SetUnitFlipX(int renderHandle, bool value) => flipX[renderHandle] = value;
             public void SetVisible(int renderHandle, bool visible) { }
             public void Despawn(int renderHandle) { }
             public void Tick(float deltaTime) { }
@@ -141,6 +225,16 @@ namespace Game.Play.Tests.Battle
             public int GetHitCount(int renderHandle)
             {
                 return hitCounts.TryGetValue(renderHandle, out int count) ? count : 0;
+            }
+
+            public int GetWalkCount(int renderHandle)
+            {
+                return walkCounts.TryGetValue(renderHandle, out int count) ? count : 0;
+            }
+
+            public bool GetFlipX(int renderHandle)
+            {
+                return flipX.TryGetValue(renderHandle, out bool value) && value;
             }
         }
     }

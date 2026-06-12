@@ -1,6 +1,7 @@
 using Game.Data.Configs;
 using Game.Play.Adapters;
 using Game.Play.Base.Attributes;
+using Game.Play.Battle.AI;
 using Game.Play.Battle.Buff;
 using Game.Play.Battle.Collision;
 using Game.Play.Battle.Projectile;
@@ -24,6 +25,7 @@ namespace Game.Play.Systems.Battle.System
         private BattleCollisionManager localCollisionManager;
         private BattleCommandBuffer commands;
         private BattleEffectExecutor effects;
+        private BattleAISystem ai;
         private BattleSkillManager skills;
         private BattleBuffManager buffs;
         private BattleProjectileManager projectiles;
@@ -90,6 +92,7 @@ namespace Game.Play.Systems.Battle.System
             effects = new BattleEffectExecutor(RuntimeData, UnitManager, commands);
             int slotsPerUnit = Mathf.Max(1, RuntimeData.MaxDefaultSkillCount, skillSlotsPerUnit);
             skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, effects, this.renderWorld, unitCapacity, slotsPerUnit, unitCapacity);
+            ai = new BattleAISystem(UnitManager, CollisionManager, skills, this.renderWorld, unitCapacity);
             buffs = new BattleBuffManager(RuntimeData, UnitManager, effects, buffCapacity);
             projectiles = new BattleProjectileManager(RuntimeData, UnitManager, CollisionManager, effects, this.renderWorld, projectileCapacity, unitCapacity);
         }
@@ -184,15 +187,18 @@ namespace Game.Play.Systems.Battle.System
                 return;
             }
 
-            renderWorld?.Tick(deltaTime);
-            SyncRenderPositions();
-
             accumulatedMs += Mathf.Max(0f, deltaTime) * 1000f;
+            bool tickedLogic = false;
             while (accumulatedMs >= logicStepMs)
             {
                 TickLogic(logicStepMs);
                 accumulatedMs -= logicStepMs;
+                tickedLogic = true;
             }
+
+            float renderAlpha = ResolveRenderAlpha(tickedLogic);
+            SyncRenderPositions(renderAlpha);
+            renderWorld?.Tick(deltaTime);
         }
 
         public void DisposeBattle()
@@ -201,6 +207,7 @@ namespace Game.Play.Systems.Battle.System
             RuntimeData = null;
             commands = null;
             effects = null;
+            ai = null;
             skills = null;
             buffs = null;
             projectiles = null;
@@ -223,6 +230,11 @@ namespace Game.Play.Systems.Battle.System
 
         private void TickLogic(int deltaMs)
         {
+            UnitManager.CapturePreviousPositions();
+            UnitManager.TickHitLocks(deltaMs);
+            UnitManager.SyncCollisionTargets(CollisionManager);
+            CollisionManager.RebuildGrid();
+            ai.Tick(deltaMs);
             UnitManager.SyncCollisionTargets(CollisionManager);
             CollisionManager.RebuildGrid();
             skills.Tick(deltaMs);
@@ -265,9 +277,11 @@ namespace Game.Play.Systems.Battle.System
                         renderWorld?.PlayUnitDead(renderHandle);
                         DespawnUnit(command.target, false);
                     }
-                    else if (command.playHitReaction)
+                    else if (command.playHitReaction && !UnitManager.HasEndure(command.target))
                     {
-                        renderWorld?.PlayUnitHit(UnitManager.GetRenderHandle(command.target));
+                        int hitDurationMs = renderWorld?.PlayUnitHit(UnitManager.GetRenderHandle(command.target)) ?? 0;
+                        skills.InterruptUnitCast(command.target);
+                        UnitManager.ApplyHitLock(command.target, hitDurationMs);
                     }
                     break;
                 case BattleCommandType.Heal:
@@ -292,7 +306,22 @@ namespace Game.Play.Systems.Battle.System
             }
         }
 
-        private void SyncRenderPositions()
+        private float ResolveRenderAlpha(bool tickedLogic)
+        {
+            if (logicStepMs <= 0)
+            {
+                return 1f;
+            }
+
+            if (tickedLogic && accumulatedMs <= 0.0001f)
+            {
+                return 1f;
+            }
+
+            return Mathf.Clamp01(accumulatedMs / logicStepMs);
+        }
+
+        private void SyncRenderPositions(float alpha)
         {
             for (int i = 0; i < UnitManager.AllocatedCount; i++)
             {
@@ -301,8 +330,10 @@ namespace Game.Play.Systems.Battle.System
                     continue;
                 }
 
-                renderWorld?.SetPosition(UnitManager.GetRenderHandle(unit), UnitManager.GetPosition(unit));
+                renderWorld?.SetPosition(UnitManager.GetRenderHandle(unit), UnitManager.GetInterpolatedPosition(unit, alpha));
             }
+
+            projectiles?.SyncRenderPositions(alpha);
         }
 
         private static int[] ResolveSkillIds(int[] defaultSkills, int[] overrideSkills)

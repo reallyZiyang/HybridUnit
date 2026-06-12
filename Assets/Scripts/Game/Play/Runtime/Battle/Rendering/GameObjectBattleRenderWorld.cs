@@ -26,9 +26,14 @@ namespace Game.Play.Battle.Rendering
             inner.PlayUnitIdle(renderHandle);
         }
 
-        public void PlayUnitHit(int renderHandle)
+        public void PlayUnitWalk(int renderHandle)
         {
-            inner.PlayUnitHit(renderHandle);
+            inner.PlayUnitWalk(renderHandle);
+        }
+
+        public int PlayUnitHit(int renderHandle)
+        {
+            return inner.PlayUnitHit(renderHandle);
         }
 
         public void PlayUnitDead(int renderHandle)
@@ -59,6 +64,11 @@ namespace Game.Play.Battle.Rendering
         public void SetRotation(int renderHandle, float angleDeg)
         {
             inner.SetRotation(renderHandle, angleDeg);
+        }
+
+        public void SetUnitFlipX(int renderHandle, bool flipX)
+        {
+            inner.SetUnitFlipX(renderHandle, flipX);
         }
 
         public void SetVisible(int renderHandle, bool visible)

@@ -10,12 +10,14 @@ namespace Game.Play.Battle.Unit
         private readonly int capacity;
         private readonly int attrStride;
         private readonly Vector2[] positions;
+        private readonly Vector2[] previousPositions;
         private readonly float[] radii;
         private readonly int[] camps;
         private readonly int[] states;
         private readonly int[] layers;
         private readonly int[] unitCfgIds;
         private readonly int[] hp;
+        private readonly int[] hitLockRemainingMs;
         private readonly bool[] active;
         private readonly int[] generations;
         private readonly int[] renderHandles;
@@ -36,12 +38,14 @@ namespace Game.Play.Battle.Unit
             this.capacity = Mathf.Max(1, capacity);
             this.attrStride = attrStride > 0 ? attrStride : BattleAttributeRegistry.Count;
             positions = new Vector2[this.capacity];
+            previousPositions = new Vector2[this.capacity];
             radii = new float[this.capacity];
             camps = new int[this.capacity];
             states = new int[this.capacity];
             layers = new int[this.capacity];
             unitCfgIds = new int[this.capacity];
             hp = new int[this.capacity];
+            hitLockRemainingMs = new int[this.capacity];
             active = new bool[this.capacity];
             generations = new int[this.capacity];
             renderHandles = new int[this.capacity];
@@ -88,6 +92,7 @@ namespace Game.Play.Battle.Unit
             generations[index] = generation > 0 ? generation : 1;
             unitCfgIds[index] = desc.unitCfgId;
             positions[index] = desc.position;
+            previousPositions[index] = desc.position;
             radii[index] = Mathf.Max(0f, desc.radius);
             camps[index] = desc.camp;
             states[index] = desc.state;
@@ -99,6 +104,7 @@ namespace Game.Play.Battle.Unit
             ClearAttributes(index);
             ApplyInitialAttributes(index, desc.attrs);
             hp[index] = ResolveSpawnHp(index, desc.hp);
+            hitLockRemainingMs[index] = 0;
             SetBaseAttrByIndex(index, AttributeType.Hp, hp[index]);
             active[index] = true;
             activeCount++;
@@ -118,6 +124,7 @@ namespace Game.Play.Battle.Unit
             active[index] = false;
             unitCfgIds[index] = 0;
             hp[index] = 0;
+            hitLockRemainingMs[index] = 0;
             states[index] = 0;
             renderHandles[index] = -1;
             skillSlotStarts[index] = -1;
@@ -152,6 +159,55 @@ namespace Game.Play.Battle.Unit
 
             positions[unit.index] = position;
             return true;
+        }
+
+        public void TickHitLocks(int deltaMs)
+        {
+            int safeDeltaMs = Mathf.Max(0, deltaMs);
+            if (safeDeltaMs <= 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < allocatedCount; i++)
+            {
+                if (active[i] && hitLockRemainingMs[i] > 0)
+                {
+                    hitLockRemainingMs[i] = Mathf.Max(0, hitLockRemainingMs[i] - safeDeltaMs);
+                }
+            }
+        }
+
+        public bool ApplyHitLock(BattleUnitHandle unit, int durationMs)
+        {
+            if (!IsAlive(unit))
+            {
+                return false;
+            }
+
+            hitLockRemainingMs[unit.index] = Mathf.Max(hitLockRemainingMs[unit.index], Mathf.Max(1, durationMs));
+            return true;
+        }
+
+        public bool IsHitLocked(BattleUnitHandle unit)
+        {
+            return IsAlive(unit) && hitLockRemainingMs[unit.index] > 0;
+        }
+
+        public bool HasEndure(BattleUnitHandle unit)
+        {
+            return IsAlive(unit) && GetAttr(unit, AttributeType.Endure) > 0;
+        }
+
+        public void CapturePreviousPositions()
+        {
+            for (int i = 0; i < allocatedCount; i++)
+            {
+                if (active[i])
+                {
+                    previousPositions[i] = positions[i];
+                }
+            }
         }
 
         public bool SetRenderHandle(BattleUnitHandle unit, int renderHandle)
@@ -242,6 +298,11 @@ namespace Game.Play.Battle.Unit
         public Vector2 GetPosition(BattleUnitHandle unit)
         {
             return IsValid(unit) ? positions[unit.index] : default;
+        }
+
+        public Vector2 GetInterpolatedPosition(BattleUnitHandle unit, float alpha)
+        {
+            return IsValid(unit) ? Vector2.Lerp(previousPositions[unit.index], positions[unit.index], Mathf.Clamp01(alpha)) : default;
         }
 
         public float GetRadius(BattleUnitHandle unit)

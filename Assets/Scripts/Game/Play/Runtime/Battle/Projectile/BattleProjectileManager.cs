@@ -143,13 +143,27 @@ namespace Game.Play.Battle.Projectile
                 previousPositions[i] = previousPosition;
                 positions[i] += directions[i] * projectile.speed * dt;
                 remainingMs[i] -= deltaMs;
-                renderWorld?.SetPosition(renderHandles[i], positions[i]);
                 TryHitTargets(i, projectile, previousPosition);
 
                 if (active[i] && remainingMs[i] <= 0)
                 {
                     DespawnAt(i);
                 }
+            }
+        }
+
+        public void SyncRenderPositions(float alpha)
+        {
+            float t = Mathf.Clamp01(alpha);
+            for (int i = 0; i < allocatedCount; i++)
+            {
+                if (!active[i])
+                {
+                    continue;
+                }
+
+                Vector2 renderPosition = Vector2.Lerp(previousPositions[i], positions[i], t);
+                renderWorld?.SetPosition(renderHandles[i], renderPosition);
             }
         }
 

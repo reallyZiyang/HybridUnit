@@ -7,8 +7,11 @@ namespace Game.Play.Battle.Rendering
     internal sealed class DrawMeshUnitRenderer
     {
         public const string IdleAction = "idle";
+        public const string WalkAction = "walk";
         public const string HitAction = "hit";
         public const string DeadAction = "dead";
+
+        public const int DefaultHitLockMs = 300;
 
         private const int UnitDeathFadeMs = 1000;
 
@@ -122,6 +125,40 @@ namespace Game.Play.Battle.Rendering
             }
 
             return 0;
+        }
+
+        public int PlayLoopOrIdle(BattleRenderEntry entry, UnitDrawRenderState state, string actionName)
+        {
+            int durationMs = PlayAction(entry, state, actionName, true);
+            if (durationMs > 0)
+            {
+                return durationMs;
+            }
+
+            return PlayAction(entry, state, IdleAction, true);
+        }
+
+        public int PlayHitOrIdle(BattleRenderEntry entry, UnitDrawRenderState state)
+        {
+            int durationMs = PlayAction(entry, state, HitAction, false);
+            if (durationMs > 0)
+            {
+                return durationMs;
+            }
+
+            PlayAction(entry, state, IdleAction, true);
+            return DefaultHitLockMs;
+        }
+
+        public void SetFlipX(BattleRenderEntry entry, bool flipX)
+        {
+            if (entry == null)
+            {
+                return;
+            }
+
+            entry.flipX = flipX;
+            ApplyEntryScale(entry);
         }
 
         public void Resume(BattleRenderEntry entry, UnitDrawRenderState state)
@@ -273,7 +310,16 @@ namespace Game.Play.Battle.Rendering
         {
             drawMeshInstances.SetPosition(entry.instanceHandle, new Vector3(entry.position.x, entry.position.y, 0f));
             drawMeshInstances.SetRotation(entry.instanceHandle, Quaternion.Euler(0f, 0f, entry.angleDeg));
+            ApplyEntryScale(entry);
             drawMeshInstances.SetVisible(entry.instanceHandle, entry.visible);
+        }
+
+        private void ApplyEntryScale(BattleRenderEntry entry)
+        {
+            if (entry != null && entry.instanceHandle.IsValid)
+            {
+                drawMeshInstances.SetScale(entry.instanceHandle, new Vector3(entry.flipX ? -1f : 1f, 1f, 1f));
+            }
         }
     }
 }

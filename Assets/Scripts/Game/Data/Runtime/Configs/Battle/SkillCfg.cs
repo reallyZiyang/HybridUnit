@@ -60,7 +60,7 @@ public sealed partial class SkillCfg : Luban.BeanBase
     /// </summary>
     public readonly int CooldownMs;
     /// <summary>
-    /// ????
+    /// 施法距离
     /// </summary>
     public readonly float CastRange;
     /// <summary>

@@ -33,7 +33,7 @@
     "castPreMs": 1000,
     "castBackMs": 300,
     "cooldownMs": 2000,
-    "castRange": 8,
+    "castRange": 5,
     "targetType": 2,
     "selectType": 1,
     "shape": {

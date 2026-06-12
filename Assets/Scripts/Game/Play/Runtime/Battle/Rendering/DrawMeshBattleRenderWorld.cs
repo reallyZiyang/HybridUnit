@@ -80,21 +80,34 @@ namespace Game.Play.Battle.Rendering
             }
 
             state.pendingAction = null;
-            unitRenderer.PlayAction(entry, state, DrawMeshUnitRenderer.IdleAction, true);
+            unitRenderer.PlayLoopOrIdle(entry, state, DrawMeshUnitRenderer.IdleAction);
         }
 
-        public void PlayUnitHit(int renderHandle)
+        public void PlayUnitWalk(int renderHandle)
         {
             if (!TryGetUnit(renderHandle, out BattleRenderEntry entry, out UnitDrawRenderState state))
             {
                 return;
             }
 
-            int durationMs = unitRenderer.PlayAction(entry, state, DrawMeshUnitRenderer.HitAction, false);
+            state.pendingAction = null;
+            unitRenderer.PlayLoopOrIdle(entry, state, DrawMeshUnitRenderer.WalkAction);
+        }
+
+        public int PlayUnitHit(int renderHandle)
+        {
+            if (!TryGetUnit(renderHandle, out BattleRenderEntry entry, out UnitDrawRenderState state))
+            {
+                return DrawMeshUnitRenderer.DefaultHitLockMs;
+            }
+
+            int durationMs = unitRenderer.PlayHitOrIdle(entry, state);
             if (!state.dead)
             {
                 state.returnIdleMs = Mathf.Max(1, durationMs);
             }
+
+            return Mathf.Max(1, durationMs);
         }
 
         public void PlayUnitDead(int renderHandle)
@@ -154,6 +167,16 @@ namespace Game.Play.Battle.Rendering
             {
                 drawMeshInstances.SetRotation(entry.instanceHandle, Quaternion.Euler(0f, 0f, angleDeg));
             }
+        }
+
+        public void SetUnitFlipX(int renderHandle, bool flipX)
+        {
+            if (!TryGetUnit(renderHandle, out BattleRenderEntry entry, out _))
+            {
+                return;
+            }
+
+            unitRenderer.SetFlipX(entry, flipX);
         }
 
         public void SetVisible(int renderHandle, bool visible)

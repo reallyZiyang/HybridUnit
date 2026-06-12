@@ -65,6 +65,70 @@ namespace Game.Play.Battle.Skill
 
         public int GetSlotStart(BattleUnitHandle unit) => unit.index * slotsPerUnit;
 
+        public bool IsUnitBusy(BattleUnitHandle unit)
+        {
+            if (!units.IsAlive(unit))
+            {
+                return false;
+            }
+
+            if (units.IsHitLocked(unit))
+            {
+                return true;
+            }
+
+            int start = GetSlotStart(unit);
+            for (int i = 0; i < slotsPerUnit; i++)
+            {
+                int slot = start + i;
+                if (active[slot] && phases[slot] != CastPhase.Idle)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void InterruptUnitCast(BattleUnitHandle unit)
+        {
+            if (!units.IsValid(unit))
+            {
+                return;
+            }
+
+            int start = GetSlotStart(unit);
+            for (int i = 0; i < slotsPerUnit; i++)
+            {
+                int slot = start + i;
+                if (!active[slot] || phases[slot] == CastPhase.Idle)
+                {
+                    continue;
+                }
+
+                phases[slot] = CastPhase.Idle;
+                phaseRemainingMs[slot] = 0;
+                castDurationMs[slot] = 0;
+                targets[slot] = BattleUnitHandle.Invalid;
+            }
+        }
+
+        public float GetBasicAttackRange(BattleUnitHandle unit)
+        {
+            if (!units.IsAlive(unit))
+            {
+                return 0f;
+            }
+
+            int start = GetSlotStart(unit);
+            if (!active[start] || !data.TryGetSkill(skillIds[start], out BattleSkillRuntimeData skill))
+            {
+                return 1f;
+            }
+
+            return ResolveCastRange(skill);
+        }
+
         public void BindUnitSkills(BattleUnitHandle unit, int[] defaultSkills)
         {
             int start = GetSlotStart(unit);
@@ -139,6 +203,12 @@ namespace Game.Play.Battle.Skill
         private void TickUnit(BattleUnitHandle unit, int deltaMs)
         {
             int start = GetSlotStart(unit);
+            if (units.IsHitLocked(unit))
+            {
+                TickCooldowns(start, deltaMs);
+                return;
+            }
+
             bool hasBusySkill = false;
             for (int i = 0; i < slotsPerUnit; i++)
             {
@@ -186,6 +256,18 @@ namespace Game.Play.Battle.Skill
 
                 StartCast(slot, skill, target);
                 return;
+            }
+        }
+
+        private void TickCooldowns(int start, int deltaMs)
+        {
+            for (int i = 0; i < slotsPerUnit; i++)
+            {
+                int slot = start + i;
+                if (active[slot] && cooldownMs[slot] > 0)
+                {
+                    cooldownMs[slot] = Mathf.Max(0, cooldownMs[slot] - deltaMs);
+                }
             }
         }
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: New Battle Scenario
   m_EditorClassIdentifier: 
   scenarioName: New Battle Scenario
-  logicStepMs: 33
+  logicStepMs: 50
   gridMin: {x: -10, y: -10}
   gridWidth: 20
   gridHeight: 20
@@ -30,7 +30,7 @@ MonoBehaviour:
     spawnCount: 80
     spawnSpacing: 0.5
     camp: 1
-    position: {x: -2.4234047, y: -0.13617073}
+    position: {x: -5.759576, y: -0.03404333}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0
@@ -40,11 +40,11 @@ MonoBehaviour:
     attrs: []
   - enabled: 1
     label: Player 2
-    unitCfgId: 1001
+    unitCfgId: 1002
     spawnCount: 80
     spawnSpacing: 0.525
     camp: 1
-    position: {x: 4.2425537, y: 6.8765955}
+    position: {x: -2.7702117, y: 7.557447}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0

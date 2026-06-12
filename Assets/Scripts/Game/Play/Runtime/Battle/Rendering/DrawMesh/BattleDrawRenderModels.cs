@@ -45,6 +45,7 @@ namespace Game.Play.Battle.Rendering
         public BattleRenderBackend backend;
         public Vector2 position;
         public float angleDeg;
+        public bool flipX;
         public BattleDrawMeshInstanceHandle instanceHandle;
         public bool assetRequestStarted;
         public bool assetRequestCompleted;
@@ -71,6 +72,7 @@ namespace Game.Play.Battle.Rendering
             backend = BattleRenderBackend.None;
             this.position = position;
             this.angleDeg = angleDeg;
+            flipX = false;
             instanceHandle = BattleDrawMeshInstanceHandle.Invalid;
             assetRequestStarted = false;
             assetRequestCompleted = false;
@@ -86,6 +88,7 @@ namespace Game.Play.Battle.Rendering
             backend = BattleRenderBackend.None;
             position = default;
             angleDeg = 0f;
+            flipX = false;
             instanceHandle = BattleDrawMeshInstanceHandle.Invalid;
             assetRequestStarted = false;
             assetRequestCompleted = false;
