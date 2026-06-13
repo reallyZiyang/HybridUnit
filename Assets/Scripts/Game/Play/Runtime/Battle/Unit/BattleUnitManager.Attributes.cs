@@ -4,6 +4,22 @@ using UnityEngine;
 
 namespace Game.Play.Battle.Unit
 {
+    public readonly struct BattleAttributeDebugInfo
+    {
+        public readonly AttributeType type;
+        public readonly long baseValue;
+        public readonly long modifierValue;
+        public readonly long finalValue;
+
+        public BattleAttributeDebugInfo(AttributeType type, long baseValue, long modifierValue, long finalValue)
+        {
+            this.type = type;
+            this.baseValue = baseValue;
+            this.modifierValue = modifierValue;
+            this.finalValue = finalValue;
+        }
+    }
+
     public sealed partial class BattleUnitManager
     {
         public long GetAttr(BattleUnitHandle unit, AttributeType attr)
@@ -24,6 +40,27 @@ namespace Game.Play.Battle.Unit
             }
 
             return baseAttrs[AttrOffset(unit.index, attrIndex)];
+        }
+
+        public long GetModifierAttr(BattleUnitHandle unit, AttributeType attr)
+        {
+            if (!IsValid(unit) || !BattleAttributeRegistry.TryGetIndex(attr, out int attrIndex))
+            {
+                return 0;
+            }
+
+            return modifierAttrs[AttrOffset(unit.index, attrIndex)];
+        }
+
+        public BattleAttributeDebugInfo GetAttributeDebugInfo(BattleUnitHandle unit, AttributeType attr)
+        {
+            if (!IsValid(unit) || !BattleAttributeRegistry.TryGetIndex(attr, out int attrIndex))
+            {
+                return new BattleAttributeDebugInfo(attr, 0, 0, 0);
+            }
+
+            int offset = AttrOffset(unit.index, attrIndex);
+            return new BattleAttributeDebugInfo(attr, baseAttrs[offset], modifierAttrs[offset], finalAttrs[offset]);
         }
 
         public bool SetBaseAttr(BattleUnitHandle unit, AttributeType attr, long value)

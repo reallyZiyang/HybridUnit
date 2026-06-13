@@ -4,6 +4,17 @@ using ConfigBattle = Game.Data.Configs.Battle;
 
 namespace Game.Play.Systems.SkillEnhancement.Runtime
 {
+    public enum SkillEnhancementUnavailableReason
+    {
+        None,
+        InvalidConfig,
+        AlreadySelected,
+        MaxStack,
+        MissingRequirement,
+        ExcludedByOwned,
+        ConflictTag
+    }
+
     public static class SkillEnhancementChoiceSelector
     {
         public static int BuildChoices(
@@ -59,22 +70,41 @@ namespace Game.Play.Systems.SkillEnhancement.Runtime
             SkillEnhancementChoice[] selected,
             int selectedCount)
         {
+            return GetUnavailableReason(config, configs, owned, selected, selectedCount) == SkillEnhancementUnavailableReason.None;
+        }
+
+        public static SkillEnhancementUnavailableReason GetUnavailableReason(
+            ConfigBattle.SkillEnhancementCfg config,
+            IList<ConfigBattle.SkillEnhancementCfg> configs,
+            OwnedSkillEnhancement[] owned,
+            SkillEnhancementChoice[] selected,
+            int selectedCount)
+        {
             if (config == null || config.Weight <= 0 || IsSelected(selected, selectedCount, config.Id))
             {
-                return false;
+                return config == null || config.Weight <= 0
+                    ? SkillEnhancementUnavailableReason.InvalidConfig
+                    : SkillEnhancementUnavailableReason.AlreadySelected;
             }
 
             if (GetOwnedStack(owned, config.Id) >= Math.Max(1, config.MaxStack))
             {
-                return false;
+                return SkillEnhancementUnavailableReason.MaxStack;
             }
 
-            if (!HasAllRequired(owned, config.RequireEnhancementIds) || HasAnyOwned(owned, config.ExcludeEnhancementIds))
+            if (!HasAllRequired(owned, config.RequireEnhancementIds))
             {
-                return false;
+                return SkillEnhancementUnavailableReason.MissingRequirement;
             }
 
-            return !HasConflictingTags(config, configs, owned, selected, selectedCount);
+            if (HasAnyOwned(owned, config.ExcludeEnhancementIds))
+            {
+                return SkillEnhancementUnavailableReason.ExcludedByOwned;
+            }
+
+            return HasConflictingTags(config, configs, owned, selected, selectedCount)
+                ? SkillEnhancementUnavailableReason.ConflictTag
+                : SkillEnhancementUnavailableReason.None;
         }
 
         private static int CalculateTotalWeight(

@@ -517,6 +517,8 @@ namespace Game.Play.Tests.Battle
             Assert.AreEqual(6003, projectileProperties.replaceProjectileId);
             Assert.AreEqual(1, projectileProperties.pierceAdd);
             Assert.AreEqual(1200, projectileProperties.hitAreaMilli);
+            Assert.AreEqual(1, enhancements.GetDebugSkillProperties(hero, 0, 2001, 2001).projectileNumAdd);
+            Assert.AreEqual(6003, enhancements.GetDebugProjectileProperties(hero, 0, 2001, 2001).replaceProjectileId);
 
             Assert.AreEqual(0, enhancements.ResolveSkillProperties(hero, 1, 2001, 2001).projectileNumAdd);
             Assert.AreEqual(0, enhancements.ResolveProjectileProperties(hero, 1, 2001, 2001).replaceProjectileId);
@@ -581,6 +583,7 @@ namespace Game.Play.Tests.Battle
             Tick(battle, 31);
 
             Assert.AreEqual(100, battle.UnitManager.GetHp(enemy));
+            Assert.AreEqual(1, enhancements.GetDebugTriggerBucketCount(ConfigBattle.TriggerEventType.OnSkillCast));
         }
 
         [Test]
@@ -615,6 +618,12 @@ namespace Game.Play.Tests.Battle
             Assert.IsFalse(SkillEnhancementChoiceSelector.IsSelectable(tables.TbSkillEnhancement.Get(9011), configs, noOwned, selected, 0));
             Assert.IsFalse(SkillEnhancementChoiceSelector.IsSelectable(tables.TbSkillEnhancement.Get(9001), configs, ownedMultiArrow, selected, 0));
             Assert.IsTrue(SkillEnhancementChoiceSelector.IsSelectable(tables.TbSkillEnhancement.Get(9011), configs, ownedMultiArrow, selected, 0));
+            Assert.AreEqual(
+                SkillEnhancementUnavailableReason.MissingRequirement,
+                SkillEnhancementChoiceSelector.GetUnavailableReason(tables.TbSkillEnhancement.Get(9011), configs, noOwned, selected, 0));
+            Assert.AreEqual(
+                SkillEnhancementUnavailableReason.MaxStack,
+                SkillEnhancementChoiceSelector.GetUnavailableReason(tables.TbSkillEnhancement.Get(9001), configs, ownedMultiArrow, selected, 0));
         }
 
         [Test]
@@ -656,6 +665,10 @@ namespace Game.Play.Tests.Battle
 
             enhancements.AddSourceModifiers(ConfigBattle.ModifierSourceType.TemporaryEffect, 10001, unit, new[] { modifier }, 2);
             Assert.AreEqual(140, battle.UnitManager.GetAttr(unit, AttributeType.Atk));
+            BattleAttributeDebugInfo debugInfo = battle.UnitManager.GetAttributeDebugInfo(unit, AttributeType.Atk);
+            Assert.AreEqual(100, debugInfo.baseValue);
+            Assert.AreEqual(40, debugInfo.modifierValue);
+            Assert.AreEqual(140, debugInfo.finalValue);
 
             enhancements.RemoveSourceModifiers(ConfigBattle.ModifierSourceType.TemporaryEffect, 10001);
             Assert.AreEqual(100, battle.UnitManager.GetAttr(unit, AttributeType.Atk));

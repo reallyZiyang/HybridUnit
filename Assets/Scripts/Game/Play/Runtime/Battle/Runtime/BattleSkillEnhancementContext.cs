@@ -91,6 +91,7 @@ namespace Game.Play.Battle.Runtime
         private bool triggerBucketsDirty = true;
 
         public int Version => version;
+        public int ModifierCount => modifierCount;
 
         public void BindUnits(BattleUnitManager unitManager)
         {
@@ -395,6 +396,23 @@ namespace Game.Play.Battle.Runtime
             properties = BuildProjectileProperties(owner, localSlotIndex, baseSkillId, skillId);
             projectilePropertyStore.Set(owner, localSlotIndex, properties);
             return properties;
+        }
+
+        public BattleSkillProperties GetDebugSkillProperties(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId)
+        {
+            return ResolveSkillProperties(owner, localSlotIndex, baseSkillId, skillId);
+        }
+
+        public BattleProjectileProperties GetDebugProjectileProperties(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId)
+        {
+            return ResolveProjectileProperties(owner, localSlotIndex, baseSkillId, skillId);
+        }
+
+        public int GetDebugTriggerBucketCount(ConfigBattle.TriggerEventType eventType)
+        {
+            EnsureTriggerBuckets();
+            int eventIndex = (int)eventType;
+            return eventIndex > 0 && eventIndex < TriggerEventTypeCapacity ? triggerBucketCounts[eventIndex] : 0;
         }
 
         private BattleSkillProperties BuildSkillProperties(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId)
