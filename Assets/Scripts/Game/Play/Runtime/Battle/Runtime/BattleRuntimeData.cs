@@ -188,7 +188,8 @@ namespace Game.Play.Battle.Runtime
                     attrs,
                     ToRuntimeEffects(cfg.TickEffects),
                     ToRuntimeEffects(cfg.BeginEffects),
-                    ToRuntimeEffects(cfg.EndEffects));
+                    ToRuntimeEffects(cfg.EndEffects),
+                    cfg.Modifiers ?? System.Array.Empty<ConfigBattle.BattleModifierRef>());
                 buffIndexById[cfg.Id] = i;
             }
         }

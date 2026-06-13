@@ -15,7 +15,8 @@
       }
     ],
     "beginEffects": [],
-    "endEffects": []
+    "endEffects": [],
+    "modifiers": []
   },
   {
     "id": 7002,
@@ -32,6 +33,34 @@
     ],
     "tickEffects": [],
     "beginEffects": [],
-    "endEffects": []
+    "endEffects": [],
+    "modifiers": []
+  },
+  {
+    "id": 7003,
+    "name": "???????",
+    "durationMs": 99,
+    "maxStack": 1,
+    "stackMode": 1,
+    "tickMs": 0,
+    "attrs": [],
+    "tickEffects": [],
+    "beginEffects": [],
+    "endEffects": [],
+    "modifiers": [
+      {
+        "targetType": 2,
+        "modifierType": 1,
+        "value": {
+          "type": 1,
+          "intValue": 1
+        },
+        "effect": {
+          "type": 0,
+          "id": 0,
+          "value": 0
+        }
+      }
+    ]
   }
 ]

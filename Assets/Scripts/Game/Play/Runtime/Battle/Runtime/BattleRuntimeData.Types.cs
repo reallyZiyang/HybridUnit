@@ -82,8 +82,9 @@ namespace Game.Play.Battle.Runtime
         public readonly BattleEffectRef[] tickEffects;
         public readonly BattleEffectRef[] beginEffects;
         public readonly BattleEffectRef[] endEffects;
+        public readonly ConfigBattle.BattleModifierRef[] modifiers;
 
-        public BattleBuffRuntimeData(int id, int durationMs, int maxStack, ConfigBattle.BuffStackMode stackMode, int tickMs, BattleAttributeValue[] attrs, BattleEffectRef[] tickEffects, BattleEffectRef[] beginEffects, BattleEffectRef[] endEffects)
+        public BattleBuffRuntimeData(int id, int durationMs, int maxStack, ConfigBattle.BuffStackMode stackMode, int tickMs, BattleAttributeValue[] attrs, BattleEffectRef[] tickEffects, BattleEffectRef[] beginEffects, BattleEffectRef[] endEffects, ConfigBattle.BattleModifierRef[] modifiers)
         {
             this.id = id;
             this.durationMs = durationMs;
@@ -94,6 +95,7 @@ namespace Game.Play.Battle.Runtime
             this.tickEffects = tickEffects;
             this.beginEffects = beginEffects;
             this.endEffects = endEffects;
+            this.modifiers = modifiers;
         }
     }
 

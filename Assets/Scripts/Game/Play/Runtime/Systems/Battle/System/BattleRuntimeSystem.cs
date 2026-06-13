@@ -110,7 +110,7 @@ namespace Game.Play.Systems.Battle.System
             skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, interception, effects, this.skillEnhancementContext, this.renderWorld, facing, unitCapacity, slotsPerUnit, unitCapacity);
             ai = new BattleAISystem(UnitManager, CollisionManager, skills, interception, this.renderWorld, facing, unitCapacity);
             push = new BattlePushSystem(UnitManager, CollisionManager, skills, unitCapacity, unitCapacity);
-            buffs = new BattleBuffManager(RuntimeData, UnitManager, effects, buffCapacity);
+            buffs = new BattleBuffManager(RuntimeData, UnitManager, effects, this.skillEnhancementContext, buffCapacity);
             projectiles = new BattleProjectileManager(RuntimeData, UnitManager, CollisionManager, effects, this.skillEnhancementContext, this.renderWorld, projectileCapacity, unitCapacity);
         }
 
@@ -194,6 +194,11 @@ namespace Game.Play.Systems.Battle.System
         public bool CastSkill(BattleUnitHandle caster, int skillId)
         {
             return IsInitialized && skills.TryCastSkill(caster, skillId);
+        }
+
+        public bool AddBuff(BattleUnitHandle source, BattleUnitHandle target, int buffId, int durationOverrideMs = 0, int stack = 1)
+        {
+            return IsInitialized && buffs.AddBuff(source, target, buffId, durationOverrideMs, stack);
         }
 
         public void SetPaused(bool paused)

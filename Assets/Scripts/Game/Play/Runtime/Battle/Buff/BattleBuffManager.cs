@@ -10,6 +10,7 @@ namespace Game.Play.Battle.Buff
         private readonly BattleRuntimeData data;
         private readonly BattleUnitManager units;
         private readonly BattleEffectExecutor effects;
+        private readonly BattleSkillEnhancementContext modifiers;
         private readonly int capacity;
         private readonly BattleUnitHandle[] owners;
         private readonly BattleUnitHandle[] sources;
@@ -24,11 +25,12 @@ namespace Game.Play.Battle.Buff
         private int allocatedCount;
         private int freeCount;
 
-        public BattleBuffManager(BattleRuntimeData data, BattleUnitManager units, BattleEffectExecutor effects, int capacity)
+        public BattleBuffManager(BattleRuntimeData data, BattleUnitManager units, BattleEffectExecutor effects, BattleSkillEnhancementContext modifiers, int capacity)
         {
             this.data = data;
             this.units = units;
             this.effects = effects;
+            this.modifiers = modifiers;
             this.capacity = Mathf.Max(1, capacity);
             owners = new BattleUnitHandle[this.capacity];
             sources = new BattleUnitHandle[this.capacity];
@@ -76,6 +78,7 @@ namespace Game.Play.Battle.Buff
             remainingMs[index] = ResolveDuration(buff, durationOverrideMs);
             tickRemainingMs[index] = Mathf.Max(0, buff.tickMs);
             ApplyAttributeDelta(target, buff, safeStack);
+            ApplyModifierSource(index, buff, safeStack);
             effects.ExecuteEffects(buff.beginEffects, source, target, units.GetPosition(target), Vector2.zero, sourceContext.AsBuffBegin(buffId));
             return true;
         }
@@ -145,10 +148,12 @@ namespace Game.Play.Battle.Buff
                     stacks[index] = Mathf.Clamp(stacks[index] + addStack, 1, maxStack);
                     break;
                 case ConfigBattle.BuffStackMode.Replace:
+                    RemoveModifierSource(index);
                     ApplyAttributeDelta(owners[index], buff, -oldStack);
                     stacks[index] = Mathf.Clamp(addStack, 1, maxStack);
                     remainingMs[index] = ResolveDuration(buff, durationOverrideMs);
                     ApplyAttributeDelta(owners[index], buff, stacks[index]);
+                    ApplyModifierSource(index, buff, stacks[index]);
                     return;
             }
 
@@ -156,6 +161,8 @@ namespace Game.Play.Battle.Buff
             if (deltaStack != 0)
             {
                 ApplyAttributeDelta(owners[index], buff, deltaStack);
+                RemoveModifierSource(index);
+                ApplyModifierSource(index, buff, stacks[index]);
             }
         }
 
@@ -199,6 +206,7 @@ namespace Game.Play.Battle.Buff
             }
 
             BattleUnitHandle owner = owners[index];
+            RemoveModifierSource(index);
             if (data.TryGetBuff(buffIds[index], out BattleBuffRuntimeData buff))
             {
                 ApplyAttributeDelta(owner, buff, -stacks[index]);
@@ -217,6 +225,24 @@ namespace Game.Play.Battle.Buff
             remainingMs[index] = 0;
             tickRemainingMs[index] = 0;
             freeStack[freeCount++] = index;
+        }
+
+        private void ApplyModifierSource(int index, BattleBuffRuntimeData buff, int stack)
+        {
+            if (buff.modifiers.Length > 0)
+            {
+                modifiers?.AddSourceModifiers(ConfigBattle.ModifierSourceType.Buff, GetSourceId(index), owners[index], buff.modifiers, stack);
+            }
+        }
+
+        private void RemoveModifierSource(int index)
+        {
+            modifiers?.RemoveSourceModifiers(ConfigBattle.ModifierSourceType.Buff, GetSourceId(index));
+        }
+
+        private static int GetSourceId(int index)
+        {
+            return index + 1;
         }
 
         private void ApplyAttributeDelta(BattleUnitHandle unit, BattleBuffRuntimeData buff, int stackDelta)

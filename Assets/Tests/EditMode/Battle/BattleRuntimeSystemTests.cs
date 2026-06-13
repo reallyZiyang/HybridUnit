@@ -566,6 +566,46 @@ namespace Game.Play.Tests.Battle
             Assert.AreEqual(160, battle.UnitManager.GetAttr(unit, AttributeType.Atk));
         }
 
+        [Test]
+        public void ModifierSource_UnitModifierRollsBackBySource()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+            BattleUnitHandle unit = SpawnSelectorTestUnit(battle, 1002, ConfigBattle.UnitFlag.Summon, ConfigBattle.UnitRoleFlag.Melee);
+            ConfigBattle.BattleModifierRef modifier = CreateModifierRef(
+                ConfigBattle.ModifierTargetType.Unit,
+                (int)AttributeType.Atk,
+                ConfigAttr.ValueType.RatioBp,
+                2000);
+
+            enhancements.AddSourceModifiers(ConfigBattle.ModifierSourceType.TemporaryEffect, 10001, unit, new[] { modifier }, 2);
+            Assert.AreEqual(140, battle.UnitManager.GetAttr(unit, AttributeType.Atk));
+
+            enhancements.RemoveSourceModifiers(ConfigBattle.ModifierSourceType.TemporaryEffect, 10001);
+            Assert.AreEqual(100, battle.UnitManager.GetAttr(unit, AttributeType.Atk));
+        }
+
+        [Test]
+        public void BuffModifierSource_ExpiresAndRefreshesSkillPropertyCache()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+            BattleUnitHandle hero = battle.SpawnUnit(1001, Vector2.zero, 1);
+            BattleUnitHandle other = battle.SpawnUnit(1002, Vector2.one, 1);
+
+            Assert.AreEqual(0, enhancements.ResolveSkillProperties(hero, 0, 2001, 2001).projectileNumAdd);
+            Assert.IsTrue(battle.AddBuff(hero, hero, 7003, durationOverrideMs: 66, stack: 1));
+
+            Assert.AreEqual(1, enhancements.ResolveSkillProperties(hero, 0, 2001, 2001).projectileNumAdd);
+            Assert.AreEqual(0, enhancements.ResolveSkillProperties(other, 0, 2001, 2001).projectileNumAdd);
+
+            Tick(battle, 2);
+
+            Assert.AreEqual(0, enhancements.ResolveSkillProperties(hero, 0, 2001, 2001).projectileNumAdd);
+        }
+
         private static BattleRuntimeSystem CreateBattle(
             Tables tables,
             IBattleRenderWorld renderWorld = null,
@@ -635,6 +675,22 @@ namespace Game.Play.Tests.Battle
                 + "\"weight\":1"
                 + "}";
             return new ConfigBattle.SkillEnhancementCfg(JSON.Parse(json));
+        }
+
+        private static ConfigBattle.BattleModifierRef CreateModifierRef(
+            ConfigBattle.ModifierTargetType targetType,
+            int modifierType,
+            ConfigAttr.ValueType valueType,
+            int value)
+        {
+            string json =
+                "{"
+                + $"\"targetType\":{(int)targetType},"
+                + $"\"modifierType\":{modifierType},"
+                + $"\"value\":{{\"type\":{(int)valueType},\"intValue\":{value}}},"
+                + "\"effect\":{\"type\":0,\"id\":0,\"value\":0}"
+                + "}";
+            return new ConfigBattle.BattleModifierRef(JSON.Parse(json));
         }
 
         private static BattleUnitHandle SpawnSelectorTestUnit(

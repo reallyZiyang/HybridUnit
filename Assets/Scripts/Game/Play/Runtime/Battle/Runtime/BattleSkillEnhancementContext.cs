@@ -102,6 +102,14 @@ namespace Game.Play.Battle.Runtime
 
         public void Clear()
         {
+            for (int i = 0; i < modifierCount; i++)
+            {
+                if (modifiers[i].TargetType == ConfigBattle.ModifierTargetType.Unit)
+                {
+                    ApplyUnitModifierDelta(modifiers[i], -modifiers[i].Stack);
+                }
+            }
+
             modifierCount = 0;
             version++;
             skillPropertyStore.Clear();
@@ -115,11 +123,11 @@ namespace Game.Play.Battle.Runtime
                 return;
             }
 
-            int existing = IndexOf(config.Id);
+            int existing = IndexOfSource(ConfigBattle.ModifierSourceType.RogueEnhancement, config.Id);
             RuntimeModifier modifier = RuntimeModifier.FromConfig(config, stack);
-            int oldStack = existing >= 0 ? modifiers[existing].Stack : 0;
             if (existing >= 0)
             {
+                ApplyRemovedModifier(modifiers[existing]);
                 modifiers[existing] = modifier;
             }
             else
@@ -129,17 +137,80 @@ namespace Game.Play.Battle.Runtime
             }
 
             version++;
-            if (modifier.TargetType == ConfigBattle.ModifierTargetType.Unit)
+            ApplyAddedModifier(modifier);
+        }
+
+        public void AddSourceModifiers(
+            ConfigBattle.ModifierSourceType sourceType,
+            int sourceId,
+            BattleUnitHandle target,
+            ConfigBattle.BattleModifierRef[] refs,
+            int stack)
+        {
+            RemoveSourceModifiers(sourceType, sourceId);
+            if (refs == null || refs.Length == 0 || sourceType == ConfigBattle.ModifierSourceType.None || sourceId == 0 || stack <= 0)
             {
-                ApplyUnitModifierDelta(modifier, modifier.Stack - oldStack);
+                return;
             }
-            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Skill)
+
+            bool changed = false;
+            for (int i = 0; i < refs.Length; i++)
             {
-                skillPropertyStore.MarkAllDirty();
+                ConfigBattle.BattleModifierRef modifierRef = refs[i];
+                if (modifierRef == null)
+                {
+                    continue;
+                }
+
+                RuntimeModifier modifier = RuntimeModifier.FromRef(sourceType, sourceId, target, modifierRef, stack);
+                EnsureModifierCapacity(modifierCount + 1);
+                modifiers[modifierCount++] = modifier;
+                ApplyAddedModifier(modifier);
+                changed = true;
             }
-            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Projectile)
+
+            if (changed)
             {
-                projectilePropertyStore.MarkAllDirty();
+                version++;
+            }
+        }
+
+        public void RemoveSourceModifiers(ConfigBattle.ModifierSourceType sourceType, int sourceId)
+        {
+            if (sourceType == ConfigBattle.ModifierSourceType.None || sourceId == 0)
+            {
+                return;
+            }
+
+            bool changed = false;
+            int write = 0;
+            for (int read = 0; read < modifierCount; read++)
+            {
+                RuntimeModifier modifier = modifiers[read];
+                if (modifier.SourceType == sourceType && modifier.SourceId == sourceId)
+                {
+                    ApplyRemovedModifier(modifier);
+                    changed = true;
+                    continue;
+                }
+
+                if (write != read)
+                {
+                    modifiers[write] = modifier;
+                }
+
+                write++;
+            }
+
+            for (int i = write; i < modifierCount; i++)
+            {
+                modifiers[i] = default;
+            }
+
+            if (changed)
+            {
+                modifierCount = write;
+                version++;
             }
         }
 
@@ -354,11 +425,11 @@ namespace Game.Play.Battle.Runtime
             return new BattleProjectileProperties(replaceProjectileId, pierceAdd, hitAreaMilli);
         }
 
-        private int IndexOf(int enhancementId)
+        private int IndexOfSource(ConfigBattle.ModifierSourceType sourceType, int sourceId)
         {
             for (int i = 0; i < modifierCount; i++)
             {
-                if (modifiers[i].EnhancementId == enhancementId)
+                if (modifiers[i].SourceType == sourceType && modifiers[i].SourceId == sourceId)
                 {
                     return i;
                 }
@@ -418,6 +489,38 @@ namespace Game.Play.Battle.Runtime
             }
         }
 
+        private void ApplyAddedModifier(RuntimeModifier modifier)
+        {
+            if (modifier.TargetType == ConfigBattle.ModifierTargetType.Unit)
+            {
+                ApplyUnitModifierDelta(modifier, modifier.Stack);
+            }
+            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Skill)
+            {
+                skillPropertyStore.MarkAllDirty();
+            }
+            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Projectile)
+            {
+                projectilePropertyStore.MarkAllDirty();
+            }
+        }
+
+        private void ApplyRemovedModifier(RuntimeModifier modifier)
+        {
+            if (modifier.TargetType == ConfigBattle.ModifierTargetType.Unit)
+            {
+                ApplyUnitModifierDelta(modifier, -modifier.Stack);
+            }
+            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Skill)
+            {
+                skillPropertyStore.MarkAllDirty();
+            }
+            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Projectile)
+            {
+                projectilePropertyStore.MarkAllDirty();
+            }
+        }
+
         private void ApplyUnitModifier(BattleUnitHandle unit, RuntimeModifier modifier, int stackDelta)
         {
             AttributeType attr = (AttributeType)modifier.ModifierType;
@@ -438,6 +541,9 @@ namespace Game.Play.Battle.Runtime
         private readonly struct RuntimeModifier
         {
             public readonly int EnhancementId;
+            public readonly ConfigBattle.ModifierSourceType SourceType;
+            public readonly int SourceId;
+            public readonly BattleUnitHandle SpecificUnit;
             public readonly int Stack;
             public readonly int RequiredUnitFlags;
             public readonly int ForbiddenUnitFlags;
@@ -455,6 +561,9 @@ namespace Game.Play.Battle.Runtime
 
             private RuntimeModifier(
                 int enhancementId,
+                ConfigBattle.ModifierSourceType sourceType,
+                int sourceId,
+                BattleUnitHandle specificUnit,
                 int stack,
                 int requiredUnitFlags,
                 int forbiddenUnitFlags,
@@ -471,6 +580,9 @@ namespace Game.Play.Battle.Runtime
                 int intValue)
             {
                 EnhancementId = enhancementId;
+                SourceType = sourceType;
+                SourceId = sourceId;
+                SpecificUnit = specificUnit;
                 Stack = Mathf.Max(1, stack);
                 RequiredUnitFlags = requiredUnitFlags;
                 ForbiddenUnitFlags = forbiddenUnitFlags;
@@ -494,6 +606,9 @@ namespace Game.Play.Battle.Runtime
                 ConfigBattle.ModifierValue value = config.Value;
                 return new RuntimeModifier(
                     config.Id,
+                    ConfigBattle.ModifierSourceType.RogueEnhancement,
+                    config.Id,
+                    BattleUnitHandle.Invalid,
                     stack,
                     (int)(unitSelector?.RequiredUnitFlags ?? ConfigBattle.UnitFlag.None),
                     (int)(unitSelector?.ForbiddenUnitFlags ?? ConfigBattle.UnitFlag.None),
@@ -506,6 +621,35 @@ namespace Game.Play.Battle.Runtime
                     (ConfigBattle.SkillModifierType)config.ModifierType,
                     (ConfigBattle.ProjectileModifierType)config.ModifierType,
                     config.ModifierType,
+                    value?.Type ?? Game.Data.Configs.Attr.ValueType.Null,
+                    value?.IntValue ?? 0);
+            }
+
+            public static RuntimeModifier FromRef(
+                ConfigBattle.ModifierSourceType sourceType,
+                int sourceId,
+                BattleUnitHandle specificUnit,
+                ConfigBattle.BattleModifierRef modifierRef,
+                int stack)
+            {
+                ConfigBattle.ModifierValue value = modifierRef.Value;
+                return new RuntimeModifier(
+                    0,
+                    sourceType,
+                    sourceId,
+                    specificUnit,
+                    stack,
+                    0,
+                    0,
+                    0,
+                    0,
+                    Array.Empty<int>(),
+                    -1,
+                    Array.Empty<int>(),
+                    modifierRef.TargetType,
+                    (ConfigBattle.SkillModifierType)modifierRef.ModifierType,
+                    (ConfigBattle.ProjectileModifierType)modifierRef.ModifierType,
+                    modifierRef.ModifierType,
                     value?.Type ?? Game.Data.Configs.Attr.ValueType.Null,
                     value?.IntValue ?? 0);
             }
@@ -546,6 +690,14 @@ namespace Game.Play.Battle.Runtime
 
             public bool MatchUnit(BattleUnitHandle owner, BattleUnitManager units)
             {
+                if (SpecificUnit.IsValid)
+                {
+                    return units != null
+                        && units.IsValid(owner)
+                        && owner.index == SpecificUnit.index
+                        && owner.generation == SpecificUnit.generation;
+                }
+
                 if (units == null || !units.IsValid(owner))
                 {
                     return RequiredUnitFlags == 0 && RequiredRoleFlags == 0 && UnitCfgIds.Length == 0;

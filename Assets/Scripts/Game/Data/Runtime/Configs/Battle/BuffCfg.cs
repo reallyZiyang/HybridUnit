@@ -27,6 +27,7 @@ public sealed partial class BuffCfg : Luban.BeanBase
         { var __json0 = _buf["tickEffects"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; TickEffects = new Battle.EffectRef[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { Battle.EffectRef __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::Game.Data.Configs.Battle.EffectRef.DeserializeEffectRef(__e0);  }  TickEffects[__index0++] = __v0; }   }
         { var __json0 = _buf["beginEffects"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; BeginEffects = new Battle.EffectRef[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { Battle.EffectRef __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::Game.Data.Configs.Battle.EffectRef.DeserializeEffectRef(__e0);  }  BeginEffects[__index0++] = __v0; }   }
         { var __json0 = _buf["endEffects"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; EndEffects = new Battle.EffectRef[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { Battle.EffectRef __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::Game.Data.Configs.Battle.EffectRef.DeserializeEffectRef(__e0);  }  EndEffects[__index0++] = __v0; }   }
+        { var __json0 = _buf["modifiers"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; Modifiers = new Battle.BattleModifierRef[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { Battle.BattleModifierRef __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::Game.Data.Configs.Battle.BattleModifierRef.DeserializeBattleModifierRef(__e0);  }  Modifiers[__index0++] = __v0; }   }
     }
 
     public static BuffCfg DeserializeBuffCfg(JSONNode _buf)
@@ -74,6 +75,10 @@ public sealed partial class BuffCfg : Luban.BeanBase
     /// 结束效果
     /// </summary>
     public readonly Battle.EffectRef[] EndEffects;
+    /// <summary>
+    /// ????
+    /// </summary>
+    public readonly Battle.BattleModifierRef[] Modifiers;
    
     public const int __ID__ = 942931931;
     public override int GetTypeId() => __ID__;
@@ -84,6 +89,7 @@ public sealed partial class BuffCfg : Luban.BeanBase
         foreach (var _e in TickEffects) { _e?.ResolveRef(tables); }
         foreach (var _e in BeginEffects) { _e?.ResolveRef(tables); }
         foreach (var _e in EndEffects) { _e?.ResolveRef(tables); }
+        foreach (var _e in Modifiers) { _e?.ResolveRef(tables); }
     }
 
     public override string ToString()
@@ -99,6 +105,7 @@ public sealed partial class BuffCfg : Luban.BeanBase
         + "tickEffects:" + Luban.StringUtil.CollectionToString(TickEffects) + ","
         + "beginEffects:" + Luban.StringUtil.CollectionToString(BeginEffects) + ","
         + "endEffects:" + Luban.StringUtil.CollectionToString(EndEffects) + ","
+        + "modifiers:" + Luban.StringUtil.CollectionToString(Modifiers) + ","
         + "}";
     }
 }
