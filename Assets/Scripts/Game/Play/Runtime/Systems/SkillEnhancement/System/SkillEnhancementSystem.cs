@@ -77,23 +77,12 @@ namespace Game.Play.Systems.SkillEnhancement.System
             }
 
             SkillEnhancementChoice[] choices = new SkillEnhancementChoice[Math.Min(3, table.DataList.Count)];
-            int count = 0;
-            for (int i = 0; i < table.DataList.Count && count < choices.Length; i++)
-            {
-                ConfigBattle.SkillEnhancementCfg config = table.DataList[i];
-                if (config == null || config.Weight <= 0)
-                {
-                    continue;
-                }
-
-                int ownedStack = GetOwnedStack(config.Id);
-                if (ownedStack >= Math.Max(1, config.MaxStack))
-                {
-                    continue;
-                }
-
-                choices[count++] = new SkillEnhancementChoice(config, ownedStack);
-            }
+            int count = SkillEnhancementChoiceSelector.BuildChoices(
+                table.DataList,
+                model.OwnedEnhancements.Value,
+                choices,
+                choices.Length,
+                Environment.TickCount);
 
             if (count == choices.Length)
             {

@@ -7,6 +7,7 @@ using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Unit;
 using Game.Play.Systems.Battle.System;
+using Game.Play.Systems.SkillEnhancement.Runtime;
 using NUnit.Framework;
 using SimpleJSON;
 using UnityEngine;
@@ -602,6 +603,45 @@ namespace Game.Play.Tests.Battle
         }
 
         [Test]
+        public void SkillEnhancementChoiceSelector_FiltersMaxStackAndUnlocksUpgradeChain()
+        {
+            Tables tables = LoadTables();
+            List<ConfigBattle.SkillEnhancementCfg> configs = tables.TbSkillEnhancement.DataList;
+            SkillEnhancementChoice[] selected = new SkillEnhancementChoice[3];
+            OwnedSkillEnhancement[] noOwned = System.Array.Empty<OwnedSkillEnhancement>();
+            OwnedSkillEnhancement[] ownedMultiArrow = { new(9001, 1) };
+
+            Assert.IsTrue(SkillEnhancementChoiceSelector.IsSelectable(tables.TbSkillEnhancement.Get(9001), configs, noOwned, selected, 0));
+            Assert.IsFalse(SkillEnhancementChoiceSelector.IsSelectable(tables.TbSkillEnhancement.Get(9011), configs, noOwned, selected, 0));
+            Assert.IsFalse(SkillEnhancementChoiceSelector.IsSelectable(tables.TbSkillEnhancement.Get(9001), configs, ownedMultiArrow, selected, 0));
+            Assert.IsTrue(SkillEnhancementChoiceSelector.IsSelectable(tables.TbSkillEnhancement.Get(9011), configs, ownedMultiArrow, selected, 0));
+        }
+
+        [Test]
+        public void SkillEnhancementChoiceSelector_BuildChoicesUsesWeightsWithoutDuplicates()
+        {
+            Tables tables = LoadTables();
+            SkillEnhancementChoice[] choices = new SkillEnhancementChoice[3];
+            int count = SkillEnhancementChoiceSelector.BuildChoices(
+                tables.TbSkillEnhancement.DataList,
+                System.Array.Empty<OwnedSkillEnhancement>(),
+                choices,
+                choices.Length,
+                12345);
+
+            Assert.Greater(count, 0);
+            Assert.LessOrEqual(count, choices.Length);
+            for (int i = 0; i < count; i++)
+            {
+                Assert.Greater(choices[i].enhancementId, 0);
+                for (int j = i + 1; j < count; j++)
+                {
+                    Assert.AreNotEqual(choices[i].enhancementId, choices[j].enhancementId);
+                }
+            }
+        }
+
+        [Test]
         public void ModifierSource_UnitModifierRollsBackBySource()
         {
             Tables tables = LoadTables();
@@ -708,7 +748,14 @@ namespace Game.Play.Tests.Battle
                 + $"\"value\":{{\"type\":{(int)valueType},\"intValue\":{value}}},"
                 + "\"effect\":{\"type\":0,\"id\":0,\"value\":0},"
                 + "\"maxStack\":1,"
-                + "\"weight\":1"
+                + "\"weight\":1,"
+                + "\"iconKey\":\"test\","
+                + "\"rarity\":0,"
+                + "\"tags\":[],"
+                + "\"conflictTags\":[],"
+                + "\"requireEnhancementIds\":[],"
+                + "\"excludeEnhancementIds\":[],"
+                + "\"nextEnhancementIds\":[]"
                 + "}";
             return new ConfigBattle.SkillEnhancementCfg(JSON.Parse(json));
         }

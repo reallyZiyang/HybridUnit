@@ -27,7 +27,19 @@
       "value": 0
     },
     "maxStack": 1,
-    "weight": 100
+    "weight": 100,
+    "iconKey": "enhance_multi_arrow",
+    "rarity": 0,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": [
+      9011
+    ]
   },
   {
     "id": 9002,
@@ -57,7 +69,19 @@
       "value": 0
     },
     "maxStack": 3,
-    "weight": 100
+    "weight": 100,
+    "iconKey": "enhance_rapid_shot",
+    "rarity": 0,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": [
+      9012
+    ]
   },
   {
     "id": 9003,
@@ -87,7 +111,22 @@
       "value": 0
     },
     "maxStack": 1,
-    "weight": 100
+    "weight": 100,
+    "iconKey": "enhance_fireball_arrow",
+    "rarity": 1,
+    "tags": [
+      "??",
+      "??",
+      "??"
+    ],
+    "conflictTags": [
+      "????"
+    ],
+    "requireEnhancementIds": [],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": [
+      9013
+    ]
   },
   {
     "id": 9004,
@@ -117,7 +156,19 @@
       "value": 0
     },
     "maxStack": 1,
-    "weight": 100
+    "weight": 100,
+    "iconKey": "enhance_blast_arrow",
+    "rarity": 1,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": [
+      9014
+    ]
   },
   {
     "id": 9005,
@@ -147,7 +198,19 @@
       "value": 0
     },
     "maxStack": 1,
-    "weight": 100
+    "weight": 100,
+    "iconKey": "enhance_pierce_arrow",
+    "rarity": 0,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": [
+      9015
+    ]
   },
   {
     "id": 9201,
@@ -177,7 +240,17 @@
       "value": 10000
     },
     "maxStack": 1,
-    "weight": 10
+    "weight": 10,
+    "iconKey": "enhance_power_draw",
+    "rarity": 1,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": []
   },
   {
     "id": 9202,
@@ -209,6 +282,228 @@
       "value": 10000
     },
     "maxStack": 1,
-    "weight": 10
+    "weight": 10,
+    "iconKey": "enhance_chase_arrow",
+    "rarity": 1,
+    "tags": [
+      "??",
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": []
+  },
+  {
+    "id": 9011,
+    "name": "??? II",
+    "description": "??????????????",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "triggerEventType": 0,
+    "targetType": 2,
+    "modifierType": 1,
+    "value": {
+      "type": 1,
+      "intValue": 1
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 1,
+    "weight": 60,
+    "iconKey": "enhance_multi_arrow_2",
+    "rarity": 1,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [
+      9001
+    ],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": []
+  },
+  {
+    "id": 9012,
+    "name": "????",
+    "description": "????????????20%?",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "triggerEventType": 0,
+    "targetType": 2,
+    "modifierType": 2,
+    "value": {
+      "type": 2,
+      "intValue": 2000
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 1,
+    "weight": 60,
+    "iconKey": "enhance_rapid_shot_2",
+    "rarity": 1,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [
+      9002
+    ],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": []
+  },
+  {
+    "id": 9013,
+    "name": "????",
+    "description": "??????????????",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "triggerEventType": 2,
+    "targetType": 4,
+    "modifierType": 1,
+    "value": {
+      "type": 1,
+      "intValue": 1
+    },
+    "effect": {
+      "type": 1,
+      "id": 3003,
+      "value": 10000
+    },
+    "maxStack": 1,
+    "weight": 50,
+    "iconKey": "enhance_fireball_arrow_2",
+    "rarity": 2,
+    "tags": [
+      "??",
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [
+      9003
+    ],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": []
+  },
+  {
+    "id": 9014,
+    "name": "??? II",
+    "description": "?????????????",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "triggerEventType": 0,
+    "targetType": 3,
+    "modifierType": 3,
+    "value": {
+      "type": 1,
+      "intValue": 600
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 1,
+    "weight": 60,
+    "iconKey": "enhance_blast_arrow_2",
+    "rarity": 1,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [
+      9004
+    ],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": []
+  },
+  {
+    "id": 9015,
+    "name": "??? II",
+    "description": "????????????1????",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "triggerEventType": 0,
+    "targetType": 3,
+    "modifierType": 2,
+    "value": {
+      "type": 1,
+      "intValue": 1
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 1,
+    "weight": 60,
+    "iconKey": "enhance_pierce_arrow_2",
+    "rarity": 1,
+    "tags": [
+      "??",
+      "??"
+    ],
+    "conflictTags": [],
+    "requireEnhancementIds": [
+      9005
+    ],
+    "excludeEnhancementIds": [],
+    "nextEnhancementIds": []
   }
 ]

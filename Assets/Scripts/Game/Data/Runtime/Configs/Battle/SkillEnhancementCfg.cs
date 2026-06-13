@@ -29,6 +29,13 @@ public sealed partial class SkillEnhancementCfg : Luban.BeanBase
         { if(!_buf["effect"].IsObject) { throw new SerializationException(); }  Effect = global::Game.Data.Configs.Battle.EffectRef.DeserializeEffectRef(_buf["effect"]);  }
         { if(!_buf["maxStack"].IsNumber) { throw new SerializationException(); }  MaxStack = _buf["maxStack"]; }
         { if(!_buf["weight"].IsNumber) { throw new SerializationException(); }  Weight = _buf["weight"]; }
+        { if(!_buf["iconKey"].IsString) { throw new SerializationException(); }  IconKey = _buf["iconKey"]; }
+        { if(!_buf["rarity"].IsNumber) { throw new SerializationException(); }  Rarity = (Battle.EnhancementRarity)_buf["rarity"].AsInt; }
+        { var __json0 = _buf["tags"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; Tags = new string[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { string __v0;  { if(!__e0.IsString) { throw new SerializationException(); }  __v0 = __e0; }  Tags[__index0++] = __v0; }   }
+        { var __json0 = _buf["conflictTags"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; ConflictTags = new string[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { string __v0;  { if(!__e0.IsString) { throw new SerializationException(); }  __v0 = __e0; }  ConflictTags[__index0++] = __v0; }   }
+        { var __json0 = _buf["requireEnhancementIds"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; RequireEnhancementIds = new int[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { int __v0;  { if(!__e0.IsNumber) { throw new SerializationException(); }  __v0 = __e0; }  RequireEnhancementIds[__index0++] = __v0; }   }
+        { var __json0 = _buf["excludeEnhancementIds"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; ExcludeEnhancementIds = new int[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { int __v0;  { if(!__e0.IsNumber) { throw new SerializationException(); }  __v0 = __e0; }  ExcludeEnhancementIds[__index0++] = __v0; }   }
+        { var __json0 = _buf["nextEnhancementIds"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; NextEnhancementIds = new int[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { int __v0;  { if(!__e0.IsNumber) { throw new SerializationException(); }  __v0 = __e0; }  NextEnhancementIds[__index0++] = __v0; }   }
     }
 
     public static SkillEnhancementCfg DeserializeSkillEnhancementCfg(JSONNode _buf)
@@ -84,6 +91,34 @@ public sealed partial class SkillEnhancementCfg : Luban.BeanBase
     /// 权重
     /// </summary>
     public readonly int Weight;
+    /// <summary>
+    /// ??Key
+    /// </summary>
+    public readonly string IconKey;
+    /// <summary>
+    /// ??
+    /// </summary>
+    public readonly Battle.EnhancementRarity Rarity;
+    /// <summary>
+    /// ??
+    /// </summary>
+    public readonly string[] Tags;
+    /// <summary>
+    /// ????
+    /// </summary>
+    public readonly string[] ConflictTags;
+    /// <summary>
+    /// ????
+    /// </summary>
+    public readonly int[] RequireEnhancementIds;
+    /// <summary>
+    /// ????
+    /// </summary>
+    public readonly int[] ExcludeEnhancementIds;
+    /// <summary>
+    /// ????
+    /// </summary>
+    public readonly int[] NextEnhancementIds;
    
     public const int __ID__ = 549482035;
     public override int GetTypeId() => __ID__;
@@ -111,6 +146,13 @@ public sealed partial class SkillEnhancementCfg : Luban.BeanBase
         + "effect:" + Effect + ","
         + "maxStack:" + MaxStack + ","
         + "weight:" + Weight + ","
+        + "iconKey:" + IconKey + ","
+        + "rarity:" + Rarity + ","
+        + "tags:" + Luban.StringUtil.CollectionToString(Tags) + ","
+        + "conflictTags:" + Luban.StringUtil.CollectionToString(ConflictTags) + ","
+        + "requireEnhancementIds:" + Luban.StringUtil.CollectionToString(RequireEnhancementIds) + ","
+        + "excludeEnhancementIds:" + Luban.StringUtil.CollectionToString(ExcludeEnhancementIds) + ","
+        + "nextEnhancementIds:" + Luban.StringUtil.CollectionToString(NextEnhancementIds) + ","
         + "}";
     }
 }
