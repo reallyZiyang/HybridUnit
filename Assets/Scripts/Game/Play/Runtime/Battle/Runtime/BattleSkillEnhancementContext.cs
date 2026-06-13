@@ -76,15 +76,19 @@ namespace Game.Play.Battle.Runtime
     {
         private const int BasisPoint = 10000;
         private const int DefaultModifierCapacity = 32;
+        private const int TriggerEventTypeCapacity = 8;
 
         public static readonly BattleSkillEnhancementContext Empty = new();
 
         private RuntimeModifier[] modifiers = new RuntimeModifier[DefaultModifierCapacity];
         private readonly BattleSkillPropertyStore skillPropertyStore = new();
         private readonly BattleProjectilePropertyStore projectilePropertyStore = new();
+        private readonly int[] triggerBucketCounts = new int[TriggerEventTypeCapacity];
+        private int[] triggerBucketIndices = new int[DefaultModifierCapacity * TriggerEventTypeCapacity];
         private BattleUnitManager units;
         private int modifierCount;
         private int version;
+        private bool triggerBucketsDirty = true;
 
         public int Version => version;
 
@@ -114,6 +118,8 @@ namespace Game.Play.Battle.Runtime
             version++;
             skillPropertyStore.Clear();
             projectilePropertyStore.Clear();
+            Array.Clear(triggerBucketCounts, 0, triggerBucketCounts.Length);
+            triggerBucketsDirty = true;
         }
 
         public void AddOrUpdate(ConfigBattle.SkillEnhancementCfg config, int stack)
@@ -271,6 +277,39 @@ namespace Game.Play.Battle.Runtime
         public BattleEffectRef[] ResolveEffects(BattleEffectRef[] effects, BattleEffectContext context)
         {
             return effects ?? Array.Empty<BattleEffectRef>();
+        }
+
+        public void ExecuteTriggerEffects(
+            ConfigBattle.TriggerEventType eventType,
+            BattleUnitHandle source,
+            BattleUnitHandle target,
+            Vector2 origin,
+            Vector2 direction,
+            BattleEffectContext context,
+            BattleEffectExecutor executor)
+        {
+            if (eventType == ConfigBattle.TriggerEventType.None || executor == null)
+            {
+                return;
+            }
+
+            EnsureTriggerBuckets();
+            int eventIndex = (int)eventType;
+            if (eventIndex <= 0 || eventIndex >= TriggerEventTypeCapacity)
+            {
+                return;
+            }
+
+            int bucketStart = eventIndex * modifiers.Length;
+            int count = triggerBucketCounts[eventIndex];
+            for (int i = 0; i < count; i++)
+            {
+                ref RuntimeModifier modifier = ref modifiers[triggerBucketIndices[bucketStart + i]];
+                if (modifier.MatchTrigger(source, context.slotIndex, context.baseSkillId, context.skillId, units))
+                {
+                    ExecuteTriggerModifier(modifier, source, target, origin, direction, context, executor);
+                }
+            }
         }
 
         public long ResolveEffectValue(long value, BattleEffectRef effect, BattleEffectContext context)
@@ -447,6 +486,8 @@ namespace Game.Play.Battle.Runtime
 
             int next = Mathf.Max(capacity, modifiers.Length * 2);
             Array.Resize(ref modifiers, next);
+            Array.Resize(ref triggerBucketIndices, next * TriggerEventTypeCapacity);
+            triggerBucketsDirty = true;
         }
 
         private static int ApplyAttackSpeed(int valueMs, int attackSpeedBp)
@@ -469,6 +510,64 @@ namespace Game.Play.Battle.Runtime
 
             int multiplier = Mathf.Max(0, BasisPoint - Mathf.Max(0, cooldownReductionBp));
             return Mathf.Max(0, (int)((long)valueMs * multiplier / BasisPoint));
+        }
+
+        private void EnsureTriggerBuckets()
+        {
+            if (!triggerBucketsDirty)
+            {
+                return;
+            }
+
+            Array.Clear(triggerBucketCounts, 0, triggerBucketCounts.Length);
+            for (int i = 0; i < modifierCount; i++)
+            {
+                ref RuntimeModifier modifier = ref modifiers[i];
+                if (modifier.TargetType != ConfigBattle.ModifierTargetType.Trigger)
+                {
+                    continue;
+                }
+
+                int eventIndex = (int)modifier.TriggerEventType;
+                if (eventIndex <= 0 || eventIndex >= TriggerEventTypeCapacity)
+                {
+                    continue;
+                }
+
+                int count = triggerBucketCounts[eventIndex];
+                if (count >= modifiers.Length)
+                {
+                    continue;
+                }
+
+                triggerBucketIndices[eventIndex * modifiers.Length + count] = i;
+                triggerBucketCounts[eventIndex] = count + 1;
+            }
+
+            triggerBucketsDirty = false;
+        }
+
+        private void ExecuteTriggerModifier(
+            RuntimeModifier modifier,
+            BattleUnitHandle source,
+            BattleUnitHandle target,
+            Vector2 origin,
+            Vector2 direction,
+            BattleEffectContext context,
+            BattleEffectExecutor executor)
+        {
+            int repeat = Mathf.Max(1, modifier.IntValue) * modifier.Stack;
+            switch (modifier.TriggerType)
+            {
+                case ConfigBattle.TriggerModifierType.AddEffect:
+                case ConfigBattle.TriggerModifierType.AddBuff:
+                case ConfigBattle.TriggerModifierType.AddProjectile:
+                    for (int i = 0; i < repeat; i++)
+                    {
+                        executor.ExecuteEffect(modifier.Effect, source, target, origin, direction, context);
+                    }
+                    break;
+            }
         }
 
         private void ApplyUnitModifierDelta(RuntimeModifier modifier, int stackDelta)
@@ -503,6 +602,10 @@ namespace Game.Play.Battle.Runtime
             {
                 projectilePropertyStore.MarkAllDirty();
             }
+            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Trigger)
+            {
+                triggerBucketsDirty = true;
+            }
         }
 
         private void ApplyRemovedModifier(RuntimeModifier modifier)
@@ -518,6 +621,10 @@ namespace Game.Play.Battle.Runtime
             else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Projectile)
             {
                 projectilePropertyStore.MarkAllDirty();
+            }
+            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Trigger)
+            {
+                triggerBucketsDirty = true;
             }
         }
 
@@ -555,6 +662,9 @@ namespace Game.Play.Battle.Runtime
             public readonly ConfigBattle.ModifierTargetType TargetType;
             public readonly ConfigBattle.SkillModifierType SkillType;
             public readonly ConfigBattle.ProjectileModifierType ProjectileType;
+            public readonly ConfigBattle.TriggerEventType TriggerEventType;
+            public readonly ConfigBattle.TriggerModifierType TriggerType;
+            public readonly BattleEffectRef Effect;
             public readonly int ModifierType;
             public readonly Game.Data.Configs.Attr.ValueType ValueType;
             public readonly int IntValue;
@@ -575,6 +685,9 @@ namespace Game.Play.Battle.Runtime
                 ConfigBattle.ModifierTargetType targetType,
                 ConfigBattle.SkillModifierType skillType,
                 ConfigBattle.ProjectileModifierType projectileType,
+                ConfigBattle.TriggerEventType triggerEventType,
+                ConfigBattle.TriggerModifierType triggerType,
+                BattleEffectRef effect,
                 int modifierType,
                 Game.Data.Configs.Attr.ValueType valueType,
                 int intValue)
@@ -594,6 +707,9 @@ namespace Game.Play.Battle.Runtime
                 TargetType = targetType;
                 SkillType = skillType;
                 ProjectileType = projectileType;
+                TriggerEventType = triggerEventType;
+                TriggerType = triggerType;
+                Effect = effect;
                 ModifierType = modifierType;
                 ValueType = valueType;
                 IntValue = intValue;
@@ -620,6 +736,9 @@ namespace Game.Play.Battle.Runtime
                     config.TargetType,
                     (ConfigBattle.SkillModifierType)config.ModifierType,
                     (ConfigBattle.ProjectileModifierType)config.ModifierType,
+                    config.TriggerEventType,
+                    (ConfigBattle.TriggerModifierType)config.ModifierType,
+                    ToRuntimeEffect(config.Effect),
                     config.ModifierType,
                     value?.Type ?? Game.Data.Configs.Attr.ValueType.Null,
                     value?.IntValue ?? 0);
@@ -649,6 +768,9 @@ namespace Game.Play.Battle.Runtime
                     modifierRef.TargetType,
                     (ConfigBattle.SkillModifierType)modifierRef.ModifierType,
                     (ConfigBattle.ProjectileModifierType)modifierRef.ModifierType,
+                    ConfigBattle.TriggerEventType.None,
+                    (ConfigBattle.TriggerModifierType)modifierRef.ModifierType,
+                    ToRuntimeEffect(modifierRef.Effect),
                     modifierRef.ModifierType,
                     value?.Type ?? Game.Data.Configs.Attr.ValueType.Null,
                     value?.IntValue ?? 0);
@@ -666,6 +788,18 @@ namespace Game.Play.Battle.Runtime
                     return false;
                 }
 
+                return MatchSkill(localSlotIndex, baseSkillId, skillId);
+            }
+
+            public bool MatchTrigger(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId, BattleUnitManager units)
+            {
+                return TargetType == ConfigBattle.ModifierTargetType.Trigger
+                    && MatchUnit(owner, units)
+                    && MatchSkill(localSlotIndex, baseSkillId, skillId);
+            }
+
+            private bool MatchSkill(int localSlotIndex, int baseSkillId, int skillId)
+            {
                 if (SlotIndex >= 0 && localSlotIndex >= 0 && SlotIndex != localSlotIndex)
                 {
                     return false;
@@ -740,6 +874,13 @@ namespace Game.Play.Battle.Runtime
                 }
 
                 return false;
+            }
+
+            private static BattleEffectRef ToRuntimeEffect(ConfigBattle.EffectRef effect)
+            {
+                return effect == null
+                    ? default
+                    : new BattleEffectRef(effect.Type, effect.Id, effect.Value);
             }
         }
     }

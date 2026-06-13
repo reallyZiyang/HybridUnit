@@ -350,6 +350,14 @@ namespace Game.Play.Systems.Battle.System
                     {
                         int renderHandle = UnitManager.GetRenderHandle(command.target);
                         renderWorld?.PlayUnitDead(renderHandle);
+                        skillEnhancementContext.ExecuteTriggerEffects(
+                            Game.Data.Configs.Battle.TriggerEventType.OnKill,
+                            command.source,
+                            command.target,
+                            UnitManager.GetPosition(command.target),
+                            Vector2.zero,
+                            command.effectContext,
+                            effects);
                         DespawnUnit(command.target, false);
                     }
                     else if (command.playHitReaction && !UnitManager.HasEndure(command.target))

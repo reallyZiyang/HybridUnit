@@ -37,9 +37,11 @@ namespace Game.Play.Battle.Runtime
             {
                 ExecuteEffect(resolvedEffects[i], source, target, origin, direction, context);
             }
+
+            enhancements.ExecuteTriggerEffects(ToTriggerEventType(context.sourceType), source, target, origin, direction, context, this);
         }
 
-        private void ExecuteEffect(BattleEffectRef effect, BattleUnitHandle source, BattleUnitHandle target, Vector2 origin, Vector2 direction, BattleEffectContext context)
+        public void ExecuteEffect(BattleEffectRef effect, BattleUnitHandle source, BattleUnitHandle target, Vector2 origin, Vector2 direction, BattleEffectContext context)
         {
             switch (effect.type)
             {
@@ -72,6 +74,21 @@ namespace Game.Play.Battle.Runtime
                         SpawnProjectiles(source, target, projectileId, origin, safeDirection, context, projectileCount);
                     }
                     break;
+            }
+        }
+
+        private static ConfigBattle.TriggerEventType ToTriggerEventType(BattleEffectSourceType sourceType)
+        {
+            switch (sourceType)
+            {
+                case BattleEffectSourceType.SkillDirect:
+                    return ConfigBattle.TriggerEventType.OnSkillCast;
+                case BattleEffectSourceType.ProjectileHit:
+                    return ConfigBattle.TriggerEventType.OnProjectileHit;
+                case BattleEffectSourceType.BuffTick:
+                    return ConfigBattle.TriggerEventType.OnBuffTick;
+                default:
+                    return ConfigBattle.TriggerEventType.None;
             }
         }
 

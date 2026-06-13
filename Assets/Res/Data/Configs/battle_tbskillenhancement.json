@@ -14,6 +14,7 @@
       "slotIndex": 0,
       "skillIds": []
     },
+    "triggerEventType": 0,
     "targetType": 2,
     "modifierType": 1,
     "value": {
@@ -43,6 +44,7 @@
       "slotIndex": 0,
       "skillIds": []
     },
+    "triggerEventType": 0,
     "targetType": 2,
     "modifierType": 2,
     "value": {
@@ -72,6 +74,7 @@
       "slotIndex": 0,
       "skillIds": []
     },
+    "triggerEventType": 0,
     "targetType": 3,
     "modifierType": 1,
     "value": {
@@ -101,6 +104,7 @@
       "slotIndex": 0,
       "skillIds": []
     },
+    "triggerEventType": 0,
     "targetType": 3,
     "modifierType": 3,
     "value": {
@@ -130,6 +134,7 @@
       "slotIndex": 0,
       "skillIds": []
     },
+    "triggerEventType": 0,
     "targetType": 3,
     "modifierType": 2,
     "value": {
@@ -143,5 +148,67 @@
     },
     "maxStack": 1,
     "weight": 100
+  },
+  {
+    "id": 9201,
+    "name": "????",
+    "description": "????????????????",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "triggerEventType": 1,
+    "targetType": 4,
+    "modifierType": 1,
+    "value": {
+      "type": 1,
+      "intValue": 1
+    },
+    "effect": {
+      "type": 1,
+      "id": 3001,
+      "value": 10000
+    },
+    "maxStack": 1,
+    "weight": 10
+  },
+  {
+    "id": 9202,
+    "name": "????",
+    "description": "????????????????????",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": [
+        2002
+      ]
+    },
+    "triggerEventType": 2,
+    "targetType": 4,
+    "modifierType": 1,
+    "value": {
+      "type": 1,
+      "intValue": 1
+    },
+    "effect": {
+      "type": 1,
+      "id": 3001,
+      "value": 10000
+    },
+    "maxStack": 1,
+    "weight": 10
   }
 ]

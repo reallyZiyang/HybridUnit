@@ -22,6 +22,7 @@ public sealed partial class SkillEnhancementCfg : Luban.BeanBase
         { if(!_buf["description"].IsString) { throw new SerializationException(); }  Description = _buf["description"]; }
         { if(!_buf["unitSelector"].IsObject) { throw new SerializationException(); }  UnitSelector = global::Game.Data.Configs.Battle.UnitSelector.DeserializeUnitSelector(_buf["unitSelector"]);  }
         { if(!_buf["skillSelector"].IsObject) { throw new SerializationException(); }  SkillSelector = global::Game.Data.Configs.Battle.SkillSelector.DeserializeSkillSelector(_buf["skillSelector"]);  }
+        { if(!_buf["triggerEventType"].IsNumber) { throw new SerializationException(); }  TriggerEventType = (Battle.TriggerEventType)_buf["triggerEventType"].AsInt; }
         { if(!_buf["targetType"].IsNumber) { throw new SerializationException(); }  TargetType = (Battle.ModifierTargetType)_buf["targetType"].AsInt; }
         { if(!_buf["modifierType"].IsNumber) { throw new SerializationException(); }  ModifierType = _buf["modifierType"]; }
         { if(!_buf["value"].IsObject) { throw new SerializationException(); }  Value = global::Game.Data.Configs.Battle.ModifierValue.DeserializeModifierValue(_buf["value"]);  }
@@ -55,6 +56,10 @@ public sealed partial class SkillEnhancementCfg : Luban.BeanBase
     /// 技能筛选
     /// </summary>
     public readonly Battle.SkillSelector SkillSelector;
+    /// <summary>
+    /// ??????
+    /// </summary>
+    public readonly Battle.TriggerEventType TriggerEventType;
     /// <summary>
     /// 目标类型
     /// </summary>
@@ -99,6 +104,7 @@ public sealed partial class SkillEnhancementCfg : Luban.BeanBase
         + "description:" + Description + ","
         + "unitSelector:" + UnitSelector + ","
         + "skillSelector:" + SkillSelector + ","
+        + "triggerEventType:" + TriggerEventType + ","
         + "targetType:" + TargetType + ","
         + "modifierType:" + ModifierType + ","
         + "value:" + Value + ","

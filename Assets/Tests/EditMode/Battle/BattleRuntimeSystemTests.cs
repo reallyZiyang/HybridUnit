@@ -567,6 +567,41 @@ namespace Game.Play.Tests.Battle
         }
 
         [Test]
+        public void TriggerModifier_OnSkillCastAddsConfiguredEffect()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+            BattleUnitHandle hero = battle.SpawnUnit(1001, Vector2.zero, 1);
+            BattleUnitHandle enemy = battle.SpawnUnit(1101, new Vector2(0.6f, 0f), 2);
+            enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(9201), 1);
+
+            Assert.IsTrue(battle.CastSkill(hero, 2001));
+            Tick(battle, 31);
+
+            Assert.AreEqual(100, battle.UnitManager.GetHp(enemy));
+        }
+
+        [Test]
+        public void TriggerModifier_OnProjectileHitAddsConfiguredEffect()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+            BattleUnitHandle hero = battle.SpawnUnit(
+                1001,
+                Vector2.zero,
+                new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new[] { 2002 }));
+            BattleUnitHandle enemy = battle.SpawnUnit(1101, new Vector2(1f, 0f), 2);
+            enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(9202), 1);
+
+            Assert.IsTrue(battle.CastSkill(hero, 2002));
+            Tick(battle, 55);
+
+            Assert.AreEqual(80, battle.UnitManager.GetHp(enemy));
+        }
+
+        [Test]
         public void ModifierSource_UnitModifierRollsBackBySource()
         {
             Tables tables = LoadTables();
@@ -667,6 +702,7 @@ namespace Game.Play.Tests.Battle
                 + $"\"unitCfgIds\":[{unitCfgIdJson}]"
                 + "},"
                 + "\"skillSelector\":{\"slotIndex\":-1,\"skillIds\":[]},"
+                + "\"triggerEventType\":0,"
                 + $"\"targetType\":{(int)ConfigBattle.ModifierTargetType.Unit},"
                 + $"\"modifierType\":{(int)AttributeType.Atk},"
                 + $"\"value\":{{\"type\":{(int)valueType},\"intValue\":{value}}},"
