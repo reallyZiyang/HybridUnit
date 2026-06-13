@@ -22,6 +22,11 @@ namespace Game.Play.Battle.Rendering
             return inner.PlayUnitAction(renderHandle, actionName);
         }
 
+        public int PlayUnitAction(int renderHandle, string actionName, float speed)
+        {
+            return inner.PlayUnitAction(renderHandle, actionName, speed);
+        }
+
         public void PlayUnitIdle(int renderHandle)
         {
             inner.PlayUnitIdle(renderHandle);

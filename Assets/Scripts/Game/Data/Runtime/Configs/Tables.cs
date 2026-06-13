@@ -24,6 +24,8 @@ public partial class Tables
     public Battle.TbHealEffect TbHealEffect {get; }
     public Battle.TbAddBuffEffect TbAddBuffEffect {get; }
     public Battle.TbProjectileEffect TbProjectileEffect {get; }
+    public Battle.TbSkillEnhancement TbSkillEnhancement {get; }
+    public Attr.TbAttribute TbAttribute {get; }
 
     public Tables(System.Func<string, JSONNode> loader)
     {
@@ -37,6 +39,8 @@ public partial class Tables
         TbHealEffect = new Battle.TbHealEffect(loader("battle_tbhealeffect"));
         TbAddBuffEffect = new Battle.TbAddBuffEffect(loader("battle_tbaddbuffeffect"));
         TbProjectileEffect = new Battle.TbProjectileEffect(loader("battle_tbprojectileeffect"));
+        TbSkillEnhancement = new Battle.TbSkillEnhancement(loader("battle_tbskillenhancement"));
+        TbAttribute = new Attr.TbAttribute(loader("attr_tbattribute"));
         ResolveRef();
     }
     
@@ -52,6 +56,8 @@ public partial class Tables
         TbHealEffect.ResolveRef(this);
         TbAddBuffEffect.ResolveRef(this);
         TbProjectileEffect.ResolveRef(this);
+        TbSkillEnhancement.ResolveRef(this);
+        TbAttribute.ResolveRef(this);
     }
 }
 

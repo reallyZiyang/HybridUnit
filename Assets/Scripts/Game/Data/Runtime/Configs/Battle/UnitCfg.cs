@@ -25,6 +25,8 @@ public sealed partial class UnitCfg : Luban.BeanBase
         { var __json0 = _buf["attrs"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; Attrs = new Attr.AttributePair[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { Attr.AttributePair __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::Game.Data.Configs.Attr.AttributePair.DeserializeAttributePair(__e0);  }  Attrs[__index0++] = __v0; }   }
         { var __json0 = _buf["defaultSkills"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; DefaultSkills = new int[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { int __v0;  { if(!__e0.IsNumber) { throw new SerializationException(); }  __v0 = __e0; }  DefaultSkills[__index0++] = __v0; }   }
         { if(!_buf["renderKey"].IsString) { throw new SerializationException(); }  RenderKey = _buf["renderKey"]; }
+        { if(!_buf["unitFlags"].IsNumber) { throw new SerializationException(); }  UnitFlags = (Battle.UnitFlag)_buf["unitFlags"].AsInt; }
+        { if(!_buf["roleFlags"].IsNumber) { throw new SerializationException(); }  RoleFlags = (Battle.UnitRoleFlag)_buf["roleFlags"].AsInt; }
     }
 
     public static UnitCfg DeserializeUnitCfg(JSONNode _buf)
@@ -64,6 +66,14 @@ public sealed partial class UnitCfg : Luban.BeanBase
     /// 表现资源key
     /// </summary>
     public readonly string RenderKey;
+    /// <summary>
+    /// 单位标记
+    /// </summary>
+    public readonly Battle.UnitFlag UnitFlags;
+    /// <summary>
+    /// 定位标记
+    /// </summary>
+    public readonly Battle.UnitRoleFlag RoleFlags;
    
     public const int __ID__ = 428416266;
     public override int GetTypeId() => __ID__;
@@ -84,6 +94,8 @@ public sealed partial class UnitCfg : Luban.BeanBase
         + "attrs:" + Luban.StringUtil.CollectionToString(Attrs) + ","
         + "defaultSkills:" + Luban.StringUtil.CollectionToString(DefaultSkills) + ","
         + "renderKey:" + RenderKey + ","
+        + "unitFlags:" + UnitFlags + ","
+        + "roleFlags:" + RoleFlags + ","
         + "}";
     }
 }

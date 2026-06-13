@@ -2,6 +2,7 @@ using System;
 using Game.Data.Configs;
 using Game.Data.Configs.Attr;
 using Game.Play.Battle.Rendering;
+using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Unit;
 using Game.Play.Systems.Battle.System;
 using UnityEngine;
@@ -49,6 +50,11 @@ namespace Game.Play.Battle.Tester
 
         public bool StartBattle(Tables tables, BattleTesterScenario targetScenario, IBattleRenderWorld renderWorld)
         {
+            return StartBattle(tables, targetScenario, renderWorld, null);
+        }
+
+        public bool StartBattle(Tables tables, BattleTesterScenario targetScenario, IBattleRenderWorld renderWorld, BattleSkillEnhancementContext skillEnhancementContext)
+        {
             StopBattle();
             if (tables == null || targetScenario == null)
             {
@@ -56,7 +62,7 @@ namespace Game.Play.Battle.Tester
             }
 
             scenario = targetScenario;
-            result = BattleTesterScenarioRunner.Start(tables, targetScenario, renderWorld);
+            result = BattleTesterScenarioRunner.Start(tables, targetScenario, renderWorld, skillEnhancementContext);
             if (result.battle == null || !result.battle.IsInitialized)
             {
                 result = default;

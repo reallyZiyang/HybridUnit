@@ -1,0 +1,82 @@
+[
+  {
+    "id": 100,
+    "name": "战斗力",
+    "power": 0,
+    "group": 0,
+    "valueType": 1,
+    "desc": "综合战斗力",
+    "minValue": 0,
+    "maxValue": 999999999
+  },
+  {
+    "id": 101,
+    "name": "攻击力",
+    "power": 6,
+    "group": 1,
+    "valueType": 1,
+    "desc": "攻击力",
+    "minValue": 0,
+    "maxValue": 999999999
+  },
+  {
+    "id": 102,
+    "name": "生命上限",
+    "power": 1,
+    "group": 1,
+    "valueType": 1,
+    "desc": "生命上限",
+    "minValue": 0,
+    "maxValue": 999999999
+  },
+  {
+    "id": 103,
+    "name": "防御",
+    "power": 30,
+    "group": 1,
+    "valueType": 1,
+    "desc": "防御力",
+    "minValue": 0,
+    "maxValue": 999999999
+  },
+  {
+    "id": 104,
+    "name": "速度",
+    "power": 1,
+    "group": 1,
+    "valueType": 1,
+    "desc": "速度越高越先发动攻击",
+    "minValue": 0,
+    "maxValue": 999999999
+  },
+  {
+    "id": 105,
+    "name": "当前生命",
+    "power": 0,
+    "group": 1,
+    "valueType": 1,
+    "desc": "当前生命",
+    "minValue": 0,
+    "maxValue": 999999999
+  },
+  {
+    "id": 201,
+    "name": "霸体",
+    "power": 0,
+    "group": 3,
+    "valueType": 1,
+    "desc": "大于0时免疫受击硬直",
+    "minValue": 0,
+    "maxValue": 999999999
+  },
+  {
+    "id": 202,
+    "name": "拦截数",
+    "power": 0,
+    "group": 3,
+    "valueType": 1,
+    "desc": "可拦截的弹道数量",
+    "minValue": 0,
+    "maxValue": 999999999
+  }
+]

@@ -36,6 +36,7 @@ namespace Game.Play.Systems.Battle.System
         private BattleProjectileManager projectiles;
         private IBattleRenderWorld renderWorld;
         private BattlefieldBoundaryConfig boundaryConfig;
+        private BattleSkillEnhancementContext skillEnhancementContext = BattleSkillEnhancementContext.Empty;
         private int logicStepMs = 33;
         private float accumulatedMs;
 
@@ -73,13 +74,15 @@ namespace Game.Play.Systems.Battle.System
             IBattleRenderWorld renderWorld = null,
             int logicStepMs = 33,
             int skillSlotsPerUnit = 0,
-            BattlefieldBoundaryConfig boundaryConfig = default)
+            BattlefieldBoundaryConfig boundaryConfig = default,
+            BattleSkillEnhancementContext skillEnhancementContext = null)
         {
             DisposeBattle();
 
             Tables safeTables = tables ?? API.Tables;
             RuntimeData = BattleRuntimeData.Build(safeTables);
             this.boundaryConfig = boundaryConfig;
+            this.skillEnhancementContext = skillEnhancementContext ?? new BattleSkillEnhancementContext();
             this.logicStepMs = Mathf.Max(1, logicStepMs);
             this.renderWorld = renderWorld ?? new DrawMeshBattleRenderWorld();
             this.renderWorld.SetSortingGrid(gridMin.y, cellSize);
@@ -99,15 +102,16 @@ namespace Game.Play.Systems.Battle.System
             }
 
             commands = new BattleCommandBuffer();
-            effects = new BattleEffectExecutor(RuntimeData, UnitManager, commands);
+            effects = new BattleEffectExecutor(RuntimeData, UnitManager, commands, this.skillEnhancementContext);
             facing = new BattleUnitFacingController(UnitManager, this.renderWorld, unitCapacity);
             interception = new BattleInterceptionSystem(UnitManager, unitCapacity);
             int slotsPerUnit = Mathf.Max(1, RuntimeData.MaxDefaultSkillCount, skillSlotsPerUnit);
-            skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, interception, effects, this.renderWorld, facing, unitCapacity, slotsPerUnit, unitCapacity);
+            this.skillEnhancementContext.BindUnits(UnitManager);
+            skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, interception, effects, this.skillEnhancementContext, this.renderWorld, facing, unitCapacity, slotsPerUnit, unitCapacity);
             ai = new BattleAISystem(UnitManager, CollisionManager, skills, interception, this.renderWorld, facing, unitCapacity);
             push = new BattlePushSystem(UnitManager, CollisionManager, skills, unitCapacity, unitCapacity);
             buffs = new BattleBuffManager(RuntimeData, UnitManager, effects, buffCapacity);
-            projectiles = new BattleProjectileManager(RuntimeData, UnitManager, CollisionManager, effects, this.renderWorld, projectileCapacity, unitCapacity);
+            projectiles = new BattleProjectileManager(RuntimeData, UnitManager, CollisionManager, effects, this.skillEnhancementContext, this.renderWorld, projectileCapacity, unitCapacity);
         }
 
         public BattleUnitHandle SpawnUnit(int unitCfgId, Vector2 position, int campOverride = 0)
@@ -135,6 +139,8 @@ namespace Game.Play.Systems.Battle.System
                 camp = overrides.hasCamp ? overrides.camp : unitData.camp,
                 state = BattleUnitStates.Alive | BattleUnitStates.Selectable,
                 layer = overrides.hasLayer ? overrides.layer : unitData.layer,
+                unitFlags = overrides.hasUnitFlags ? overrides.unitFlags : unitData.unitFlags,
+                roleFlags = overrides.hasRoleFlags ? overrides.roleFlags : unitData.roleFlags,
                 renderHandle = renderHandle,
                 skillSlotCount = skillIds.Length,
                 attrs = attrs,
@@ -153,6 +159,7 @@ namespace Game.Play.Systems.Battle.System
                 return BattleUnitHandle.Invalid;
             }
 
+            skillEnhancementContext.ApplyUnitModifiers(unit);
             skills.BindUnitSkills(unit, skillIds);
             UnitManager.SetSkillSlots(unit, skills.GetSlotStart(unit), Mathf.Min(skills.SlotsPerUnit, skillIds.Length));
             facing.ResetUnit(unit);
@@ -236,6 +243,7 @@ namespace Game.Play.Systems.Battle.System
             buffs = null;
             projectiles = null;
             UnitManager = null;
+            skillEnhancementContext = BattleSkillEnhancementContext.Empty;
             accumulatedMs = 0f;
             if (collisionSystem != null)
             {
@@ -357,10 +365,10 @@ namespace Game.Play.Systems.Battle.System
                     }
                     break;
                 case BattleCommandType.AddBuff:
-                    buffs.AddBuff(command.source, command.target, command.id, command.durationMs, command.stack);
+                    buffs.AddBuff(command.source, command.target, command.id, command.durationMs, command.stack, command.effectContext);
                     break;
                 case BattleCommandType.SpawnProjectile:
-                    projectiles.Spawn(command.id, command.source, command.position, command.direction);
+                    projectiles.Spawn(command.id, command.source, command.position, command.direction, command.effectContext);
                     break;
                 case BattleCommandType.DespawnUnit:
                     DespawnUnit(command.target);

@@ -23,16 +23,20 @@ namespace Game.Play.Battle.Runtime
         public readonly float radius;
         public readonly int camp;
         public readonly int layer;
+        public readonly ConfigBattle.UnitFlag unitFlags;
+        public readonly ConfigBattle.UnitRoleFlag roleFlags;
         public readonly string renderKey;
         public readonly BattleAttributeValue[] attrs;
         public readonly int[] defaultSkills;
 
-        public BattleUnitRuntimeData(int id, float radius, int camp, int layer, string renderKey, BattleAttributeValue[] attrs, int[] defaultSkills)
+        public BattleUnitRuntimeData(int id, float radius, int camp, int layer, ConfigBattle.UnitFlag unitFlags, ConfigBattle.UnitRoleFlag roleFlags, string renderKey, BattleAttributeValue[] attrs, int[] defaultSkills)
         {
             this.id = id;
             this.radius = radius;
             this.camp = camp;
             this.layer = layer;
+            this.unitFlags = unitFlags;
+            this.roleFlags = roleFlags;
             this.renderKey = renderKey;
             this.attrs = attrs;
             this.defaultSkills = defaultSkills;

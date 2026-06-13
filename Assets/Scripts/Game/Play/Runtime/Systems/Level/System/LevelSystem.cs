@@ -4,6 +4,7 @@ using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Tester;
 using Game.Play.Systems.Level.Interface;
 using Game.Play.Systems.Level.Model;
+using Game.Play.Systems.SkillEnhancement.Interface;
 using Game.Play.UI.View.Menu;
 using Game.Play.UI.View.Result;
 using UniKit.Framework.Base;
@@ -16,6 +17,7 @@ namespace Game.Play.Systems.Level.System
     {
         private LevelModel model;
         private BattleRuntimeDriver driver;
+        private ISkillEnhancementSystem skillEnhancementSystem;
         private bool createdDriver;
         private bool starting;
         private bool ending;
@@ -25,6 +27,7 @@ namespace Game.Play.Systems.Level.System
         protected override void OnInitialize()
         {
             model = Context.GetModel<LevelModel>();
+            skillEnhancementSystem = Context.GetSystem<ISkillEnhancementSystem>();
         }
 
         public async UniTask StartLevelAsync(string scenarioKey = "TestBattleScenario")
@@ -56,12 +59,13 @@ namespace Game.Play.Systems.Level.System
 
                 StopLevel();
                 driver = CreateDriver();
+                skillEnhancementSystem.BeginBattle();
 
                 IBattleRenderWorld renderWorld = scenario.useNullRenderWorld
                     ? new NullBattleRenderWorld()
                     : new DrawMeshBattleRenderWorld();
 
-                if (!driver.StartBattle(API.Tables, scenario, renderWorld))
+                if (!driver.StartBattle(API.Tables, scenario, renderWorld, skillEnhancementSystem.GetBattleContext()))
                 {
                     Debug.LogError($"[LevelSystem] Start battle failed: {scenarioKey}");
                     ReturnToMainMenu();
@@ -91,6 +95,7 @@ namespace Game.Play.Systems.Level.System
             driver = null;
             createdDriver = false;
             ending = false;
+            skillEnhancementSystem?.EndBattle();
         }
 
         public void OnUpdate(float deltaTime)

@@ -1,4 +1,5 @@
 using Game.Play.Battle.Unit;
+using ConfigBattle = Game.Data.Configs.Battle;
 
 namespace Game.Play.Battle.Runtime
 {
@@ -10,6 +11,10 @@ namespace Game.Play.Battle.Runtime
         public readonly float radius;
         public readonly bool hasLayer;
         public readonly int layer;
+        public readonly bool hasUnitFlags;
+        public readonly ConfigBattle.UnitFlag unitFlags;
+        public readonly bool hasRoleFlags;
+        public readonly ConfigBattle.UnitRoleFlag roleFlags;
         public readonly string renderKey;
         public readonly int[] skillIds;
         public readonly BattleAttributeValue[] attrs;
@@ -27,6 +32,10 @@ namespace Game.Play.Battle.Runtime
             float radius = 0f,
             bool hasLayer = false,
             int layer = 0,
+            bool hasUnitFlags = false,
+            ConfigBattle.UnitFlag unitFlags = ConfigBattle.UnitFlag.None,
+            bool hasRoleFlags = false,
+            ConfigBattle.UnitRoleFlag roleFlags = ConfigBattle.UnitRoleFlag.None,
             string renderKey = null,
             int[] skillIds = null,
             BattleAttributeValue[] attrs = null,
@@ -43,6 +52,10 @@ namespace Game.Play.Battle.Runtime
             this.radius = radius;
             this.hasLayer = hasLayer;
             this.layer = layer;
+            this.hasUnitFlags = hasUnitFlags;
+            this.unitFlags = unitFlags;
+            this.hasRoleFlags = hasRoleFlags;
+            this.roleFlags = roleFlags;
             this.renderKey = renderKey;
             this.skillIds = skillIds;
             this.attrs = attrs;

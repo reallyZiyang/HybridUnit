@@ -10,6 +10,7 @@ namespace Game.Play.Battle.Rendering
         public int SpawnUnit(string renderKey, Vector2 position) => nextHandle++;
         public int SpawnProjectile(string projectileKey, Vector2 position, float angleDeg) => nextHandle++;
         public int PlayUnitAction(int renderHandle, string actionName) => 0;
+        public int PlayUnitAction(int renderHandle, string actionName, float speed) => 0;
         public void PlayUnitIdle(int renderHandle) { }
         public void PlayUnitWalk(int renderHandle) { }
         public int PlayUnitHit(int renderHandle) => DrawMeshUnitRenderer.DefaultHitLockMs;

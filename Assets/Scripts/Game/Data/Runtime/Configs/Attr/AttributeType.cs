@@ -14,7 +14,6 @@ namespace Game.Data.Configs.Attr
     /// <summary>
     /// 属性类型
     /// </summary>
-    [System.Flags]
     public enum AttributeType
     {
         /// <summary>
@@ -49,6 +48,10 @@ namespace Game.Data.Configs.Attr
         /// 霸体
         /// </summary>
         Endure = 201,
+        /// <summary>
+        /// 拦截数
+        /// </summary>
+        Intercept = 202,
     }
 
 } 

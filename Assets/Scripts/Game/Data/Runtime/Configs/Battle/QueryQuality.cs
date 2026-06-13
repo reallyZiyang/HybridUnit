@@ -12,20 +12,20 @@
 namespace Game.Data.Configs.Battle
 { 
     /// <summary>
-    /// Query quality
+    /// 查询精度
     /// </summary>
     public enum QueryQuality
     {
         /// <summary>
-        /// Current position only
+        /// 仅当前位置
         /// </summary>
         Low = 0,
         /// <summary>
-        /// Full path query
+        /// 完整路径
         /// </summary>
         Mid = 1,
         /// <summary>
-        /// Full path and nearest hit
+        /// 完整路径并取最近命中
         /// </summary>
         High = 2,
     }

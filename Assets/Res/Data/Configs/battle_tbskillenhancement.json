@@ -1,0 +1,147 @@
+[
+  {
+    "id": 9001,
+    "name": "多重箭",
+    "description": "英雄普攻额外发射一支箭。",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "targetType": 2,
+    "modifierType": 1,
+    "value": {
+      "type": 1,
+      "intValue": 1
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 1,
+    "weight": 100
+  },
+  {
+    "id": 9002,
+    "name": "急速射击",
+    "description": "英雄普攻整体周期提升20%，包含动画、前摇、后摇和冷却。",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "targetType": 2,
+    "modifierType": 2,
+    "value": {
+      "type": 2,
+      "intValue": 2000
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 3,
+    "weight": 100
+  },
+  {
+    "id": 9003,
+    "name": "火球箭",
+    "description": "英雄普攻弹道替换为附带燃烧的火球。",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "targetType": 2,
+    "modifierType": 4,
+    "value": {
+      "type": 1,
+      "intValue": 6003
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 1,
+    "weight": 100
+  },
+  {
+    "id": 9004,
+    "name": "爆裂箭",
+    "description": "英雄普攻弹道命中时对范围内目标造成命中效果。",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "targetType": 2,
+    "modifierType": 6,
+    "value": {
+      "type": 1,
+      "intValue": 1200
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 1,
+    "weight": 100
+  },
+  {
+    "id": 9005,
+    "name": "穿透箭",
+    "description": "英雄普攻弹道额外穿透1个目标。",
+    "unitSelector": {
+      "requiredUnitFlags": 1,
+      "forbiddenUnitFlags": 0,
+      "requiredRoleFlags": 0,
+      "forbiddenRoleFlags": 0,
+      "unitCfgIds": []
+    },
+    "skillSelector": {
+      "slotIndex": 0,
+      "skillIds": []
+    },
+    "targetType": 2,
+    "modifierType": 5,
+    "value": {
+      "type": 1,
+      "intValue": 1
+    },
+    "effect": {
+      "type": 0,
+      "id": 0,
+      "value": 0
+    },
+    "maxStack": 1,
+    "weight": 100
+  }
+]

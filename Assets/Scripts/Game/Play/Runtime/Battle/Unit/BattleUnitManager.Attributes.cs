@@ -16,6 +16,16 @@ namespace Game.Play.Battle.Unit
             return finalAttrs[AttrOffset(unit.index, attrIndex)];
         }
 
+        public long GetBaseAttr(BattleUnitHandle unit, AttributeType attr)
+        {
+            if (!IsValid(unit) || !BattleAttributeRegistry.TryGetIndex(attr, out int attrIndex))
+            {
+                return 0;
+            }
+
+            return baseAttrs[AttrOffset(unit.index, attrIndex)];
+        }
+
         public bool SetBaseAttr(BattleUnitHandle unit, AttributeType attr, long value)
         {
             if (!IsValid(unit))

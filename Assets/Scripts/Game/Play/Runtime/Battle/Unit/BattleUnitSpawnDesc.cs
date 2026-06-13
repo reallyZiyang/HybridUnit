@@ -1,5 +1,6 @@
 using UnityEngine;
 using Game.Play.Battle.Runtime;
+using ConfigBattle = Game.Data.Configs.Battle;
 
 namespace Game.Play.Battle.Unit
 {
@@ -11,6 +12,8 @@ namespace Game.Play.Battle.Unit
         public int camp;
         public int state;
         public int layer;
+        public ConfigBattle.UnitFlag unitFlags;
+        public ConfigBattle.UnitRoleFlag roleFlags;
         public int hp;
         public int renderHandle;
         public int skillSlotStart;

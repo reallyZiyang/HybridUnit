@@ -23,6 +23,7 @@ namespace Game.Play.Battle.Skill
         private readonly BattleInterceptionSystem interception;
         private readonly BattleInterceptionTargetFilter interceptionFilter;
         private readonly BattleEffectExecutor effects;
+        private readonly BattleSkillEnhancementContext enhancements;
         private readonly IBattleRenderWorld renderWorld;
         private readonly BattleUnitFacingController facing;
         private readonly int unitCapacity;
@@ -31,6 +32,9 @@ namespace Game.Play.Battle.Skill
         private readonly int[] cooldownMs;
         private readonly int[] phaseRemainingMs;
         private readonly int[] castDurationMs;
+        private readonly int[] resolvedCastPreMs;
+        private readonly int[] resolvedCastBackMs;
+        private readonly int[] resolvedCooldownMs;
         private readonly int[] endureRemainingMs;
         private readonly CastPhase[] phases;
         private readonly BattleUnitHandle[] owners;
@@ -44,6 +48,7 @@ namespace Game.Play.Battle.Skill
             BattleCollisionManager collisions,
             BattleInterceptionSystem interception,
             BattleEffectExecutor effects,
+            BattleSkillEnhancementContext enhancements,
             IBattleRenderWorld renderWorld,
             BattleUnitFacingController facing,
             int unitCapacity,
@@ -55,6 +60,7 @@ namespace Game.Play.Battle.Skill
             this.collisions = collisions;
             this.interception = interception;
             this.effects = effects;
+            this.enhancements = enhancements ?? BattleSkillEnhancementContext.Empty;
             this.renderWorld = renderWorld;
             this.facing = facing;
             this.unitCapacity = Mathf.Max(1, unitCapacity);
@@ -64,6 +70,9 @@ namespace Game.Play.Battle.Skill
             cooldownMs = new int[capacity];
             phaseRemainingMs = new int[capacity];
             castDurationMs = new int[capacity];
+            resolvedCastPreMs = new int[capacity];
+            resolvedCastBackMs = new int[capacity];
+            resolvedCooldownMs = new int[capacity];
             endureRemainingMs = new int[capacity];
             phases = new CastPhase[capacity];
             owners = new BattleUnitHandle[capacity];
@@ -136,12 +145,12 @@ namespace Game.Play.Battle.Skill
             }
 
             int start = GetSlotStart(unit);
-            if (!active[start] || !data.TryGetSkill(skillIds[start], out BattleSkillRuntimeData skill))
+            if (!active[start] || !TryGetResolvedSkill(start, out BattleSkillRuntimeData skill, out int baseSkillId))
             {
                 return 1f;
             }
 
-            return ResolveCastRange(skill);
+            return ResolveCastRange(unit, baseSkillId, skill);
         }
 
         public bool IsBasicAttackInterceptLimited(BattleUnitHandle unit)
@@ -153,7 +162,7 @@ namespace Game.Play.Battle.Skill
 
             int start = GetSlotStart(unit);
             return active[start]
-                && data.TryGetSkill(skillIds[start], out BattleSkillRuntimeData skill)
+                && TryGetResolvedSkill(start, out BattleSkillRuntimeData skill, out _)
                 && IsInterceptLimitedSkill(skill);
         }
 
@@ -171,7 +180,7 @@ namespace Game.Play.Battle.Skill
                     continue;
                 }
 
-                if (data.TryGetSkill(skillIds[slot], out BattleSkillRuntimeData skill) && IsInterceptLimitedSkill(skill))
+                if (TryGetResolvedSkill(slot, out BattleSkillRuntimeData skill, out _) && IsInterceptLimitedSkill(skill))
                 {
                     interception.TryReserve(owners[slot], targets[slot]);
                 }
@@ -193,6 +202,9 @@ namespace Game.Play.Battle.Skill
                 cooldownMs[slot] = 0;
                 phaseRemainingMs[slot] = 0;
                 castDurationMs[slot] = 0;
+                resolvedCastPreMs[slot] = 0;
+                resolvedCastBackMs[slot] = 0;
+                resolvedCooldownMs[slot] = 0;
                 endureRemainingMs[slot] = 0;
                 phases[slot] = CastPhase.Idle;
             }
@@ -212,6 +224,9 @@ namespace Game.Play.Battle.Skill
                 cooldownMs[slot] = 0;
                 phaseRemainingMs[slot] = 0;
                 castDurationMs[slot] = 0;
+                resolvedCastPreMs[slot] = 0;
+                resolvedCastBackMs[slot] = 0;
+                resolvedCooldownMs[slot] = 0;
                 endureRemainingMs[slot] = 0;
                 phases[slot] = CastPhase.Idle;
             }
@@ -219,7 +234,7 @@ namespace Game.Play.Battle.Skill
 
         public bool TryCastSkill(BattleUnitHandle caster, int skillId)
         {
-            if (!units.IsAlive(caster) || !data.TryGetSkill(skillId, out BattleSkillRuntimeData skill))
+            if (!units.IsAlive(caster))
             {
                 return false;
             }
@@ -230,7 +245,13 @@ namespace Game.Play.Battle.Skill
                 return false;
             }
 
-            BattleUnitHandle target = SelectTarget(caster, skill, true);
+            int localSlotIndex = GetLocalSlotIndex(slot);
+            if (!data.TryGetSkill(enhancements.ResolveSkillId(caster, localSlotIndex, skillId), out BattleSkillRuntimeData skill))
+            {
+                return false;
+            }
+
+            BattleUnitHandle target = SelectTarget(caster, skillId, skill, true);
             if (!target.IsValid)
             {
                 return false;
@@ -296,12 +317,12 @@ namespace Game.Play.Battle.Skill
                     continue;
                 }
 
-                if (!data.TryGetSkill(skillIds[slot], out BattleSkillRuntimeData skill))
+                if (!TryGetResolvedSkill(slot, out BattleSkillRuntimeData skill, out int baseSkillId))
                 {
                     continue;
                 }
 
-                BattleUnitHandle target = SelectTarget(unit, skill, false);
+                BattleUnitHandle target = SelectTarget(unit, baseSkillId, skill, false);
                 if (!target.IsValid)
                 {
                     continue;
@@ -328,16 +349,16 @@ namespace Game.Play.Battle.Skill
         {
             TickCastEndure(slot, deltaMs);
             phaseRemainingMs[slot] = Mathf.Max(0, phaseRemainingMs[slot] - deltaMs);
-            if (phaseRemainingMs[slot] > 0 || !data.TryGetSkill(skillIds[slot], out BattleSkillRuntimeData skill))
+            if (phaseRemainingMs[slot] > 0 || !TryGetResolvedSkill(slot, out BattleSkillRuntimeData skill, out int baseSkillId))
             {
                 return;
             }
 
             if (phases[slot] == CastPhase.WaitingTrigger)
             {
-                FireSkill(owners[slot], targets[slot], skill);
+                FireSkill(slot, owners[slot], targets[slot], skill, baseSkillId);
                 int castDurationMs = ResolveCastDurationMs(slot, skill);
-                int remainingCastMs = Mathf.Max(0, castDurationMs - Mathf.Max(0, skill.castPreMs));
+                int remainingCastMs = Mathf.Max(0, castDurationMs - resolvedCastPreMs[slot]);
                 if (remainingCastMs > 0)
                 {
                     phases[slot] = CastPhase.WaitingEnd;
@@ -359,14 +380,29 @@ namespace Game.Play.Battle.Skill
             ReleaseCastEndure(slot);
             targets[slot] = target;
             facing?.FaceTarget(owners[slot], target);
-            int animationMs = renderWorld?.PlayUnitAction(units.GetRenderHandle(owners[slot]), skill.actionName) ?? 0;
-            castDurationMs[slot] = Mathf.Max(animationMs, Mathf.Max(0, skill.castPreMs));
+            int baseSkillId = skillIds[slot];
+            int localSlotIndex = GetLocalSlotIndex(slot);
+            float animationSpeed = enhancements.ResolveAnimationSpeed(owners[slot], localSlotIndex, baseSkillId, skill.id);
+            int animationMs = renderWorld?.PlayUnitAction(units.GetRenderHandle(owners[slot]), skill.actionName, animationSpeed) ?? 0;
+            BattleResolvedSkillTiming timing = enhancements.ResolveTiming(
+                owners[slot],
+                localSlotIndex,
+                baseSkillId,
+                skill.id,
+                skill.castPreMs,
+                skill.castBackMs,
+                skill.cooldownMs,
+                animationMs);
+            resolvedCastPreMs[slot] = timing.castPreMs;
+            resolvedCastBackMs[slot] = timing.castBackMs;
+            resolvedCooldownMs[slot] = timing.cooldownMs;
+            castDurationMs[slot] = Mathf.Max(timing.animationMs, timing.castPreMs);
             phaseRemainingMs[slot] = castDurationMs[slot];
-            GrantCastEndure(slot, skill);
+            GrantCastEndure(slot);
 
-            if (skill.castPreMs <= 0)
+            if (timing.castPreMs <= 0)
             {
-                FireSkill(owners[slot], target, skill);
+                FireSkill(slot, owners[slot], target, skill, skillIds[slot]);
                 if (phaseRemainingMs[slot] > 0)
                 {
                     phases[slot] = CastPhase.WaitingEnd;
@@ -379,26 +415,31 @@ namespace Game.Play.Battle.Skill
             else
             {
                 phases[slot] = CastPhase.WaitingTrigger;
-                phaseRemainingMs[slot] = skill.castPreMs;
+                phaseRemainingMs[slot] = timing.castPreMs;
             }
         }
 
         private int ResolveCastDurationMs(int slot, BattleSkillRuntimeData skill)
         {
-            return Mathf.Max(castDurationMs[slot], Mathf.Max(0, skill.castPreMs));
+            return Mathf.Max(castDurationMs[slot], resolvedCastPreMs[slot]);
         }
 
         private void FinishCast(int slot)
         {
             ReleaseCastEndure(slot);
-            if (data.TryGetSkill(skillIds[slot], out BattleSkillRuntimeData skill))
+            if (TryGetResolvedSkill(slot, out BattleSkillRuntimeData skill, out int baseSkillId))
             {
-                cooldownMs[slot] = Mathf.Max(0, skill.cooldownMs);
+                cooldownMs[slot] = resolvedCooldownMs[slot] > 0
+                    ? resolvedCooldownMs[slot]
+                    : enhancements.ResolveTiming(owners[slot], GetLocalSlotIndex(slot), baseSkillId, skill.id, skill.castPreMs, skill.castBackMs, skill.cooldownMs, 0).cooldownMs;
             }
 
             phases[slot] = CastPhase.Idle;
             phaseRemainingMs[slot] = 0;
             castDurationMs[slot] = 0;
+            resolvedCastPreMs[slot] = 0;
+            resolvedCastBackMs[slot] = 0;
+            resolvedCooldownMs[slot] = 0;
             BattleUnitHandle owner = owners[slot];
             targets[slot] = BattleUnitHandle.Invalid;
             if (units.IsAlive(owner))
@@ -407,9 +448,9 @@ namespace Game.Play.Battle.Skill
             }
         }
 
-        private void GrantCastEndure(int slot, BattleSkillRuntimeData skill)
+        private void GrantCastEndure(int slot)
         {
-            int durationMs = Mathf.Max(0, skill.castPreMs) + Mathf.Max(0, skill.castBackMs);
+            int durationMs = resolvedCastPreMs[slot] + resolvedCastBackMs[slot];
             if (durationMs <= 0 || !units.AddEndure(owners[slot], 1))
             {
                 endureRemainingMs[slot] = 0;
@@ -460,6 +501,18 @@ namespace Game.Play.Battle.Skill
             }
 
             return -1;
+        }
+
+        private bool TryGetResolvedSkill(int slot, out BattleSkillRuntimeData skill, out int baseSkillId)
+        {
+            baseSkillId = skillIds[slot];
+            int resolvedSkillId = enhancements.ResolveSkillId(owners[slot], GetLocalSlotIndex(slot), baseSkillId);
+            return data.TryGetSkill(resolvedSkillId, out skill);
+        }
+
+        private int GetLocalSlotIndex(int slot)
+        {
+            return slot >= 0 ? slot % slotsPerUnit : -1;
         }
     }
 }

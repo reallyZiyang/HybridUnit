@@ -14,33 +14,20 @@ namespace Game.Data.Configs.Attr
     /// <summary>
     /// 属性数值类型
     /// </summary>
-    [System.Flags]
     public enum ValueType
     {
         /// <summary>
         /// 布尔值
         /// </summary>
-        Boolean = 1,
+        Null = 0,
         /// <summary>
         /// 整数
         /// </summary>
-        Int = 2,
-        /// <summary>
-        /// 浮点数
-        /// </summary>
-        Float = 3,
-        /// <summary>
-        /// 百分比
-        /// </summary>
-        Percent = 4,
-        /// <summary>
-        /// 千分比
-        /// </summary>
-        Permil = 5,
+        Int = 1,
         /// <summary>
         /// 万分比
         /// </summary>
-        PerTenThousand = 6,
+        RatioBp = 2,
     }
 
 } 

@@ -2,6 +2,7 @@ using Game.Play.Battle.Collision;
 using Game.Play.Battle.Runtime;
 using Game.Data.Configs.Attr;
 using UnityEngine;
+using ConfigBattle = Game.Data.Configs.Battle;
 
 namespace Game.Play.Battle.Unit
 {
@@ -19,6 +20,8 @@ namespace Game.Play.Battle.Unit
         private readonly int[] states;
         private readonly int[] layers;
         private readonly int[] unitCfgIds;
+        private readonly int[] unitFlags;
+        private readonly int[] roleFlags;
         private readonly int[] hp;
         private readonly int[] hitLockRemainingMs;
         private readonly bool[] canPushOthers;
@@ -51,6 +54,8 @@ namespace Game.Play.Battle.Unit
             states = new int[this.capacity];
             layers = new int[this.capacity];
             unitCfgIds = new int[this.capacity];
+            unitFlags = new int[this.capacity];
+            roleFlags = new int[this.capacity];
             hp = new int[this.capacity];
             hitLockRemainingMs = new int[this.capacity];
             canPushOthers = new bool[this.capacity];
@@ -106,6 +111,8 @@ namespace Game.Play.Battle.Unit
             camps[index] = desc.camp;
             states[index] = desc.state;
             layers[index] = desc.layer;
+            unitFlags[index] = (int)desc.unitFlags;
+            roleFlags[index] = (int)desc.roleFlags;
             renderHandles[index] = desc.renderHandle;
             skillSlotStarts[index] = desc.skillSlotStart;
             skillSlotCounts[index] = Mathf.Max(0, desc.skillSlotCount);
@@ -143,6 +150,8 @@ namespace Game.Play.Battle.Unit
             canPushOthers[index] = false;
             canBePushed[index] = false;
             states[index] = 0;
+            unitFlags[index] = 0;
+            roleFlags[index] = 0;
             renderHandles[index] = -1;
             skillSlotStarts[index] = -1;
             skillSlotCounts[index] = 0;
@@ -357,6 +366,38 @@ namespace Game.Play.Battle.Unit
         public int GetState(BattleUnitHandle unit)
         {
             return IsValid(unit) ? states[unit.index] : 0;
+        }
+
+        public int GetUnitFlags(BattleUnitHandle unit)
+        {
+            return IsValid(unit) ? unitFlags[unit.index] : 0;
+        }
+
+        public int GetRoleFlags(BattleUnitHandle unit)
+        {
+            return IsValid(unit) ? roleFlags[unit.index] : 0;
+        }
+
+        public bool SetUnitFlags(BattleUnitHandle unit, ConfigBattle.UnitFlag flags)
+        {
+            if (!IsValid(unit))
+            {
+                return false;
+            }
+
+            unitFlags[unit.index] = (int)flags;
+            return true;
+        }
+
+        public bool SetRoleFlags(BattleUnitHandle unit, ConfigBattle.UnitRoleFlag flags)
+        {
+            if (!IsValid(unit))
+            {
+                return false;
+            }
+
+            roleFlags[unit.index] = (int)flags;
+            return true;
         }
 
         public int GetUnitCfgId(BattleUnitHandle unit)

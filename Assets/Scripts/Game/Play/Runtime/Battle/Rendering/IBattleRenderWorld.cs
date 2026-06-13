@@ -8,6 +8,7 @@ namespace Game.Play.Battle.Rendering
         int SpawnUnit(string renderKey, Vector2 position);
         int SpawnProjectile(string projectileKey, Vector2 position, float angleDeg);
         int PlayUnitAction(int renderHandle, string actionName);
+        int PlayUnitAction(int renderHandle, string actionName, float speed);
         void PlayUnitIdle(int renderHandle);
         void PlayUnitWalk(int renderHandle);
         int PlayUnitHit(int renderHandle);

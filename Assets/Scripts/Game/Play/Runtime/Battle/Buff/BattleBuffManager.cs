@@ -13,6 +13,7 @@ namespace Game.Play.Battle.Buff
         private readonly int capacity;
         private readonly BattleUnitHandle[] owners;
         private readonly BattleUnitHandle[] sources;
+        private readonly BattleEffectContext[] sourceContexts;
         private readonly int[] buffIds;
         private readonly int[] stacks;
         private readonly int[] remainingMs;
@@ -31,6 +32,7 @@ namespace Game.Play.Battle.Buff
             this.capacity = Mathf.Max(1, capacity);
             owners = new BattleUnitHandle[this.capacity];
             sources = new BattleUnitHandle[this.capacity];
+            sourceContexts = new BattleEffectContext[this.capacity];
             buffIds = new int[this.capacity];
             stacks = new int[this.capacity];
             remainingMs = new int[this.capacity];
@@ -41,6 +43,11 @@ namespace Game.Play.Battle.Buff
 
         public bool AddBuff(BattleUnitHandle source, BattleUnitHandle target, int buffId, int durationOverrideMs, int stack)
         {
+            return AddBuff(source, target, buffId, durationOverrideMs, stack, BattleEffectContext.None);
+        }
+
+        public bool AddBuff(BattleUnitHandle source, BattleUnitHandle target, int buffId, int durationOverrideMs, int stack, BattleEffectContext sourceContext)
+        {
             if (!units.IsAlive(target) || !data.TryGetBuff(buffId, out BattleBuffRuntimeData buff))
             {
                 return false;
@@ -49,7 +56,7 @@ namespace Game.Play.Battle.Buff
             int existing = FindBuff(target, buffId);
             if (existing >= 0)
             {
-                RefreshExisting(existing, source, buff, durationOverrideMs, stack);
+                RefreshExisting(existing, source, sourceContext, buff, durationOverrideMs, stack);
                 return true;
             }
 
@@ -63,12 +70,13 @@ namespace Game.Play.Battle.Buff
             active[index] = true;
             owners[index] = target;
             sources[index] = source;
+            sourceContexts[index] = sourceContext;
             buffIds[index] = buffId;
             stacks[index] = safeStack;
             remainingMs[index] = ResolveDuration(buff, durationOverrideMs);
             tickRemainingMs[index] = Mathf.Max(0, buff.tickMs);
             ApplyAttributeDelta(target, buff, safeStack);
-            effects.ExecuteEffects(buff.beginEffects, source, target, units.GetPosition(target), Vector2.zero);
+            effects.ExecuteEffects(buff.beginEffects, source, target, units.GetPosition(target), Vector2.zero, sourceContext.AsBuffBegin(buffId));
             return true;
         }
 
@@ -104,7 +112,7 @@ namespace Game.Play.Battle.Buff
                     while (tickRemainingMs[i] <= 0)
                     {
                         tickRemainingMs[i] += buff.tickMs;
-                        effects.ExecuteEffects(buff.tickEffects, sources[i], owners[i], units.GetPosition(owners[i]), Vector2.zero);
+                        effects.ExecuteEffects(buff.tickEffects, sources[i], owners[i], units.GetPosition(owners[i]), Vector2.zero, sourceContexts[i].AsBuffTick(buffIds[i]));
                     }
                 }
 
@@ -116,9 +124,10 @@ namespace Game.Play.Battle.Buff
             }
         }
 
-        private void RefreshExisting(int index, BattleUnitHandle source, BattleBuffRuntimeData buff, int durationOverrideMs, int stack)
+        private void RefreshExisting(int index, BattleUnitHandle source, BattleEffectContext sourceContext, BattleBuffRuntimeData buff, int durationOverrideMs, int stack)
         {
             sources[index] = source;
+            sourceContexts[index] = sourceContext;
             int oldStack = stacks[index];
             int addStack = Mathf.Max(1, stack);
             int maxStack = Mathf.Max(1, buff.maxStack);
@@ -195,13 +204,14 @@ namespace Game.Play.Battle.Buff
                 ApplyAttributeDelta(owner, buff, -stacks[index]);
                 if (executeEndEffects && units.IsValid(owner))
                 {
-                    effects.ExecuteEffects(buff.endEffects, sources[index], owner, units.GetPosition(owner), Vector2.zero);
+                    effects.ExecuteEffects(buff.endEffects, sources[index], owner, units.GetPosition(owner), Vector2.zero, sourceContexts[index].AsBuffEnd(buffIds[index]));
                 }
             }
 
             active[index] = false;
             owners[index] = BattleUnitHandle.Invalid;
             sources[index] = BattleUnitHandle.Invalid;
+            sourceContexts[index] = BattleEffectContext.None;
             buffIds[index] = 0;
             stacks[index] = 0;
             remainingMs[index] = 0;

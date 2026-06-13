@@ -30,7 +30,9 @@
     "defaultSkills": [
       2002
     ],
-    "renderKey": "Character_1_AnimationVit"
+    "renderKey": "Character_1_AnimationVit",
+    "unitFlags": 1,
+    "roleFlags": 2
   },
   {
     "id": 1002,
@@ -63,7 +65,9 @@
     "defaultSkills": [
       2001
     ],
-    "renderKey": "Character_2_AnimationVit"
+    "renderKey": "Character_2_AnimationVit",
+    "unitFlags": 2,
+    "roleFlags": 1
   },
   {
     "id": 2001,
@@ -96,7 +100,9 @@
     "defaultSkills": [
       2001
     ],
-    "renderKey": "Animal_Cat_AnimationVit"
+    "renderKey": "Animal_Cat_AnimationVit",
+    "unitFlags": 8,
+    "roleFlags": 1
   },
   {
     "id": 2002,
@@ -129,6 +135,8 @@
     "defaultSkills": [
       2001
     ],
-    "renderKey": "Animal_Dog_AnimationVit"
+    "renderKey": "Animal_Dog_AnimationVit",
+    "unitFlags": 8,
+    "roleFlags": 1
   }
 ]

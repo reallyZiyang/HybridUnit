@@ -8,7 +8,10 @@ using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Unit;
 using Game.Play.Systems.Battle.System;
 using NUnit.Framework;
+using SimpleJSON;
 using UnityEngine;
+using ConfigAttr = Game.Data.Configs.Attr;
+using ConfigBattle = Game.Data.Configs.Battle;
 
 namespace Game.Play.Tests.Battle
 {
@@ -25,6 +28,25 @@ namespace Game.Play.Tests.Battle
             Assert.IsTrue(player.IsValid);
             Assert.AreEqual(1000, battle.UnitManager.GetHp(player));
             Assert.AreEqual(2, battle.UnitManager.GetSkillSlotCount(player));
+        }
+
+        [Test]
+        public void AttributeTable_MatchesRuntimeAttributeEnum()
+        {
+            Tables tables = LoadTables();
+
+            Assert.NotNull(tables.TbAttribute.GetOrDefault(AttributeType.Power));
+            Assert.NotNull(tables.TbAttribute.GetOrDefault(AttributeType.Atk));
+            Assert.NotNull(tables.TbAttribute.GetOrDefault(AttributeType.HpMax));
+            Assert.NotNull(tables.TbAttribute.GetOrDefault(AttributeType.Defense));
+            Assert.NotNull(tables.TbAttribute.GetOrDefault(AttributeType.Speed));
+            Assert.NotNull(tables.TbAttribute.GetOrDefault(AttributeType.Hp));
+            Assert.NotNull(tables.TbAttribute.GetOrDefault(AttributeType.Endure));
+            Assert.NotNull(tables.TbAttribute.GetOrDefault(AttributeType.Intercept));
+            Assert.IsNull(tables.TbAttribute.GetOrDefault((AttributeType)1001));
+            Assert.IsNull(tables.TbAttribute.GetOrDefault((AttributeType)1002));
+            Assert.IsNull(tables.TbAttribute.GetOrDefault((AttributeType)1003));
+            Assert.IsNull(tables.TbAttribute.GetOrDefault((AttributeType)1004));
         }
 
         [Test]
@@ -440,10 +462,85 @@ namespace Game.Play.Tests.Battle
             Assert.AreEqual(BattleInterceptionSystem.DefaultInterceptCapacity + 1, renderWorld.GetHitCount(battle.UnitManager.GetRenderHandle(target)));
         }
 
+        [Test]
+        public void SkillEnhancement_HeroBasicAttackModifiersResolveTogether()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+            BattleUnitHandle hero = battle.SpawnUnit(1001, Vector2.zero, 1);
+            BattleUnitHandle placed = battle.SpawnUnit(1002, Vector2.one, 1);
+
+            for (int id = 9001; id <= 9005; id++)
+            {
+                enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(id), 1);
+            }
+
+            BattleEffectContext basicAttack = BattleEffectContext.SkillDirect(2001, 2001, 0);
+            Assert.AreEqual(2, enhancements.ResolveProjectileCount(hero, 6001, basicAttack, 1));
+            Assert.AreEqual(6003, enhancements.ResolveProjectileId(hero, 6001, basicAttack));
+            Assert.AreEqual(2, enhancements.ResolveProjectilePierceCount(hero, 6001, basicAttack, 1));
+            Assert.AreEqual(1.2f, enhancements.ResolveProjectileHitAreaRadius(hero, 6001, basicAttack), 0.0001f);
+
+            BattleResolvedSkillTiming timing = enhancements.ResolveTiming(hero, 0, 2001, 2001, 300, 200, 1000, 600);
+            Assert.AreEqual(250, timing.castPreMs);
+            Assert.AreEqual(166, timing.castBackMs);
+            Assert.AreEqual(833, timing.cooldownMs);
+            Assert.AreEqual(500, timing.animationMs);
+            Assert.AreEqual(1.2f, timing.animationSpeed, 0.0001f);
+
+            BattleEffectContext otherSlot = BattleEffectContext.SkillDirect(2001, 2001, 1);
+            Assert.AreEqual(1, enhancements.ResolveProjectileCount(hero, 6001, otherSlot, 1));
+            Assert.AreEqual(6001, enhancements.ResolveProjectileId(placed, 6001, basicAttack));
+        }
+
+        [Test]
+        public void SkillEnhancement_UnitSelectorsRequireAllConfiguredConditions()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            enhancements.AddOrUpdate(CreateUnitAtkModifier(9101, ConfigBattle.UnitFlag.Summon, ConfigBattle.UnitRoleFlag.None, new[] { 1002 }, 100), 1);
+            enhancements.AddOrUpdate(CreateUnitAtkModifier(9102, ConfigBattle.UnitFlag.Summon, ConfigBattle.UnitRoleFlag.Ranged, null, 10), 1);
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+
+            BattleUnitHandle summonBarbarian = SpawnSelectorTestUnit(battle, 1002, ConfigBattle.UnitFlag.Summon, ConfigBattle.UnitRoleFlag.Melee);
+            BattleUnitHandle placedBarbarian = SpawnSelectorTestUnit(battle, 1002, ConfigBattle.UnitFlag.Placed, ConfigBattle.UnitRoleFlag.Melee);
+            BattleUnitHandle summonArcher = SpawnSelectorTestUnit(battle, 1001, ConfigBattle.UnitFlag.Summon, ConfigBattle.UnitRoleFlag.Ranged);
+            BattleUnitHandle summonRangedBarbarian = SpawnSelectorTestUnit(battle, 1002, ConfigBattle.UnitFlag.Summon, ConfigBattle.UnitRoleFlag.Ranged);
+
+            Assert.AreEqual(200, battle.UnitManager.GetAttr(summonBarbarian, AttributeType.Atk));
+            Assert.AreEqual(100, battle.UnitManager.GetAttr(placedBarbarian, AttributeType.Atk));
+            Assert.AreEqual(110, battle.UnitManager.GetAttr(summonArcher, AttributeType.Atk));
+            Assert.AreEqual(210, battle.UnitManager.GetAttr(summonRangedBarbarian, AttributeType.Atk));
+        }
+
+        [Test]
+        public void SkillEnhancement_RatioUnitModifierStacksFromBaseAttribute()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            ConfigBattle.SkillEnhancementCfg modifier = CreateUnitAtkModifier(
+                9103,
+                ConfigBattle.UnitFlag.Summon,
+                ConfigBattle.UnitRoleFlag.None,
+                null,
+                2000,
+                ConfigAttr.ValueType.RatioBp);
+            enhancements.AddOrUpdate(modifier, 2);
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+
+            BattleUnitHandle unit = SpawnSelectorTestUnit(battle, 1002, ConfigBattle.UnitFlag.Summon, ConfigBattle.UnitRoleFlag.Melee);
+            Assert.AreEqual(140, battle.UnitManager.GetAttr(unit, AttributeType.Atk));
+
+            enhancements.AddOrUpdate(modifier, 3);
+            Assert.AreEqual(160, battle.UnitManager.GetAttr(unit, AttributeType.Atk));
+        }
+
         private static BattleRuntimeSystem CreateBattle(
             Tables tables,
             IBattleRenderWorld renderWorld = null,
-            BattlefieldBoundaryConfig boundaryConfig = default)
+            BattlefieldBoundaryConfig boundaryConfig = default,
+            BattleSkillEnhancementContext skillEnhancementContext = null)
         {
             BattleRuntimeSystem battle = new();
             battle.InitializeBattle(
@@ -457,7 +554,8 @@ namespace Game.Play.Tests.Battle
                 cellSize: 1f,
                 renderWorld: renderWorld ?? new NullBattleRenderWorld(),
                 logicStepMs: 33,
-                boundaryConfig: boundaryConfig);
+                boundaryConfig: boundaryConfig,
+                skillEnhancementContext: skillEnhancementContext);
             return battle;
         }
 
@@ -473,6 +571,65 @@ namespace Game.Play.Tests.Battle
         {
             API.InitConfig().GetAwaiter().GetResult();
             return API.Tables;
+        }
+
+        private static ConfigBattle.SkillEnhancementCfg CreateUnitAtkModifier(
+            int id,
+            ConfigBattle.UnitFlag requiredUnitFlags,
+            ConfigBattle.UnitRoleFlag requiredRoleFlags,
+            int[] unitCfgIds,
+            int value,
+            ConfigAttr.ValueType valueType = ConfigAttr.ValueType.Int)
+        {
+            string unitCfgIdJson = unitCfgIds != null && unitCfgIds.Length > 0
+                ? string.Join(",", unitCfgIds)
+                : string.Empty;
+            string json =
+                "{"
+                + $"\"id\":{id},"
+                + "\"name\":\"test\","
+                + "\"description\":\"test\","
+                + "\"unitSelector\":{"
+                + $"\"requiredUnitFlags\":{(int)requiredUnitFlags},"
+                + "\"forbiddenUnitFlags\":0,"
+                + $"\"requiredRoleFlags\":{(int)requiredRoleFlags},"
+                + "\"forbiddenRoleFlags\":0,"
+                + $"\"unitCfgIds\":[{unitCfgIdJson}]"
+                + "},"
+                + "\"skillSelector\":{\"slotIndex\":-1,\"skillIds\":[]},"
+                + $"\"targetType\":{(int)ConfigBattle.ModifierTargetType.Unit},"
+                + $"\"modifierType\":{(int)AttributeType.Atk},"
+                + $"\"value\":{{\"type\":{(int)valueType},\"intValue\":{value}}},"
+                + "\"effect\":{\"type\":0,\"id\":0,\"value\":0},"
+                + "\"maxStack\":1,"
+                + "\"weight\":1"
+                + "}";
+            return new ConfigBattle.SkillEnhancementCfg(JSON.Parse(json));
+        }
+
+        private static BattleUnitHandle SpawnSelectorTestUnit(
+            BattleRuntimeSystem battle,
+            int unitCfgId,
+            ConfigBattle.UnitFlag unitFlags,
+            ConfigBattle.UnitRoleFlag roleFlags)
+        {
+            return battle.SpawnUnit(
+                unitCfgId,
+                Vector2.zero,
+                new BattleUnitSpawnOverrides(
+                    hasCamp: true,
+                    camp: 1,
+                    hasUnitFlags: true,
+                    unitFlags: unitFlags,
+                    hasRoleFlags: true,
+                    roleFlags: roleFlags,
+                    skillIds: new int[0],
+                    attrs: new[]
+                    {
+                        new BattleAttributeValue(AttributeType.Atk, 100),
+                        new BattleAttributeValue(AttributeType.HpMax, 1000),
+                        new BattleAttributeValue(AttributeType.Hp, 1000)
+                    }));
         }
 
         private sealed class RecordingRenderWorld : IBattleRenderWorld
@@ -497,6 +654,7 @@ namespace Game.Play.Tests.Battle
             }
 
             public int PlayUnitAction(int renderHandle, string actionName) => ActionDurationMs;
+            public int PlayUnitAction(int renderHandle, string actionName, float speed) => ActionDurationMs;
             public void PlayUnitIdle(int renderHandle) { }
 
             public void PlayUnitWalk(int renderHandle)

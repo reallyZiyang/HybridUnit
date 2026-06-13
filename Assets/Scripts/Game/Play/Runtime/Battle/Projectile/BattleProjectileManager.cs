@@ -18,7 +18,9 @@ namespace Game.Play.Battle.Projectile
         private readonly BattleRuntimeData data;
         private readonly BattleUnitManager units;
         private readonly BattleCollisionManager collisions;
+        private readonly BattleCollisionQueryBuffer areaQueryBuffer;
         private readonly BattleEffectExecutor effects;
+        private readonly BattleSkillEnhancementContext enhancements;
         private readonly IBattleRenderWorld renderWorld;
         private readonly int capacity;
         private readonly int hitRecordStride;
@@ -26,11 +28,16 @@ namespace Game.Play.Battle.Projectile
         private readonly Vector2[] previousPositions;
         private readonly Vector2[] directions;
         private readonly int[] projectileIds;
+        private readonly float[] speeds;
+        private readonly float[] radii;
+        private readonly float[] hitAreaRadii;
+        private readonly int[] hitIntervalMs;
         private readonly int[] remainingMs;
         private readonly int[] pierceRemaining;
         private readonly int[] sourceCamps;
         private readonly int[] renderHandles;
         private readonly BattleUnitHandle[] sources;
+        private readonly BattleEffectContext[] sourceContexts;
         private readonly bool[] active;
         private readonly int[] generations;
         private readonly int[] freeStack;
@@ -53,6 +60,7 @@ namespace Game.Play.Battle.Projectile
             BattleUnitManager units,
             BattleCollisionManager collisions,
             BattleEffectExecutor effects,
+            BattleSkillEnhancementContext enhancements,
             IBattleRenderWorld renderWorld,
             int capacity,
             int queryCapacity,
@@ -61,7 +69,9 @@ namespace Game.Play.Battle.Projectile
             this.data = data;
             this.units = units;
             this.collisions = collisions;
+            areaQueryBuffer = new BattleCollisionQueryBuffer(Mathf.Max(1, queryCapacity));
             this.effects = effects;
+            this.enhancements = enhancements ?? BattleSkillEnhancementContext.Empty;
             this.renderWorld = renderWorld;
             this.capacity = Mathf.Max(1, capacity);
             this.hitRecordStride = Mathf.Max(1, hitRecordStride);
@@ -69,11 +79,16 @@ namespace Game.Play.Battle.Projectile
             previousPositions = new Vector2[this.capacity];
             directions = new Vector2[this.capacity];
             projectileIds = new int[this.capacity];
+            speeds = new float[this.capacity];
+            radii = new float[this.capacity];
+            hitAreaRadii = new float[this.capacity];
+            hitIntervalMs = new int[this.capacity];
             remainingMs = new int[this.capacity];
             pierceRemaining = new int[this.capacity];
             sourceCamps = new int[this.capacity];
             renderHandles = new int[this.capacity];
             sources = new BattleUnitHandle[this.capacity];
+            sourceContexts = new BattleEffectContext[this.capacity];
             active = new bool[this.capacity];
             generations = new int[this.capacity];
             freeStack = new int[this.capacity];
@@ -93,6 +108,11 @@ namespace Game.Play.Battle.Projectile
 
         public BattleProjectileHandle Spawn(int projectileId, BattleUnitHandle source, Vector2 position, Vector2 direction)
         {
+            return Spawn(projectileId, source, position, direction, BattleEffectContext.None);
+        }
+
+        public BattleProjectileHandle Spawn(int projectileId, BattleUnitHandle source, Vector2 position, Vector2 direction, BattleEffectContext sourceContext)
+        {
             if (!data.TryGetProjectileEffect(projectileId, out BattleProjectileRuntimeData projectile))
             {
                 return BattleProjectileHandle.Invalid;
@@ -109,11 +129,16 @@ namespace Game.Play.Battle.Projectile
             active[index] = true;
             projectileIds[index] = projectileId;
             sources[index] = source;
+            sourceContexts[index] = sourceContext;
             positions[index] = position;
             previousPositions[index] = position;
             directions[index] = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector2.right;
-            remainingMs[index] = Mathf.Max(1, projectile.lifetimeMs);
-            pierceRemaining[index] = Mathf.Max(1, projectile.pierceCount);
+            speeds[index] = enhancements.ResolveProjectileSpeed(source, projectileId, sourceContext, projectile.speed);
+            radii[index] = enhancements.ResolveProjectileRadius(source, projectileId, sourceContext, projectile.radius);
+            hitAreaRadii[index] = enhancements.ResolveProjectileHitAreaRadius(source, projectileId, sourceContext);
+            hitIntervalMs[index] = enhancements.ResolveProjectileHitIntervalMs(source, projectileId, sourceContext, projectile.hitIntervalMs);
+            remainingMs[index] = enhancements.ResolveProjectileLifetimeMs(source, projectileId, sourceContext, projectile.lifetimeMs);
+            pierceRemaining[index] = enhancements.ResolveProjectilePierceCount(source, projectileId, sourceContext, projectile.pierceCount);
             sourceCamps[index] = units.GetCamp(source);
             ClearHitRecords(index);
 
@@ -141,7 +166,7 @@ namespace Game.Play.Battle.Projectile
                 TickHitCooldowns(i, deltaMs);
                 Vector2 previousPosition = positions[i];
                 previousPositions[i] = previousPosition;
-                positions[i] += directions[i] * projectile.speed * dt;
+                positions[i] += directions[i] * speeds[i] * dt;
                 remainingMs[i] -= deltaMs;
                 TryHitTargets(i, projectile, previousPosition);
 
@@ -197,7 +222,7 @@ namespace Game.Play.Battle.Projectile
                     visitSegmentStart,
                     visitSegmentEnd,
                     units.GetPosition(target),
-                    visitProjectile.radius + units.GetRadius(target));
+                    radii[visitProjectileIndex] + units.GetRadius(target));
                 if (t < nearestTargetT)
                 {
                     nearestTargetT = t;
@@ -219,7 +244,7 @@ namespace Game.Play.Battle.Projectile
                 {
                     type = BattleCollisionShapeType.Circle,
                     center = positions[index],
-                    radius = projectile.radius
+                    radius = radii[index]
                 };
                 VisitImmediate(index, projectile, shape, previousPosition, positions[index]);
                 return;
@@ -230,7 +255,7 @@ namespace Game.Play.Battle.Projectile
                 type = BattleCollisionShapeType.CapsuleSegment,
                 start = previousPosition,
                 end = positions[index],
-                width = projectile.radius * 2f
+                width = radii[index] * 2f
             };
 
             if (projectile.queryQuality == ConfigBattle.QueryQuality.High)
@@ -289,17 +314,60 @@ namespace Game.Play.Battle.Projectile
         {
             return !target.SameAs(sources[index])
                 && units.IsAlive(target)
-                && CanHit(index, target, projectile.hitIntervalMs);
+                && CanHit(index, target, hitIntervalMs[index]);
         }
 
         private void ExecuteHit(int index, BattleUnitHandle target, BattleProjectileRuntimeData projectile)
         {
-            SetHitCooldown(index, target, projectile.hitIntervalMs);
-            effects.ExecuteEffects(projectile.hitEffects, sources[index], target, positions[index], directions[index]);
+            BattleEffectContext context = sourceContexts[index].AsProjectileHit(projectileIds[index]);
+            if (hitAreaRadii[index] > 0f)
+            {
+                ExecuteAreaHit(index, target, projectile, context);
+            }
+            else
+            {
+                SetHitCooldown(index, target, hitIntervalMs[index]);
+                effects.ExecuteEffects(projectile.hitEffects, sources[index], target, positions[index], directions[index], context);
+            }
+
             pierceRemaining[index]--;
             if (pierceRemaining[index] <= 0)
             {
                 DespawnAt(index);
+            }
+        }
+
+        private void ExecuteAreaHit(int index, BattleUnitHandle primaryTarget, BattleProjectileRuntimeData projectile, BattleEffectContext context)
+        {
+            BattleCollisionShape shape = new()
+            {
+                type = BattleCollisionShapeType.Circle,
+                center = positions[index],
+                radius = hitAreaRadii[index]
+            };
+            bool primaryHit = false;
+            collisions.Query(shape, EnemyOptions(index), areaQueryBuffer);
+            for (int i = 0; i < areaQueryBuffer.Count; i++)
+            {
+                BattleUnitHandle target = collisions.GetUnitHandle(areaQueryBuffer.TargetIndices[i]);
+                if (!CanHitTarget(index, target, projectile))
+                {
+                    continue;
+                }
+
+                if (target.SameAs(primaryTarget))
+                {
+                    primaryHit = true;
+                }
+
+                SetHitCooldown(index, target, hitIntervalMs[index]);
+                effects.ExecuteEffects(projectile.hitEffects, sources[index], target, positions[index], directions[index], context);
+            }
+
+            if (!primaryHit && CanHitTarget(index, primaryTarget, projectile))
+            {
+                SetHitCooldown(index, primaryTarget, hitIntervalMs[index]);
+                effects.ExecuteEffects(projectile.hitEffects, sources[index], primaryTarget, positions[index], directions[index], context);
             }
         }
 
@@ -376,10 +444,15 @@ namespace Game.Play.Battle.Projectile
             renderWorld?.Despawn(renderHandles[index]);
             active[index] = false;
             projectileIds[index] = 0;
+            speeds[index] = 0f;
+            radii[index] = 0f;
+            hitAreaRadii[index] = 0f;
+            hitIntervalMs[index] = 0;
             remainingMs[index] = 0;
             pierceRemaining[index] = 0;
             renderHandles[index] = -1;
             sources[index] = BattleUnitHandle.Invalid;
+            sourceContexts[index] = BattleEffectContext.None;
             ClearHitRecords(index);
             freeStack[freeCount++] = index;
         }

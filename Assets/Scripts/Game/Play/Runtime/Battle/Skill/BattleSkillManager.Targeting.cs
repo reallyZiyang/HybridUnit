@@ -10,29 +10,30 @@ namespace Game.Play.Battle.Skill
     {
         private static bool invalidCastRangeWarned;
 
-        private void FireSkill(BattleUnitHandle caster, BattleUnitHandle target, BattleSkillRuntimeData skill)
+        private void FireSkill(int slot, BattleUnitHandle caster, BattleUnitHandle target, BattleSkillRuntimeData skill, int baseSkillId)
         {
             if (!units.IsAlive(caster))
             {
                 return;
             }
 
+            BattleEffectContext context = BattleEffectContext.SkillDirect(baseSkillId, skill.id, GetLocalSlotIndex(slot));
             Vector2 origin = units.GetPosition(caster);
             bool canUseTarget = units.IsValid(target) && (!target.SameAs(caster) || skill.targetType == ConfigBattle.SkillTargetType.Self);
             Vector2 direction = canUseTarget ? units.GetPosition(target) - origin : Vector2.right;
             if (skill.shape != null && skill.shape.ShapeType == ConfigBattle.SkillShapeType.Circle && skill.shape.Radius > 0f)
             {
-                ExecuteAreaSkill(caster, skill, origin, direction);
+                ExecuteAreaSkill(caster, skill, origin, direction, context);
                 return;
             }
 
             if (canUseTarget && units.IsAlive(target))
             {
-                effects.ExecuteEffects(skill.effects, caster, target, origin, direction);
+                effects.ExecuteEffects(skill.effects, caster, target, origin, direction, context);
             }
         }
 
-        private void ExecuteAreaSkill(BattleUnitHandle caster, BattleSkillRuntimeData skill, Vector2 origin, Vector2 direction)
+        private void ExecuteAreaSkill(BattleUnitHandle caster, BattleSkillRuntimeData skill, Vector2 origin, Vector2 direction, BattleEffectContext context)
         {
             BattleCollisionShape shape = new()
             {
@@ -51,19 +52,19 @@ namespace Game.Play.Battle.Skill
 
                 if (units.IsAlive(target))
                 {
-                    effects.ExecuteEffects(skill.effects, caster, target, origin, direction);
+                    effects.ExecuteEffects(skill.effects, caster, target, origin, direction, context);
                 }
             }
         }
 
-        private BattleUnitHandle SelectTarget(BattleUnitHandle caster, BattleSkillRuntimeData skill, bool allowInterceptionFallback)
+        private BattleUnitHandle SelectTarget(BattleUnitHandle caster, int baseSkillId, BattleSkillRuntimeData skill, bool allowInterceptionFallback)
         {
             if (skill.targetType == ConfigBattle.SkillTargetType.Self)
             {
                 return caster;
             }
 
-            float radius = ResolveCastRange(skill);
+            float radius = ResolveCastRange(caster, baseSkillId, skill);
             bool interceptLimited = IsInterceptLimitedSkill(skill);
             if (interceptLimited && TryGetReservedTargetInRange(caster, radius, out BattleUnitHandle reservedTarget))
             {
@@ -164,11 +165,13 @@ namespace Game.Play.Battle.Skill
             return true;
         }
 
-        private static float ResolveCastRange(BattleSkillRuntimeData skill)
+        private float ResolveCastRange(BattleUnitHandle owner, int baseSkillId, BattleSkillRuntimeData skill)
         {
+            float castRange;
             if (skill.castRange > 0f)
             {
-                return skill.castRange;
+                castRange = skill.castRange;
+                return enhancements.ResolveCastRange(owner, baseSkillId, skill.id, castRange);
             }
 
             if (!invalidCastRangeWarned)
@@ -177,7 +180,8 @@ namespace Game.Play.Battle.Skill
                 Debug.LogWarning($"[BattleSkill] Skill {skill.id} has invalid castRange {skill.castRange}. Fallback to 1.");
             }
 
-            return 1f;
+            castRange = 1f;
+            return enhancements.ResolveCastRange(owner, baseSkillId, skill.id, castRange);
         }
 
         private BattleCollisionQueryOptions EnemyOptions(BattleUnitHandle caster, int maxHits, bool sortByDistance)

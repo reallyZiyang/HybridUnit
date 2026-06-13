@@ -1,5 +1,6 @@
 using Game.Data.Configs;
 using Game.Play.Battle.Rendering;
+using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Unit;
 using Game.Play.Systems.Battle.System;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace Game.Play.Battle.Tester
 {
     public static class BattleTesterScenarioRunner
     {
-        public static BattleTesterRunResult Start(Tables tables, BattleTesterScenario scenario, IBattleRenderWorld renderWorld)
+        public static BattleTesterRunResult Start(Tables tables, BattleTesterScenario scenario, IBattleRenderWorld renderWorld, BattleSkillEnhancementContext skillEnhancementContext = null)
         {
             if (scenario == null)
             {
@@ -31,7 +32,8 @@ namespace Game.Play.Battle.Tester
                 renderWorld: renderWorld,
                 logicStepMs: Mathf.Max(1, scenario.logicStepMs),
                 skillSlotsPerUnit: scenario.MaxSkillCount,
-                boundaryConfig: scenario.GetBoundaryConfig());
+                boundaryConfig: scenario.GetBoundaryConfig(),
+                skillEnhancementContext: skillEnhancementContext);
 
             BattleUnitHandle[] handles = new BattleUnitHandle[unitCount];
             for (int i = 0; i < unitCount; i++)

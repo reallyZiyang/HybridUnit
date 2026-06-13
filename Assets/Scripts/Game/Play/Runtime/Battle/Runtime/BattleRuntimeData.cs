@@ -139,7 +139,7 @@ namespace Game.Play.Battle.Runtime
                     MaxDefaultSkillCount = skills.Length;
                 }
 
-                Units[i] = new BattleUnitRuntimeData(cfg.Id, cfg.Radius, cfg.Camp, cfg.Layer, cfg.RenderKey, attrs, skills);
+                Units[i] = new BattleUnitRuntimeData(cfg.Id, cfg.Radius, cfg.Camp, cfg.Layer, cfg.UnitFlags, cfg.RoleFlags, cfg.RenderKey, attrs, skills);
                 unitIndexById[cfg.Id] = i;
             }
         }

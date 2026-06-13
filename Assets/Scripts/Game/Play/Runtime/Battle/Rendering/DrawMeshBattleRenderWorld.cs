@@ -64,14 +64,21 @@ namespace Game.Play.Battle.Rendering
 
         public int PlayUnitAction(int renderHandle, string actionName)
         {
+            return PlayUnitAction(renderHandle, actionName, 1f);
+        }
+
+        public int PlayUnitAction(int renderHandle, string actionName, float speed)
+        {
             if (!TryGetUnit(renderHandle, out BattleRenderEntry entry, out UnitDrawRenderState state))
             {
                 return 0;
             }
 
             state.pendingAction = actionName;
+            state.speed = Mathf.Max(0.01f, speed);
             string safeAction = string.IsNullOrEmpty(actionName) ? DrawMeshUnitRenderer.IdleAction : actionName;
-            return unitRenderer.PlayAction(entry, state, safeAction, false);
+            int durationMs = unitRenderer.PlayAction(entry, state, safeAction, false);
+            return Mathf.CeilToInt(durationMs / Mathf.Max(0.01f, state.speed));
         }
 
         public void PlayUnitIdle(int renderHandle)
@@ -82,6 +89,7 @@ namespace Game.Play.Battle.Rendering
             }
 
             state.pendingAction = null;
+            state.speed = 1f;
             unitRenderer.PlayLoopOrIdle(entry, state, DrawMeshUnitRenderer.IdleAction);
         }
 
@@ -93,6 +101,7 @@ namespace Game.Play.Battle.Rendering
             }
 
             state.pendingAction = null;
+            state.speed = 1f;
             unitRenderer.PlayLoopOrIdle(entry, state, DrawMeshUnitRenderer.WalkAction);
         }
 
@@ -103,6 +112,7 @@ namespace Game.Play.Battle.Rendering
                 return DrawMeshUnitRenderer.DefaultHitLockMs;
             }
 
+            state.speed = 1f;
             int durationMs = unitRenderer.PlayHitOrIdle(entry, state);
             if (!state.dead)
             {
@@ -120,6 +130,7 @@ namespace Game.Play.Battle.Rendering
             }
 
             state.pendingAction = null;
+            state.speed = 1f;
             state.dead = true;
             state.returnIdleMs = 0;
             state.deathFadeElapsedMs = 0;
