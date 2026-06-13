@@ -4,6 +4,7 @@ using Game.Play.Base.Attributes;
 using Game.Play.Battle.AI;
 using Game.Play.Battle.Buff;
 using Game.Play.Battle.Collision;
+using Game.Play.Battle.Interception;
 using Game.Play.Battle.Projectile;
 using Game.Play.Battle.Push;
 using Game.Play.Battle.Rendering;
@@ -27,12 +28,14 @@ namespace Game.Play.Systems.Battle.System
         private BattleCommandBuffer commands;
         private BattleEffectExecutor effects;
         private BattleUnitFacingController facing;
+        private BattleInterceptionSystem interception;
         private BattleAISystem ai;
         private BattlePushSystem push;
         private BattleSkillManager skills;
         private BattleBuffManager buffs;
         private BattleProjectileManager projectiles;
         private IBattleRenderWorld renderWorld;
+        private BattlefieldBoundaryConfig boundaryConfig;
         private int logicStepMs = 33;
         private float accumulatedMs;
 
@@ -69,15 +72,18 @@ namespace Game.Play.Systems.Battle.System
             float cellSize,
             IBattleRenderWorld renderWorld = null,
             int logicStepMs = 33,
-            int skillSlotsPerUnit = 0)
+            int skillSlotsPerUnit = 0,
+            BattlefieldBoundaryConfig boundaryConfig = default)
         {
             DisposeBattle();
 
             Tables safeTables = tables ?? API.Tables;
             RuntimeData = BattleRuntimeData.Build(safeTables);
+            this.boundaryConfig = boundaryConfig;
             this.logicStepMs = Mathf.Max(1, logicStepMs);
             this.renderWorld = renderWorld ?? new DrawMeshBattleRenderWorld();
             this.renderWorld.SetSortingGrid(gridMin.y, cellSize);
+            this.renderWorld.SetBattlefieldBoundary(boundaryConfig);
             accumulatedMs = 0f;
             IsPaused = false;
 
@@ -95,9 +101,10 @@ namespace Game.Play.Systems.Battle.System
             commands = new BattleCommandBuffer();
             effects = new BattleEffectExecutor(RuntimeData, UnitManager, commands);
             facing = new BattleUnitFacingController(UnitManager, this.renderWorld, unitCapacity);
+            interception = new BattleInterceptionSystem(UnitManager, unitCapacity);
             int slotsPerUnit = Mathf.Max(1, RuntimeData.MaxDefaultSkillCount, skillSlotsPerUnit);
-            skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, effects, this.renderWorld, facing, unitCapacity, slotsPerUnit, unitCapacity);
-            ai = new BattleAISystem(UnitManager, CollisionManager, skills, this.renderWorld, facing, unitCapacity);
+            skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, interception, effects, this.renderWorld, facing, unitCapacity, slotsPerUnit, unitCapacity);
+            ai = new BattleAISystem(UnitManager, CollisionManager, skills, interception, this.renderWorld, facing, unitCapacity);
             push = new BattlePushSystem(UnitManager, CollisionManager, skills, unitCapacity, unitCapacity);
             buffs = new BattleBuffManager(RuntimeData, UnitManager, effects, buffCapacity);
             projectiles = new BattleProjectileManager(RuntimeData, UnitManager, CollisionManager, effects, this.renderWorld, projectileCapacity, unitCapacity);
@@ -115,6 +122,7 @@ namespace Game.Play.Systems.Battle.System
                 return BattleUnitHandle.Invalid;
             }
 
+            position = ClampToBattlefield(position);
             string renderKey = string.IsNullOrEmpty(overrides.renderKey) ? unitData.renderKey : overrides.renderKey;
             int[] skillIds = ResolveSkillIds(unitData.defaultSkills, overrides.skillIds);
             BattleAttributeValue[] attrs = ResolveAttrs(unitData.attrs, overrides.attrs);
@@ -221,6 +229,7 @@ namespace Game.Play.Systems.Battle.System
             commands = null;
             effects = null;
             facing = null;
+            interception = null;
             ai = null;
             push = null;
             skills = null;
@@ -249,10 +258,17 @@ namespace Game.Play.Systems.Battle.System
             UnitManager.TickHitLocks(deltaMs);
             UnitManager.SyncCollisionTargets(CollisionManager);
             CollisionManager.RebuildGrid();
+            interception.BeginTick(deltaMs);
+            skills.ReserveActiveInterceptions();
+            ai.ReserveCommittedInterceptions();
+            ai.CollectInterceptionCandidates(deltaMs);
+            interception.ResolveCandidates();
             ai.Tick(deltaMs);
+            ClampUnitsToBattlefield();
             UnitManager.SyncCollisionTargets(CollisionManager);
             CollisionManager.RebuildGrid();
             push.Tick();
+            ClampUnitsToBattlefield();
             UnitManager.SyncCollisionTargets(CollisionManager);
             CollisionManager.RebuildGrid();
             skills.Tick(deltaMs);
@@ -273,6 +289,34 @@ namespace Game.Play.Systems.Battle.System
             }
 
             commands.Clear();
+        }
+
+        private void ClampUnitsToBattlefield()
+        {
+            if (!BattlefieldBoundary.IsEnabled(boundaryConfig))
+            {
+                return;
+            }
+
+            for (int i = 0; i < UnitManager.AllocatedCount; i++)
+            {
+                if (!UnitManager.TryGetHandleByIndex(i, out BattleUnitHandle unit))
+                {
+                    continue;
+                }
+
+                Vector2 position = UnitManager.GetPosition(unit);
+                Vector2 clamped = BattlefieldBoundary.Clamp(position, boundaryConfig);
+                if ((clamped - position).sqrMagnitude > 0.0000001f)
+                {
+                    UnitManager.SetPosition(unit, clamped);
+                }
+            }
+        }
+
+        private Vector2 ClampToBattlefield(Vector2 position)
+        {
+            return BattlefieldBoundary.Clamp(position, boundaryConfig);
         }
 
         private void ExecuteCommand(BattleCommand command)

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Game.Data.Configs;
 using Game.Data.Configs.Attr;
 using Game.Play.Adapters;
+using Game.Play.Battle.Interception;
 using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Unit;
@@ -287,7 +288,162 @@ namespace Game.Play.Tests.Battle
             Assert.Less(battle.UnitManager.GetPosition(mover).x, 0.2f);
         }
 
-        private static BattleRuntimeSystem CreateBattle(Tables tables, IBattleRenderWorld renderWorld = null)
+        [Test]
+        public void Boundary_ClampsSpawnPosition()
+        {
+            Tables tables = LoadTables();
+            BattlefieldBoundaryConfig boundary = new()
+            {
+                enabled = true,
+                rectWidth = 2f,
+                rectHeight = 4f,
+                rectCenterOffset = Vector2.zero
+            };
+            BattleRuntimeSystem battle = CreateBattle(tables, boundaryConfig: boundary);
+
+            BattleUnitHandle unit = battle.SpawnUnit(1001, new Vector2(5f, 0f), 1);
+
+            Assert.IsTrue(BattlefieldBoundary.Contains(battle.UnitManager.GetPosition(unit), boundary));
+        }
+
+        [Test]
+        public void Boundary_ClampsAfterMovementAndPush()
+        {
+            Tables tables = LoadTables();
+            BattlefieldBoundaryConfig boundary = new()
+            {
+                enabled = true,
+                rectWidth = 2f,
+                rectHeight = 4f,
+                rectCenterOffset = Vector2.zero
+            };
+            BattleRuntimeSystem battle = CreateBattle(tables, boundaryConfig: boundary);
+            BattleUnitHandle a = battle.SpawnUnit(1001, new Vector2(0.9f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new int[0]));
+            BattleUnitHandle b = battle.SpawnUnit(1001, new Vector2(1.1f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 1, skillIds: new int[0]));
+
+            battle.OnUpdate(0.033f);
+
+            Assert.IsTrue(BattlefieldBoundary.Contains(battle.UnitManager.GetPosition(a), boundary));
+            Assert.IsTrue(BattlefieldBoundary.Contains(battle.UnitManager.GetPosition(b), boundary));
+        }
+
+        [Test]
+        public void Interception_MeleeAttackersAreLimitedToDefaultCapacity()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle target = SpawnDurableUnit(battle, 1002, Vector2.zero, 1, new int[0]);
+
+            for (int i = 0; i < BattleInterceptionSystem.DefaultInterceptCapacity + 1; i++)
+            {
+                battle.SpawnUnit(2001, new Vector2(0.6f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new[] { 2001 }));
+            }
+
+            Tick(battle, 31);
+
+            Assert.AreEqual(BattleInterceptionSystem.DefaultInterceptCapacity, renderWorld.GetHitCount(battle.UnitManager.GetRenderHandle(target)));
+        }
+
+        [Test]
+        public void Interception_NearMeleeGetsSlotEvenWhenSpawnedAfterFarMelee()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle target = SpawnDurableUnit(battle, 1002, Vector2.zero, 1, new int[0]);
+
+            for (int i = 0; i < BattleInterceptionSystem.DefaultInterceptCapacity; i++)
+            {
+                battle.SpawnUnit(2001, new Vector2(0.6f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new[] { 2001 }));
+            }
+
+            battle.SpawnUnit(
+                2001,
+                new Vector2(0.1f, 0f),
+                new BattleUnitSpawnOverrides(
+                    hasCamp: true,
+                    camp: 2,
+                    skillIds: new[] { 2001 },
+                    attrs: new[] { new BattleAttributeValue(AttributeType.Atk, 1000) }));
+            int hpBefore = battle.UnitManager.GetHp(target);
+
+            Tick(battle, 31);
+
+            Assert.LessOrEqual(battle.UnitManager.GetHp(target), hpBefore - 1000);
+        }
+
+        [Test]
+        public void Interception_UnassignedMeleeStopsWhenCapacityIsFull()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            SpawnDurableUnit(battle, 1002, Vector2.zero, 1, new int[0]);
+
+            for (int i = 0; i < BattleInterceptionSystem.DefaultInterceptCapacity; i++)
+            {
+                battle.SpawnUnit(2001, new Vector2(1f, i * 0.05f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new[] { 2001 }));
+            }
+
+            BattleUnitHandle overflow = battle.SpawnUnit(2001, new Vector2(2f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new[] { 2001 }));
+
+            battle.OnUpdate(0.033f);
+
+            Assert.AreEqual(0, renderWorld.GetWalkCount(battle.UnitManager.GetRenderHandle(overflow)));
+        }
+
+        [Test]
+        public void Interception_UnassignedMeleeSkipsBlockedTargetAfterRetryInterval()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            SpawnDurableUnit(battle, 1002, Vector2.zero, 1, new int[0]);
+            SpawnDurableUnit(battle, 1002, new Vector2(8f, 0f), 1, new int[0]);
+
+            for (int i = 0; i < BattleInterceptionSystem.DefaultInterceptCapacity; i++)
+            {
+                battle.SpawnUnit(2001, new Vector2(0.6f, i * 0.05f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new[] { 2001 }));
+            }
+
+            BattleUnitHandle overflow = battle.SpawnUnit(2001, new Vector2(1.2f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new[] { 2001 }));
+            int overflowRenderHandle = battle.UnitManager.GetRenderHandle(overflow);
+
+            battle.OnUpdate(0.033f);
+            Assert.AreEqual(0, renderWorld.GetWalkCount(overflowRenderHandle));
+
+            Tick(battle, 9);
+            Assert.Greater(renderWorld.GetWalkCount(overflowRenderHandle), 0);
+
+            int walkCountAfterRetarget = renderWorld.GetWalkCount(overflowRenderHandle);
+            Tick(battle, 70);
+
+            Assert.AreEqual(walkCountAfterRetarget, renderWorld.GetWalkCount(overflowRenderHandle));
+        }
+
+        [Test]
+        public void Interception_RangedProjectileAttackersIgnoreCapacity()
+        {
+            Tables tables = LoadTables();
+            RecordingRenderWorld renderWorld = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, renderWorld);
+            BattleUnitHandle target = SpawnDurableUnit(battle, 1002, Vector2.zero, 1, new int[0]);
+
+            for (int i = 0; i < BattleInterceptionSystem.DefaultInterceptCapacity + 1; i++)
+            {
+                battle.SpawnUnit(1001, new Vector2(1f, 0f), new BattleUnitSpawnOverrides(hasCamp: true, camp: 2, skillIds: new[] { 2002 }));
+            }
+
+            Tick(battle, 55);
+
+            Assert.AreEqual(BattleInterceptionSystem.DefaultInterceptCapacity + 1, renderWorld.GetHitCount(battle.UnitManager.GetRenderHandle(target)));
+        }
+
+        private static BattleRuntimeSystem CreateBattle(
+            Tables tables,
+            IBattleRenderWorld renderWorld = null,
+            BattlefieldBoundaryConfig boundaryConfig = default)
         {
             BattleRuntimeSystem battle = new();
             battle.InitializeBattle(
@@ -300,7 +456,8 @@ namespace Game.Play.Tests.Battle
                 gridHeight: 20,
                 cellSize: 1f,
                 renderWorld: renderWorld ?? new NullBattleRenderWorld(),
-                logicStepMs: 33);
+                logicStepMs: 33,
+                boundaryConfig: boundaryConfig);
             return battle;
         }
 
@@ -360,6 +517,7 @@ namespace Game.Play.Tests.Battle
             public void ShowHealText(Vector2 worldPosition, long value) => HealTextCount++;
             public void SetPaused(bool paused) { }
             public void SetSortingGrid(float gridMinY, float cellSize) { }
+            public void SetBattlefieldBoundary(BattlefieldBoundaryConfig config) { }
             public void SetPosition(int renderHandle, Vector2 position) { }
             public void SetRotation(int renderHandle, float angleDeg) { }
             public void SetUnitFlipX(int renderHandle, bool value) => flipX[renderHandle] = value;
@@ -382,6 +540,27 @@ namespace Game.Play.Tests.Battle
             {
                 return flipX.TryGetValue(renderHandle, out bool value) && value;
             }
+        }
+
+        private static BattleUnitHandle SpawnDurableUnit(
+            BattleRuntimeSystem battle,
+            int unitCfgId,
+            Vector2 position,
+            int camp,
+            int[] skillIds)
+        {
+            return battle.SpawnUnit(
+                unitCfgId,
+                position,
+                new BattleUnitSpawnOverrides(
+                    hasCamp: true,
+                    camp: camp,
+                    skillIds: skillIds,
+                    attrs: new[]
+                    {
+                        new BattleAttributeValue(AttributeType.HpMax, 10000),
+                        new BattleAttributeValue(AttributeType.Hp, 10000)
+                    }));
         }
     }
 }

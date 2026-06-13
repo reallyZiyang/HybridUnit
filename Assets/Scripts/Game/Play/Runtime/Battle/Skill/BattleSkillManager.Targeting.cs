@@ -56,7 +56,7 @@ namespace Game.Play.Battle.Skill
             }
         }
 
-        private BattleUnitHandle SelectTarget(BattleUnitHandle caster, BattleSkillRuntimeData skill)
+        private BattleUnitHandle SelectTarget(BattleUnitHandle caster, BattleSkillRuntimeData skill, bool allowInterceptionFallback)
         {
             if (skill.targetType == ConfigBattle.SkillTargetType.Self)
             {
@@ -64,6 +64,17 @@ namespace Game.Play.Battle.Skill
             }
 
             float radius = ResolveCastRange(skill);
+            bool interceptLimited = IsInterceptLimitedSkill(skill);
+            if (interceptLimited && TryGetReservedTargetInRange(caster, radius, out BattleUnitHandle reservedTarget))
+            {
+                return reservedTarget;
+            }
+
+            if (interceptLimited && !allowInterceptionFallback)
+            {
+                return BattleUnitHandle.Invalid;
+            }
+
             BattleCollisionShape shape = new()
             {
                 type = BattleCollisionShapeType.Circle,
@@ -71,28 +82,86 @@ namespace Game.Play.Battle.Skill
                 radius = radius
             };
             BattleCollisionQueryOptions options = EnemyOptions(caster, 0, true);
+            IBattleCollisionTargetFilter targetFilter = null;
+            if (interceptLimited && interceptionFilter != null)
+            {
+                interceptionFilter.Reset(caster);
+                targetFilter = interceptionFilter;
+            }
+
             if (skill.selectType == ConfigBattle.TargetSelectType.Nearest)
             {
-                if (!collisions.QueryNearestCircle(shape.center, radius, options, out int nearestTargetIndex))
+                if (!collisions.QueryNearestCircle(shape.center, radius, options, targetFilter, out int nearestTargetIndex))
                 {
                     return BattleUnitHandle.Invalid;
                 }
 
                 BattleUnitHandle nearestTarget = collisions.GetUnitHandle(nearestTargetIndex);
-                return !nearestTarget.SameAs(caster) && units.IsAlive(nearestTarget) ? nearestTarget : BattleUnitHandle.Invalid;
+                if (nearestTarget.SameAs(caster) || !units.IsAlive(nearestTarget))
+                {
+                    return BattleUnitHandle.Invalid;
+                }
+
+                return !interceptLimited || interception.TryReserve(caster, nearestTarget)
+                    ? nearestTarget
+                    : BattleUnitHandle.Invalid;
             }
 
             collisions.Query(shape, options, queryBuffer);
             for (int i = 0; i < queryBuffer.Count; i++)
             {
                 BattleUnitHandle target = collisions.GetUnitHandle(queryBuffer.TargetIndices[i]);
-                if (!target.SameAs(caster) && units.IsAlive(target))
+                if (!target.SameAs(caster)
+                    && units.IsAlive(target)
+                    && (!interceptLimited || interception.TryReserve(caster, target)))
                 {
                     return target;
                 }
             }
 
             return BattleUnitHandle.Invalid;
+        }
+
+        private bool TryGetReservedTargetInRange(BattleUnitHandle caster, float radius, out BattleUnitHandle target)
+        {
+            target = BattleUnitHandle.Invalid;
+            if (interception == null)
+            {
+                return false;
+            }
+
+            BattleUnitHandle reservedTarget = interception.GetReservedTarget(caster);
+            if (!units.IsAlive(reservedTarget))
+            {
+                return false;
+            }
+
+            if (!BattleCollisionMath.CircleHitsCircle(units.GetPosition(caster), radius, units.GetPosition(reservedTarget), units.GetRadius(reservedTarget)))
+            {
+                return false;
+            }
+
+            target = reservedTarget;
+            return true;
+        }
+
+        private static bool IsInterceptLimitedSkill(BattleSkillRuntimeData skill)
+        {
+            if (skill.targetType == ConfigBattle.SkillTargetType.Self)
+            {
+                return false;
+            }
+
+            BattleEffectRef[] effects = skill.effects;
+            for (int i = 0; i < (effects?.Length ?? 0); i++)
+            {
+                if (effects[i].type == ConfigBattle.EffectType.Projectile)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static float ResolveCastRange(BattleSkillRuntimeData skill)

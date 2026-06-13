@@ -2,6 +2,7 @@ using Game.Data.Configs;
 using Game.Data.Configs.Attr;
 using Game.Play.Adapters;
 using Game.Play.Battle.Rendering;
+using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Tester;
 using Game.Play.Battle.Unit;
 using NUnit.Framework;
@@ -26,12 +27,30 @@ namespace Game.Play.Tests.Battle
             Assert.AreEqual(1, restored.enemyUnits.Length);
             Assert.AreEqual(BattleTesterSpawnMultiplierPreset.X10, restored.spawnMultiplierPreset);
             Assert.AreEqual(13, restored.customSpawnMultiplier);
+            Assert.IsTrue(restored.boundaryEnabled);
+            Assert.AreEqual(7f, restored.boundaryRectWidth);
+            Assert.AreEqual(11f, restored.boundaryRectHeight);
+            Assert.AreEqual(new Vector2(1f, 2f), restored.boundaryRectCenterOffset);
             Assert.AreEqual(999, restored.playerUnits[0].attrs[0].value);
             Assert.AreEqual(2002, restored.playerUnits[0].skillIds[0]);
             Assert.IsTrue(restored.playerUnits[0].enabled);
             Assert.AreEqual(new Vector2(1f, 0f), restored.enemyUnits[0].position);
 
             Object.DestroyImmediate(scenario);
+            Object.DestroyImmediate(restored);
+        }
+
+        [Test]
+        public void ScenarioJson_LegacyJsonUsesBoundaryDefaults()
+        {
+            string json = @"{""schemaVersion"":4,""scenarioName"":""Legacy"",""logicStepMs"":33,""gridWidth"":20,""gridHeight"":20,""cellSize"":1}";
+            BattleTesterScenario restored = BattleTesterScenarioJsonUtility.FromJson(json);
+
+            Assert.IsTrue(restored.boundaryEnabled);
+            Assert.AreEqual(BattlefieldBoundaryConfig.TesterDefault.rectWidth, restored.boundaryRectWidth);
+            Assert.AreEqual(BattlefieldBoundaryConfig.TesterDefault.rectHeight, restored.boundaryRectHeight);
+            Assert.AreEqual(BattlefieldBoundaryConfig.TesterDefault.rectCenterOffset, restored.boundaryRectCenterOffset);
+
             Object.DestroyImmediate(restored);
         }
 
@@ -112,6 +131,21 @@ namespace Game.Play.Tests.Battle
             Object.DestroyImmediate(scenario);
         }
 
+        [Test]
+        public void ScenarioRunner_AppliesBattlefieldBoundary()
+        {
+            Tables tables = LoadTables();
+            BattleTesterScenario scenario = CreateScenario();
+            scenario.playerUnits[0].position = new Vector2(10f, 0f);
+
+            BattleTesterRunResult result = BattleTesterScenarioRunner.Start(tables, scenario, new NullBattleRenderWorld());
+
+            Assert.IsTrue(BattlefieldBoundary.Contains(result.battle.UnitManager.GetPosition(result.units[0]), scenario.GetBoundaryConfig()));
+
+            result.battle.DisposeBattle();
+            Object.DestroyImmediate(scenario);
+        }
+
         private static BattleTesterScenario CreateScenario()
         {
             BattleTesterScenario scenario = ScriptableObject.CreateInstance<BattleTesterScenario>();
@@ -121,6 +155,10 @@ namespace Game.Play.Tests.Battle
             scenario.gridWidth = 20;
             scenario.gridHeight = 20;
             scenario.cellSize = 1f;
+            scenario.boundaryEnabled = true;
+            scenario.boundaryRectWidth = 7f;
+            scenario.boundaryRectHeight = 11f;
+            scenario.boundaryRectCenterOffset = new Vector2(1f, 2f);
             scenario.autoStart = true;
             scenario.useNullRenderWorld = true;
             scenario.SetSideUnits(

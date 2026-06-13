@@ -25,7 +25,8 @@ namespace Game.Play.Systems.Battle.Interface
             float cellSize,
             IBattleRenderWorld renderWorld = null,
             int logicStepMs = 33,
-            int skillSlotsPerUnit = 0);
+            int skillSlotsPerUnit = 0,
+            BattlefieldBoundaryConfig boundaryConfig = default);
 
         BattleUnitHandle SpawnUnit(int unitCfgId, Vector2 position, int campOverride = 0);
         BattleUnitHandle SpawnUnit(int unitCfgId, Vector2 position, BattleUnitSpawnOverrides overrides);

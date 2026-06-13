@@ -23,6 +23,11 @@ namespace Game.Play.Editor.Battle
         [SerializeField] private int gridWidth = 20;
         [SerializeField] private int gridHeight = 20;
         [SerializeField] private float cellSize = 1f;
+        [SerializeField] private bool boundaryEnabled = true;
+        [SerializeField] private float boundaryRectWidth = 9f;
+        [SerializeField] private float boundaryRectHeight = 16f;
+        [SerializeField] private Vector2 boundaryRectCenterOffset = Vector2.zero;
+        [SerializeField] private Vector2 previewCameraCenter = Vector2.zero;
         [SerializeField] private bool autoStart = true;
         [SerializeField] private float defaultRunSeconds = 10f;
         [SerializeField] private bool useNullRenderWorld;
@@ -51,9 +56,12 @@ namespace Game.Play.Editor.Battle
         private Vector2 rightScroll;
         private Vector2 statusScroll;
         private bool draggingTemplate;
+        private bool panningPreview;
         private int draggingTemplateSide;
         private int draggingTemplateIndex;
         private Vector2 dragTemplateOffset;
+        private Vector2 panStartMouse;
+        private Vector2 panStartCenter;
         private string configStatus = "Not loaded";
         private string runtimeStatus = "Stopped";
         private float elapsedSeconds;

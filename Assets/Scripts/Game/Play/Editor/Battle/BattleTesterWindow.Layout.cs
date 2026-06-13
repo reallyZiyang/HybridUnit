@@ -39,6 +39,14 @@ namespace Game.Play.Editor.Battle
             gridWidth = Mathf.Max(1, EditorGUILayout.IntField("Grid Width", gridWidth));
             gridHeight = Mathf.Max(1, EditorGUILayout.IntField("Grid Height", gridHeight));
             cellSize = Mathf.Max(0.01f, EditorGUILayout.FloatField("Cell Size", cellSize));
+            boundaryEnabled = EditorGUILayout.Toggle("Boundary Enabled", boundaryEnabled);
+            using (new EditorGUI.DisabledScope(!boundaryEnabled))
+            {
+                boundaryRectWidth = Mathf.Max(0f, EditorGUILayout.FloatField("Rect Width", boundaryRectWidth));
+                boundaryRectHeight = Mathf.Max(0f, EditorGUILayout.FloatField("Rect Height", boundaryRectHeight));
+                boundaryRectCenterOffset = EditorGUILayout.Vector2Field("Rect Center Offset", boundaryRectCenterOffset);
+            }
+
             logicStepMs = Mathf.Max(1, EditorGUILayout.IntField("Logic Step Ms", logicStepMs));
             autoStart = EditorGUILayout.Toggle("Auto Start", autoStart);
             defaultRunSeconds = Mathf.Max(0f, EditorGUILayout.FloatField("Default Run Seconds", defaultRunSeconds));

@@ -133,6 +133,11 @@ namespace Game.Play.Editor.Battle
             gridWidth = defaults.gridWidth;
             gridHeight = defaults.gridHeight;
             cellSize = defaults.cellSize;
+            boundaryEnabled = defaults.boundaryEnabled;
+            boundaryRectWidth = defaults.boundaryRectWidth;
+            boundaryRectHeight = defaults.boundaryRectHeight;
+            boundaryRectCenterOffset = defaults.boundaryRectCenterOffset;
+            previewCameraCenter = Vector2.zero;
             autoStart = defaults.autoStart;
             defaultRunSeconds = defaults.defaultRunSeconds;
             useNullRenderWorld = defaults.useNullRenderWorld;
@@ -153,6 +158,11 @@ namespace Game.Play.Editor.Battle
             gridWidth = scenario.gridWidth;
             gridHeight = scenario.gridHeight;
             cellSize = scenario.cellSize;
+            boundaryEnabled = scenario.boundaryEnabled;
+            boundaryRectWidth = scenario.boundaryRectWidth;
+            boundaryRectHeight = scenario.boundaryRectHeight;
+            boundaryRectCenterOffset = scenario.boundaryRectCenterOffset;
+            previewCameraCenter = Vector2.zero;
             autoStart = scenario.autoStart;
             defaultRunSeconds = scenario.defaultRunSeconds;
             useNullRenderWorld = scenario.useNullRenderWorld;
@@ -184,6 +194,10 @@ namespace Game.Play.Editor.Battle
             scenario.gridWidth = Mathf.Max(1, gridWidth);
             scenario.gridHeight = Mathf.Max(1, gridHeight);
             scenario.cellSize = Mathf.Max(0.01f, cellSize);
+            scenario.boundaryEnabled = boundaryEnabled;
+            scenario.boundaryRectWidth = Mathf.Max(0f, boundaryRectWidth);
+            scenario.boundaryRectHeight = Mathf.Max(0f, boundaryRectHeight);
+            scenario.boundaryRectCenterOffset = boundaryRectCenterOffset;
             scenario.autoStart = autoStart;
             scenario.defaultRunSeconds = Mathf.Max(0f, defaultRunSeconds);
             scenario.useNullRenderWorld = useNullRenderWorld;

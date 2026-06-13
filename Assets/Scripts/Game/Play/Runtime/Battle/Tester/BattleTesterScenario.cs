@@ -22,6 +22,10 @@ namespace Game.Play.Battle.Tester
         public int gridWidth = 20;
         public int gridHeight = 20;
         public float cellSize = 1f;
+        public bool boundaryEnabled = BattlefieldBoundaryConfig.TesterDefault.enabled;
+        public float boundaryRectWidth = BattlefieldBoundaryConfig.TesterDefault.rectWidth;
+        public float boundaryRectHeight = BattlefieldBoundaryConfig.TesterDefault.rectHeight;
+        public Vector2 boundaryRectCenterOffset = BattlefieldBoundaryConfig.TesterDefault.rectCenterOffset;
         public bool autoStart = true;
         public float defaultRunSeconds = 10f;
         public bool useNullRenderWorld;
@@ -118,6 +122,17 @@ namespace Game.Play.Battle.Tester
             playerUnits = players ?? Array.Empty<BattleTesterUnitEntry>();
             enemyUnits = enemies ?? Array.Empty<BattleTesterUnitEntry>();
             units = Array.Empty<BattleTesterUnitEntry>();
+        }
+
+        public BattlefieldBoundaryConfig GetBoundaryConfig()
+        {
+            return new BattlefieldBoundaryConfig
+            {
+                enabled = boundaryEnabled,
+                rectWidth = Mathf.Max(0f, boundaryRectWidth),
+                rectHeight = Mathf.Max(0f, boundaryRectHeight),
+                rectCenterOffset = boundaryRectCenterOffset
+            };
         }
     }
 

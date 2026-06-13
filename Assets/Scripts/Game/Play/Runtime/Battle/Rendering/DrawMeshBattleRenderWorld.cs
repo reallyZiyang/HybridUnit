@@ -1,4 +1,5 @@
 using Game.Play.Rendering.Runtime;
+using Game.Play.Battle.Runtime;
 using UnityEngine;
 
 namespace Game.Play.Battle.Rendering
@@ -22,6 +23,7 @@ namespace Game.Play.Battle.Rendering
         private readonly BattleDrawMeshInstanceManager drawMeshInstances = new();
         private readonly BattleRenderAssetLoader assetLoader;
         private readonly BattleFloatTextRenderer floatTextRenderer = new();
+        private readonly DrawMeshBattlefieldBoundaryRenderer boundaryRenderer = new();
         private readonly DrawMeshUnitRenderer unitRenderer;
         private readonly DrawMeshEffectRenderer effectRenderer;
         private readonly DrawMeshRenderAssetBinder assetBinder;
@@ -146,6 +148,11 @@ namespace Game.Play.Battle.Rendering
             drawMeshInstances.SetUnitSortingGrid(gridMinY, cellSize);
         }
 
+        public void SetBattlefieldBoundary(BattlefieldBoundaryConfig config)
+        {
+            boundaryRenderer.SetBoundary(config);
+        }
+
         public void SetPosition(int renderHandle, Vector2 position)
         {
             if (!TryGetEntry(renderHandle, out BattleRenderEntry entry))
@@ -216,6 +223,7 @@ namespace Game.Play.Battle.Rendering
 
             ReleaseCompletedRenderEntries();
             floatTextRenderer.Tick(deltaTime);
+            boundaryRenderer.Draw();
             SubmitDrawMeshInstances();
             floatTextRenderer.Draw();
         }
@@ -230,6 +238,7 @@ namespace Game.Play.Battle.Rendering
             activeCount = 0;
             completedRenderHandleCount = 0;
             drawMeshInstances.Clear();
+            boundaryRenderer.Clear();
             BattleRenderObjectUtility.DestroyObject(drawMeshRoot);
             drawMeshRoot = null;
             drawMeshRenderHost = null;

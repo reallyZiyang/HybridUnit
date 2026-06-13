@@ -1,4 +1,5 @@
 using Game.Play.Battle.Collision;
+using Game.Play.Battle.Interception;
 using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Runtime;
 using Game.Play.Battle.Unit;
@@ -19,6 +20,8 @@ namespace Game.Play.Battle.Skill
         private readonly BattleUnitManager units;
         private readonly BattleCollisionManager collisions;
         private readonly BattleCollisionQueryBuffer queryBuffer;
+        private readonly BattleInterceptionSystem interception;
+        private readonly BattleInterceptionTargetFilter interceptionFilter;
         private readonly BattleEffectExecutor effects;
         private readonly IBattleRenderWorld renderWorld;
         private readonly BattleUnitFacingController facing;
@@ -39,6 +42,7 @@ namespace Game.Play.Battle.Skill
             BattleRuntimeData data,
             BattleUnitManager units,
             BattleCollisionManager collisions,
+            BattleInterceptionSystem interception,
             BattleEffectExecutor effects,
             IBattleRenderWorld renderWorld,
             BattleUnitFacingController facing,
@@ -49,6 +53,7 @@ namespace Game.Play.Battle.Skill
             this.data = data;
             this.units = units;
             this.collisions = collisions;
+            this.interception = interception;
             this.effects = effects;
             this.renderWorld = renderWorld;
             this.facing = facing;
@@ -66,6 +71,7 @@ namespace Game.Play.Battle.Skill
             castEndureGranted = new bool[capacity];
             active = new bool[capacity];
             queryBuffer = new BattleCollisionQueryBuffer(Mathf.Max(1, queryCapacity));
+            interceptionFilter = interception != null ? new BattleInterceptionTargetFilter(collisions, interception) : null;
         }
 
         public int SlotsPerUnit => slotsPerUnit;
@@ -138,6 +144,40 @@ namespace Game.Play.Battle.Skill
             return ResolveCastRange(skill);
         }
 
+        public bool IsBasicAttackInterceptLimited(BattleUnitHandle unit)
+        {
+            if (!units.IsAlive(unit))
+            {
+                return false;
+            }
+
+            int start = GetSlotStart(unit);
+            return active[start]
+                && data.TryGetSkill(skillIds[start], out BattleSkillRuntimeData skill)
+                && IsInterceptLimitedSkill(skill);
+        }
+
+        public void ReserveActiveInterceptions()
+        {
+            if (interception == null)
+            {
+                return;
+            }
+
+            for (int slot = 0; slot < active.Length; slot++)
+            {
+                if (!active[slot] || phases[slot] == CastPhase.Idle)
+                {
+                    continue;
+                }
+
+                if (data.TryGetSkill(skillIds[slot], out BattleSkillRuntimeData skill) && IsInterceptLimitedSkill(skill))
+                {
+                    interception.TryReserve(owners[slot], targets[slot]);
+                }
+            }
+        }
+
         public void BindUnitSkills(BattleUnitHandle unit, int[] defaultSkills)
         {
             int start = GetSlotStart(unit);
@@ -184,14 +224,14 @@ namespace Game.Play.Battle.Skill
                 return false;
             }
 
-            BattleUnitHandle target = SelectTarget(caster, skill);
-            if (!target.IsValid)
+            int slot = FindSlot(caster, skillId);
+            if (slot < 0)
             {
                 return false;
             }
 
-            int slot = FindSlot(caster, skillId);
-            if (slot < 0)
+            BattleUnitHandle target = SelectTarget(caster, skill, true);
+            if (!target.IsValid)
             {
                 return false;
             }
@@ -261,7 +301,7 @@ namespace Game.Play.Battle.Skill
                     continue;
                 }
 
-                BattleUnitHandle target = SelectTarget(unit, skill);
+                BattleUnitHandle target = SelectTarget(unit, skill, false);
                 if (!target.IsValid)
                 {
                     continue;

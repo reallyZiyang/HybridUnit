@@ -1,5 +1,6 @@
 using Game.Data.Configs.Attr;
 using Game.Play.Battle.Collision;
+using Game.Play.Battle.Interception;
 using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Skill;
 using Game.Play.Battle.Unit;
@@ -18,9 +19,12 @@ namespace Game.Play.Battle.AI
         private readonly BattleUnitManager units;
         private readonly BattleCollisionManager collisions;
         private readonly BattleSkillManager skills;
+        private readonly BattleInterceptionSystem interception;
+        private readonly BattleInterceptionTargetFilter interceptionFilter;
         private readonly IBattleRenderWorld renderWorld;
         private readonly BattleUnitFacingController facing;
         private readonly BattleUnitHandle[] targets;
+        private readonly BattleUnitHandle[] pendingTargets;
         private readonly int[] searchRemainingMs;
         private readonly bool[] moving;
         private readonly BattleUnitHandle[] cachedTargets;
@@ -31,6 +35,7 @@ namespace Game.Play.Battle.AI
             BattleUnitManager units,
             BattleCollisionManager collisions,
             BattleSkillManager skills,
+            BattleInterceptionSystem interception,
             IBattleRenderWorld renderWorld,
             BattleUnitFacingController facing,
             int unitCapacity)
@@ -38,21 +43,128 @@ namespace Game.Play.Battle.AI
             this.units = units;
             this.collisions = collisions;
             this.skills = skills;
+            this.interception = interception;
             this.renderWorld = renderWorld;
             this.facing = facing;
             int capacity = Mathf.Max(1, unitCapacity);
             targets = new BattleUnitHandle[capacity];
+            pendingTargets = new BattleUnitHandle[capacity];
             searchRemainingMs = new int[capacity];
             moving = new bool[capacity];
             cachedTargets = new BattleUnitHandle[Mathf.Max(1, collisions.GridCellCount * MaxCampCount)];
+            interceptionFilter = interception != null ? new BattleInterceptionTargetFilter(collisions, interception) : null;
 
             ClearTargets();
             ClearTargetCache();
         }
 
-        public void Tick(int deltaMs)
+        public void ReserveCommittedInterceptions()
+        {
+            if (interception == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < units.AllocatedCount; i++)
+            {
+                if (!units.TryGetHandleByIndex(i, out BattleUnitHandle unit))
+                {
+                    ClearUnitState(i);
+                    continue;
+                }
+
+                if (!units.IsAlive(unit))
+                {
+                    ClearUnitState(i);
+                    continue;
+                }
+
+                if (units.IsHitLocked(unit) || skills.IsUnitBusy(unit) || !skills.IsBasicAttackInterceptLimited(unit))
+                {
+                    continue;
+                }
+
+                BattleUnitHandle target = targets[i];
+                if (!IsValidEnemyTarget(unit, target))
+                {
+                    targets[i] = BattleUnitHandle.Invalid;
+                    pendingTargets[i] = BattleUnitHandle.Invalid;
+                    continue;
+                }
+
+                interception.TryReserve(unit, target);
+            }
+        }
+
+        public void CollectInterceptionCandidates(int deltaMs)
         {
             TickCache(deltaMs);
+
+            if (interception == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < units.AllocatedCount; i++)
+            {
+                if (!units.TryGetHandleByIndex(i, out BattleUnitHandle unit))
+                {
+                    ClearUnitState(i);
+                    continue;
+                }
+
+                if (!units.IsAlive(unit))
+                {
+                    ClearUnitState(i);
+                    continue;
+                }
+
+                if (units.IsHitLocked(unit) || skills.IsUnitBusy(unit) || !skills.IsBasicAttackInterceptLimited(unit))
+                {
+                    continue;
+                }
+
+                searchRemainingMs[i] = Mathf.Max(0, searchRemainingMs[i] - deltaMs);
+                BattleUnitHandle target = targets[i];
+                bool hasTarget = IsValidEnemyTarget(unit, target);
+                if (!hasTarget)
+                {
+                    target = BattleUnitHandle.Invalid;
+                    targets[i] = target;
+                }
+
+                if (hasTarget && searchRemainingMs[i] > 0)
+                {
+                    pendingTargets[i] = BattleUnitHandle.Invalid;
+                    continue;
+                }
+
+                if (!hasTarget && searchRemainingMs[i] > 0)
+                {
+                    continue;
+                }
+
+                if (TryFindNearestTarget(unit, out target))
+                {
+                    pendingTargets[i] = target;
+                    AddInterceptionCandidate(unit, target);
+                }
+                else
+                {
+                    pendingTargets[i] = BattleUnitHandle.Invalid;
+                    if (!hasTarget)
+                    {
+                        targets[i] = BattleUnitHandle.Invalid;
+                    }
+
+                    searchRemainingMs[i] = NoTargetSearchIntervalMs;
+                    continue;
+                }
+            }
+        }
+
+        public void Tick(int deltaMs)
+        {
             float deltaSeconds = Mathf.Max(0, deltaMs) / 1000f;
 
             for (int i = 0; i < units.AllocatedCount; i++)
@@ -80,6 +192,51 @@ namespace Game.Play.Battle.AI
                     continue;
                 }
 
+                bool interceptLimited = skills.IsBasicAttackInterceptLimited(unit);
+                if (interceptLimited)
+                {
+                    BattleUnitHandle reservedTarget = interception != null ? interception.GetReservedTarget(unit) : BattleUnitHandle.Invalid;
+                    if (!IsValidEnemyTarget(unit, reservedTarget))
+                    {
+                        BattleUnitHandle committedTarget = targets[i];
+                        if (IsValidEnemyTarget(unit, committedTarget))
+                        {
+                            if (pendingTargets[i].IsValid)
+                            {
+                                searchRemainingMs[i] = NoTargetSearchIntervalMs;
+                                pendingTargets[i] = BattleUnitHandle.Invalid;
+                            }
+
+                            MoveTowardTarget(unit, committedTarget, deltaSeconds);
+                        }
+                        else
+                        {
+                            StopMoving(unit);
+                        }
+
+                        continue;
+                    }
+
+                    if (pendingTargets[i].SameAs(reservedTarget))
+                    {
+                        targets[i] = reservedTarget;
+                        searchRemainingMs[i] = HasTargetSearchIntervalMs;
+                        pendingTargets[i] = BattleUnitHandle.Invalid;
+                    }
+                    else if (pendingTargets[i].IsValid)
+                    {
+                        searchRemainingMs[i] = NoTargetSearchIntervalMs;
+                        pendingTargets[i] = BattleUnitHandle.Invalid;
+                    }
+                    else if (!targets[i].SameAs(reservedTarget))
+                    {
+                        targets[i] = reservedTarget;
+                    }
+
+                    MoveTowardTarget(unit, targets[i], deltaSeconds);
+                    continue;
+                }
+
                 searchRemainingMs[i] = Mathf.Max(0, searchRemainingMs[i] - deltaMs);
                 BattleUnitHandle target = targets[i];
                 bool hasTarget = IsValidEnemyTarget(unit, target);
@@ -93,16 +250,28 @@ namespace Game.Play.Battle.AI
                 {
                     if (TrySearchTarget(unit, out target))
                     {
-                        targets[i] = target;
-                        hasTarget = true;
-                        searchRemainingMs[i] = HasTargetSearchIntervalMs;
+                        if (!hasTarget || !targets[i].SameAs(target))
+                        {
+                            targets[i] = target;
+                            hasTarget = true;
+                            searchRemainingMs[i] = HasTargetSearchIntervalMs;
+                        }
+                        else
+                        {
+                            target = targets[i];
+                            hasTarget = true;
+                            searchRemainingMs[i] = HasTargetSearchIntervalMs;
+                        }
                     }
                     else
                     {
-                        targets[i] = BattleUnitHandle.Invalid;
                         searchRemainingMs[i] = NoTargetSearchIntervalMs;
-                        StopMoving(unit);
-                        continue;
+                        if (!hasTarget)
+                        {
+                            targets[i] = BattleUnitHandle.Invalid;
+                            StopMoving(unit);
+                            continue;
+                        }
                     }
                 }
 
@@ -164,6 +333,49 @@ namespace Game.Play.Battle.AI
             cachedTargets[cacheIndex] = queriedTarget;
             target = queriedTarget;
             return true;
+        }
+
+        private bool TryFindNearestTarget(BattleUnitHandle unit, out BattleUnitHandle target)
+        {
+            target = BattleUnitHandle.Invalid;
+            int camp = units.GetCamp(unit);
+            if (camp < 0 || camp >= MaxCampCount)
+            {
+                return false;
+            }
+
+            Vector2 position = units.GetPosition(unit);
+            IBattleCollisionTargetFilter targetFilter = null;
+            if (interceptionFilter != null)
+            {
+                interceptionFilter.Reset(unit, true);
+                targetFilter = interceptionFilter;
+            }
+
+            if (!collisions.QueryNearestByCellRings(position, EnemyOptions(camp), targetFilter, out int targetIndex))
+            {
+                return false;
+            }
+
+            BattleUnitHandle queriedTarget = collisions.GetUnitHandle(targetIndex);
+            if (!IsValidEnemyTarget(unit, queriedTarget))
+            {
+                return false;
+            }
+
+            target = queriedTarget;
+            return true;
+        }
+
+        private bool AddInterceptionCandidate(BattleUnitHandle unit, BattleUnitHandle target)
+        {
+            if (interception == null || !IsValidEnemyTarget(unit, target))
+            {
+                return false;
+            }
+
+            float distanceSqr = (units.GetPosition(target) - units.GetPosition(unit)).sqrMagnitude;
+            return interception.AddCandidate(unit, target, distanceSqr);
         }
 
         private void MoveTowardTarget(BattleUnitHandle unit, BattleUnitHandle target, float deltaSeconds)
@@ -279,6 +491,7 @@ namespace Game.Play.Battle.AI
             }
 
             targets[index] = BattleUnitHandle.Invalid;
+            pendingTargets[index] = BattleUnitHandle.Invalid;
             searchRemainingMs[index] = 0;
             moving[index] = false;
         }
@@ -288,6 +501,7 @@ namespace Game.Play.Battle.AI
             for (int i = 0; i < targets.Length; i++)
             {
                 targets[i] = BattleUnitHandle.Invalid;
+                pendingTargets[i] = BattleUnitHandle.Invalid;
                 searchRemainingMs[i] = 0;
             }
         }

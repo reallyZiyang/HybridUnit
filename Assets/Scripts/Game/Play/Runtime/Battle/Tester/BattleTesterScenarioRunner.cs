@@ -30,7 +30,8 @@ namespace Game.Play.Battle.Tester
                 cellSize: Mathf.Max(0.01f, scenario.cellSize),
                 renderWorld: renderWorld,
                 logicStepMs: Mathf.Max(1, scenario.logicStepMs),
-                skillSlotsPerUnit: scenario.MaxSkillCount);
+                skillSlotsPerUnit: scenario.MaxSkillCount,
+                boundaryConfig: scenario.GetBoundaryConfig());
 
             BattleUnitHandle[] handles = new BattleUnitHandle[unitCount];
             for (int i = 0; i < unitCount; i++)

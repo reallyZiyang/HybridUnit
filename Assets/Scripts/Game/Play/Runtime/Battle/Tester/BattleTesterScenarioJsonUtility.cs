@@ -6,7 +6,7 @@ namespace Game.Play.Battle.Tester
 {
     public static class BattleTesterScenarioJsonUtility
     {
-        private const int CurrentSchemaVersion = 4;
+        private const int CurrentSchemaVersion = 6;
 
         public static string ToJson(BattleTesterScenario scenario, bool prettyPrint = true)
         {
@@ -38,6 +38,11 @@ namespace Game.Play.Battle.Tester
                 gridWidth = scenario.gridWidth,
                 gridHeight = scenario.gridHeight,
                 cellSize = scenario.cellSize,
+                boundaryEnabled = scenario.boundaryEnabled,
+                boundaryRectWidth = scenario.boundaryRectWidth,
+                boundaryRectHeight = scenario.boundaryRectHeight,
+                boundaryRectCenterOffsetX = scenario.boundaryRectCenterOffset.x,
+                boundaryRectCenterOffsetY = scenario.boundaryRectCenterOffset.y,
                 autoStart = scenario.autoStart,
                 defaultRunSeconds = scenario.defaultRunSeconds,
                 useNullRenderWorld = scenario.useNullRenderWorld,
@@ -118,6 +123,14 @@ namespace Game.Play.Battle.Tester
             scenario.gridWidth = data.gridWidth;
             scenario.gridHeight = data.gridHeight;
             scenario.cellSize = data.cellSize;
+            if (data.schemaVersion >= 6)
+            {
+                scenario.boundaryEnabled = data.boundaryEnabled;
+                scenario.boundaryRectWidth = Mathf.Max(0f, data.boundaryRectWidth);
+                scenario.boundaryRectHeight = Mathf.Max(0f, data.boundaryRectHeight);
+                scenario.boundaryRectCenterOffset = new Vector2(data.boundaryRectCenterOffsetX, data.boundaryRectCenterOffsetY);
+            }
+
             scenario.autoStart = data.autoStart;
             scenario.defaultRunSeconds = data.defaultRunSeconds;
             scenario.useNullRenderWorld = data.useNullRenderWorld;
@@ -234,6 +247,11 @@ namespace Game.Play.Battle.Tester
         public int gridWidth;
         public int gridHeight;
         public float cellSize;
+        public bool boundaryEnabled;
+        public float boundaryRectWidth;
+        public float boundaryRectHeight;
+        public float boundaryRectCenterOffsetX;
+        public float boundaryRectCenterOffsetY;
         public bool autoStart;
         public float defaultRunSeconds;
         public bool useNullRenderWorld;

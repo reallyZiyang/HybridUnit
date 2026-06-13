@@ -1,4 +1,5 @@
 using UnityEngine;
+using Game.Play.Battle.Runtime;
 
 namespace Game.Play.Battle.Rendering
 {
@@ -15,6 +16,7 @@ namespace Game.Play.Battle.Rendering
         void ShowHealText(Vector2 worldPosition, long value);
         void SetPaused(bool paused);
         void SetSortingGrid(float gridMinY, float cellSize);
+        void SetBattlefieldBoundary(BattlefieldBoundaryConfig config);
         void SetPosition(int renderHandle, Vector2 position);
         void SetRotation(int renderHandle, float angleDeg);
         void SetUnitFlipX(int renderHandle, bool flipX);

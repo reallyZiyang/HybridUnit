@@ -1,4 +1,5 @@
 using UnityEngine;
+using Game.Play.Battle.Runtime;
 
 namespace Game.Play.Battle.Rendering
 {
@@ -59,6 +60,11 @@ namespace Game.Play.Battle.Rendering
         public void SetSortingGrid(float gridMinY, float cellSize)
         {
             inner.SetSortingGrid(gridMinY, cellSize);
+        }
+
+        public void SetBattlefieldBoundary(BattlefieldBoundaryConfig config)
+        {
+            inner.SetBattlefieldBoundary(config);
         }
 
         public void SetPosition(int renderHandle, Vector2 position)
