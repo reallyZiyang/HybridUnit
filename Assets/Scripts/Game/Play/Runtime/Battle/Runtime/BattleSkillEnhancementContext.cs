@@ -80,6 +80,8 @@ namespace Game.Play.Battle.Runtime
         public static readonly BattleSkillEnhancementContext Empty = new();
 
         private RuntimeModifier[] modifiers = new RuntimeModifier[DefaultModifierCapacity];
+        private readonly BattleSkillPropertyStore skillPropertyStore = new();
+        private readonly BattleProjectilePropertyStore projectilePropertyStore = new();
         private BattleUnitManager units;
         private int modifierCount;
         private int version;
@@ -91,10 +93,19 @@ namespace Game.Play.Battle.Runtime
             units = unitManager;
         }
 
+        public void BindRuntime(BattleUnitManager unitManager, int unitCapacity, int slotsPerUnit)
+        {
+            units = unitManager;
+            skillPropertyStore.Initialize(unitCapacity, slotsPerUnit);
+            projectilePropertyStore.Initialize(unitCapacity, slotsPerUnit);
+        }
+
         public void Clear()
         {
             modifierCount = 0;
             version++;
+            skillPropertyStore.Clear();
+            projectilePropertyStore.Clear();
         }
 
         public void AddOrUpdate(ConfigBattle.SkillEnhancementCfg config, int stack)
@@ -122,6 +133,14 @@ namespace Game.Play.Battle.Runtime
             {
                 ApplyUnitModifierDelta(modifier, modifier.Stack - oldStack);
             }
+            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Skill)
+            {
+                skillPropertyStore.MarkAllDirty();
+            }
+            else if (modifier.TargetType == ConfigBattle.ModifierTargetType.Projectile)
+            {
+                projectilePropertyStore.MarkAllDirty();
+            }
         }
 
         public int ResolveSkillId(BattleUnitHandle owner, int localSlotIndex, int skillId)
@@ -144,27 +163,9 @@ namespace Game.Play.Battle.Runtime
             int cooldownMs,
             int animationMs)
         {
-            int attackSpeedBp = 0;
-            int cooldownReductionBp = 0;
-            for (int i = 0; i < modifierCount; i++)
-            {
-                ref RuntimeModifier modifier = ref modifiers[i];
-                if (!modifier.Match(owner, localSlotIndex, baseSkillId, skillId, units))
-                {
-                    continue;
-                }
-
-                int value = modifier.IntValue * modifier.Stack;
-                switch (modifier.SkillType)
-                {
-                    case ConfigBattle.SkillModifierType.AttackSpeed:
-                        attackSpeedBp += value;
-                        break;
-                    case ConfigBattle.SkillModifierType.CooldownReduction:
-                        cooldownReductionBp += value;
-                        break;
-                }
-            }
+            BattleSkillProperties properties = ResolveSkillProperties(owner, localSlotIndex, baseSkillId, skillId);
+            int attackSpeedBp = properties.attackSpeedBp;
+            int cooldownReductionBp = properties.cooldownReductionBp;
 
             int resolvedCastPreMs = ApplyAttackSpeed(castPreMs, attackSpeedBp);
             int resolvedCastBackMs = ApplyAttackSpeed(castBackMs, attackSpeedBp);
@@ -177,17 +178,7 @@ namespace Game.Play.Battle.Runtime
 
         public float ResolveAnimationSpeed(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId)
         {
-            int attackSpeedBp = 0;
-            for (int i = 0; i < modifierCount; i++)
-            {
-                ref RuntimeModifier modifier = ref modifiers[i];
-                if (modifier.SkillType == ConfigBattle.SkillModifierType.AttackSpeed
-                    && modifier.Match(owner, localSlotIndex, baseSkillId, skillId, units))
-                {
-                    attackSpeedBp += modifier.IntValue * modifier.Stack;
-                }
-            }
-
+            int attackSpeedBp = ResolveSkillProperties(owner, localSlotIndex, baseSkillId, skillId).attackSpeedBp;
             return (BasisPoint + Mathf.Max(0, attackSpeedBp)) / (float)BasisPoint;
         }
 
@@ -230,39 +221,14 @@ namespace Game.Play.Battle.Runtime
 
         public int ResolveProjectileId(BattleUnitHandle source, int projectileId, BattleEffectContext context)
         {
-            int resolvedProjectileId = projectileId;
-            for (int i = 0; i < modifierCount; i++)
-            {
-                ref RuntimeModifier modifier = ref modifiers[i];
-                if (modifier.SkillType != ConfigBattle.SkillModifierType.ReplaceProjectile
-                    || !modifier.Match(source, context.slotIndex, context.baseSkillId, context.skillId, units))
-                {
-                    continue;
-                }
-
-                if (modifier.IntValue > 0)
-                {
-                    resolvedProjectileId = modifier.IntValue;
-                }
-            }
-
-            return resolvedProjectileId;
+            BattleProjectileProperties properties = ResolveProjectileProperties(source, context.slotIndex, context.baseSkillId, context.skillId);
+            return properties.replaceProjectileId > 0 ? properties.replaceProjectileId : projectileId;
         }
 
         public int ResolveProjectileCount(BattleUnitHandle source, int projectileId, BattleEffectContext context, int baseCount)
         {
-            int count = Mathf.Max(1, baseCount);
-            for (int i = 0; i < modifierCount; i++)
-            {
-                ref RuntimeModifier modifier = ref modifiers[i];
-                if (modifier.SkillType == ConfigBattle.SkillModifierType.ProjectileNum
-                    && modifier.Match(source, context.slotIndex, context.baseSkillId, context.skillId, units))
-                {
-                    count += modifier.IntValue * modifier.Stack;
-                }
-            }
-
-            return Mathf.Max(1, count);
+            BattleSkillProperties properties = ResolveSkillProperties(source, context.slotIndex, context.baseSkillId, context.skillId);
+            return Mathf.Max(1, Mathf.Max(1, baseCount) + properties.projectileNumAdd);
         }
 
         public int ResolveProjectileLifetimeMs(BattleUnitHandle source, int projectileId, BattleEffectContext context, int lifetimeMs)
@@ -272,18 +238,8 @@ namespace Game.Play.Battle.Runtime
 
         public int ResolveProjectilePierceCount(BattleUnitHandle source, int projectileId, BattleEffectContext context, int pierceCount)
         {
-            int resolved = Mathf.Max(1, pierceCount);
-            for (int i = 0; i < modifierCount; i++)
-            {
-                ref RuntimeModifier modifier = ref modifiers[i];
-                if (modifier.SkillType == ConfigBattle.SkillModifierType.ProjectilePierce
-                    && modifier.Match(source, context.slotIndex, context.baseSkillId, context.skillId, units))
-                {
-                    resolved += modifier.IntValue * modifier.Stack;
-                }
-            }
-
-            return Mathf.Max(1, resolved);
+            BattleProjectileProperties properties = ResolveProjectileProperties(source, context.slotIndex, context.baseSkillId, context.skillId);
+            return Mathf.Max(1, Mathf.Max(1, pierceCount) + properties.pierceAdd);
         }
 
         public float ResolveProjectileSpeed(BattleUnitHandle source, int projectileId, BattleEffectContext context, float speed)
@@ -303,18 +259,99 @@ namespace Game.Play.Battle.Runtime
 
         public float ResolveProjectileHitAreaRadius(BattleUnitHandle source, int projectileId, BattleEffectContext context)
         {
-            int radiusMilli = 0;
+            BattleProjectileProperties properties = ResolveProjectileProperties(source, context.slotIndex, context.baseSkillId, context.skillId);
+            return Mathf.Max(0f, properties.hitAreaMilli / 1000f);
+        }
+
+        public BattleSkillProperties ResolveSkillProperties(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId)
+        {
+            if (skillPropertyStore.TryGetCached(owner, localSlotIndex, out BattleSkillProperties properties))
+            {
+                return properties;
+            }
+
+            properties = BuildSkillProperties(owner, localSlotIndex, baseSkillId, skillId);
+            skillPropertyStore.Set(owner, localSlotIndex, properties);
+            return properties;
+        }
+
+        public BattleProjectileProperties ResolveProjectileProperties(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId)
+        {
+            if (projectilePropertyStore.TryGetCached(owner, localSlotIndex, out BattleProjectileProperties properties))
+            {
+                return properties;
+            }
+
+            properties = BuildProjectileProperties(owner, localSlotIndex, baseSkillId, skillId);
+            projectilePropertyStore.Set(owner, localSlotIndex, properties);
+            return properties;
+        }
+
+        private BattleSkillProperties BuildSkillProperties(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId)
+        {
+            int projectileNumAdd = 0;
+            int attackSpeedBp = 0;
+            int cooldownReductionBp = 0;
             for (int i = 0; i < modifierCount; i++)
             {
                 ref RuntimeModifier modifier = ref modifiers[i];
-                if (modifier.SkillType == ConfigBattle.SkillModifierType.ProjectileHitArea
-                    && modifier.Match(source, context.slotIndex, context.baseSkillId, context.skillId, units))
+                if (modifier.TargetType != ConfigBattle.ModifierTargetType.Skill
+                    || !modifier.Match(owner, localSlotIndex, baseSkillId, skillId, units))
                 {
-                    radiusMilli += modifier.IntValue * modifier.Stack;
+                    continue;
+                }
+
+                int value = modifier.IntValue * modifier.Stack;
+                switch (modifier.SkillType)
+                {
+                    case ConfigBattle.SkillModifierType.ProjectileNum:
+                        projectileNumAdd += value;
+                        break;
+                    case ConfigBattle.SkillModifierType.AttackSpeed:
+                        attackSpeedBp += value;
+                        break;
+                    case ConfigBattle.SkillModifierType.CooldownReduction:
+                        cooldownReductionBp += value;
+                        break;
                 }
             }
 
-            return Mathf.Max(0f, radiusMilli / 1000f);
+            return new BattleSkillProperties(projectileNumAdd, attackSpeedBp, cooldownReductionBp);
+        }
+
+        private BattleProjectileProperties BuildProjectileProperties(BattleUnitHandle owner, int localSlotIndex, int baseSkillId, int skillId)
+        {
+            int replaceProjectileId = 0;
+            int pierceAdd = 0;
+            int hitAreaMilli = 0;
+            for (int i = 0; i < modifierCount; i++)
+            {
+                ref RuntimeModifier modifier = ref modifiers[i];
+                if (modifier.TargetType != ConfigBattle.ModifierTargetType.Projectile
+                    || !modifier.Match(owner, localSlotIndex, baseSkillId, skillId, units))
+                {
+                    continue;
+                }
+
+                int value = modifier.IntValue * modifier.Stack;
+                switch (modifier.ProjectileType)
+                {
+                    case ConfigBattle.ProjectileModifierType.ReplaceProjectile:
+                        if (modifier.IntValue > 0)
+                        {
+                            replaceProjectileId = modifier.IntValue;
+                        }
+                        break;
+                    case ConfigBattle.ProjectileModifierType.ProjectilePierce:
+                        pierceAdd += value;
+                        break;
+                    case ConfigBattle.ProjectileModifierType.ProjectileHitArea:
+                        hitAreaMilli += value;
+                        break;
+                }
+            }
+
+            return new BattleProjectileProperties(replaceProjectileId, pierceAdd, hitAreaMilli);
         }
 
         private int IndexOf(int enhancementId)
@@ -411,6 +448,7 @@ namespace Game.Play.Battle.Runtime
             public readonly int[] SkillIds;
             public readonly ConfigBattle.ModifierTargetType TargetType;
             public readonly ConfigBattle.SkillModifierType SkillType;
+            public readonly ConfigBattle.ProjectileModifierType ProjectileType;
             public readonly int ModifierType;
             public readonly Game.Data.Configs.Attr.ValueType ValueType;
             public readonly int IntValue;
@@ -427,6 +465,7 @@ namespace Game.Play.Battle.Runtime
                 int[] skillIds,
                 ConfigBattle.ModifierTargetType targetType,
                 ConfigBattle.SkillModifierType skillType,
+                ConfigBattle.ProjectileModifierType projectileType,
                 int modifierType,
                 Game.Data.Configs.Attr.ValueType valueType,
                 int intValue)
@@ -442,6 +481,7 @@ namespace Game.Play.Battle.Runtime
                 SkillIds = skillIds ?? Array.Empty<int>();
                 TargetType = targetType;
                 SkillType = skillType;
+                ProjectileType = projectileType;
                 ModifierType = modifierType;
                 ValueType = valueType;
                 IntValue = intValue;
@@ -464,6 +504,7 @@ namespace Game.Play.Battle.Runtime
                     skillSelector?.SkillIds,
                     config.TargetType,
                     (ConfigBattle.SkillModifierType)config.ModifierType,
+                    (ConfigBattle.ProjectileModifierType)config.ModifierType,
                     config.ModifierType,
                     value?.Type ?? Game.Data.Configs.Attr.ValueType.Null,
                     value?.IntValue ?? 0);

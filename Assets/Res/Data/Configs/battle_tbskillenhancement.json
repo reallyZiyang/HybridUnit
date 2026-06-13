@@ -72,8 +72,8 @@
       "slotIndex": 0,
       "skillIds": []
     },
-    "targetType": 2,
-    "modifierType": 4,
+    "targetType": 3,
+    "modifierType": 1,
     "value": {
       "type": 1,
       "intValue": 6003
@@ -101,8 +101,8 @@
       "slotIndex": 0,
       "skillIds": []
     },
-    "targetType": 2,
-    "modifierType": 6,
+    "targetType": 3,
+    "modifierType": 3,
     "value": {
       "type": 1,
       "intValue": 1200
@@ -130,8 +130,8 @@
       "slotIndex": 0,
       "skillIds": []
     },
-    "targetType": 2,
-    "modifierType": 5,
+    "targetType": 3,
+    "modifierType": 2,
     "value": {
       "type": 1,
       "intValue": 1

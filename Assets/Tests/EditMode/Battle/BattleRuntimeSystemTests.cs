@@ -495,6 +495,36 @@ namespace Game.Play.Tests.Battle
         }
 
         [Test]
+        public void SkillEnhancement_PropertyStoresCacheByHeroBasicAttackSlot()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+            BattleUnitHandle hero = battle.SpawnUnit(1001, Vector2.zero, 1);
+
+            enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(9001), 1);
+            enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(9002), 1);
+            enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(9003), 1);
+            enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(9004), 1);
+            enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(9005), 1);
+
+            BattleSkillProperties skillProperties = enhancements.ResolveSkillProperties(hero, 0, 2001, 2001);
+            BattleProjectileProperties projectileProperties = enhancements.ResolveProjectileProperties(hero, 0, 2001, 2001);
+            Assert.AreEqual(1, skillProperties.projectileNumAdd);
+            Assert.AreEqual(2000, skillProperties.attackSpeedBp);
+            Assert.AreEqual(0, skillProperties.cooldownReductionBp);
+            Assert.AreEqual(6003, projectileProperties.replaceProjectileId);
+            Assert.AreEqual(1, projectileProperties.pierceAdd);
+            Assert.AreEqual(1200, projectileProperties.hitAreaMilli);
+
+            Assert.AreEqual(0, enhancements.ResolveSkillProperties(hero, 1, 2001, 2001).projectileNumAdd);
+            Assert.AreEqual(0, enhancements.ResolveProjectileProperties(hero, 1, 2001, 2001).replaceProjectileId);
+
+            enhancements.AddOrUpdate(tables.TbSkillEnhancement.Get(9001), 2);
+            Assert.AreEqual(2, enhancements.ResolveSkillProperties(hero, 0, 2001, 2001).projectileNumAdd);
+        }
+
+        [Test]
         public void SkillEnhancement_UnitSelectorsRequireAllConfiguredConditions()
         {
             Tables tables = LoadTables();

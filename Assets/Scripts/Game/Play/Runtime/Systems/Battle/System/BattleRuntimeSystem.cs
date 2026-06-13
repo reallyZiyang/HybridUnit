@@ -106,7 +106,7 @@ namespace Game.Play.Systems.Battle.System
             facing = new BattleUnitFacingController(UnitManager, this.renderWorld, unitCapacity);
             interception = new BattleInterceptionSystem(UnitManager, unitCapacity);
             int slotsPerUnit = Mathf.Max(1, RuntimeData.MaxDefaultSkillCount, skillSlotsPerUnit);
-            this.skillEnhancementContext.BindUnits(UnitManager);
+            this.skillEnhancementContext.BindRuntime(UnitManager, unitCapacity, slotsPerUnit);
             skills = new BattleSkillManager(RuntimeData, UnitManager, CollisionManager, interception, effects, this.skillEnhancementContext, this.renderWorld, facing, unitCapacity, slotsPerUnit, unitCapacity);
             ai = new BattleAISystem(UnitManager, CollisionManager, skills, interception, this.renderWorld, facing, unitCapacity);
             push = new BattlePushSystem(UnitManager, CollisionManager, skills, unitCapacity, unitCapacity);

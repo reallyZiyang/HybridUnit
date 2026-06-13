@@ -14,7 +14,7 @@ namespace Game.Data.Configs.Battle
     /// <summary>
     /// ??????
     /// </summary>
-    public enum SkillModifierType
+    public enum ProjectileModifierType
     {
         /// <summary>
         /// ?
@@ -23,15 +23,15 @@ namespace Game.Data.Configs.Battle
         /// <summary>
         /// ??????
         /// </summary>
-        ProjectileNum = 1,
+        ReplaceProjectile = 1,
         /// <summary>
-        /// ????
+        /// ??????
         /// </summary>
-        AttackSpeed = 2,
+        ProjectilePierce = 2,
         /// <summary>
-        /// ????
+        /// ??????
         /// </summary>
-        CooldownReduction = 3,
+        ProjectileHitArea = 3,
     }
 
 } 
