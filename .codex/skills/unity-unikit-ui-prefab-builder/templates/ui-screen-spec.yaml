@@ -1,0 +1,58 @@
+# Copy this file for each UI screen and replace all example values.
+screen_name: MainMenuView
+bucket: Menu
+ui_type: View
+namespace: Game.Play.UI.View.Menu
+class_name: MainMenuView
+mockup: UI_Mockups/01_main_menu.png
+target_resolution:
+  width: 1080
+  height: 1920
+prefab:
+  path: Assets/Res/UI/Views/Menu/Prefabs/Views/UI_MainMenuView.prefab
+  yoo_key: UI_MainMenuView
+runtime:
+  script_path: Assets/Scripts/Game/Play/Runtime/UI/View/Menu/MainMenuView.cs
+  data_type: MainMenuData
+  refresh_method: Render
+sprites:
+  - name: Menu_Background
+    source: UI_Mockups/assets/Menu_Background.png
+    destination: Assets/Res/UI/Views/Menu/Sprites/Menu_Background.png
+    atlas: SA_UI_Menu
+  - name: Icon_Gold
+    source: UI_Mockups/assets/Icon_Gold.png
+    destination: Assets/Res/UI/Common/Sprites/Icon/Icon_Gold.png
+    atlas: SA_UI_Icon
+bindings:
+  - name: BtnStart
+    component: Button
+    access: private
+    purpose: open battle
+  - name: TxtGold
+    component: TextMeshProUGUI
+    access: private
+    purpose: show gold amount
+  - name: ImgBackground
+    component: Image
+    access: private
+    purpose: show menu background
+  - name: ListRewards
+    component: ListView
+    access: private
+    purpose: render reward entries
+buttons:
+  - binding: BtnStart
+    handler: OnClickStart
+lists:
+  - binding: ListRewards
+    data_type: RewardData
+    item_type: RewardItem
+    renderer: BindItems
+runtime_data:
+  - name: gold
+    type: int
+    target_binding: TxtGold
+acceptance_screenshots:
+  - mockup: UI_Mockups/01_main_menu.png
+    viewport: 1080x1920

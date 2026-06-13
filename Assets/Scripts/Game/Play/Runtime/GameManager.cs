@@ -1,8 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Game.Play.Adapters;
-using Game.Play.Debugging;
+using Game.Play.Systems.Level.Command;
 using UniKit.Asset;
-using UniKit.Localization;
 using UniKit.UI;
 using UnityEngine;
 
@@ -74,7 +73,7 @@ namespace Game.Play
         {
             var context = GameContext.Instance;
             await context.InitAsync();
-            FindObjectOfType<BattleRuntimeDebugLauncher>().enabled = true;
+            context.SendCommand(new OpenMainMenuCommand());
         }
     }
 }

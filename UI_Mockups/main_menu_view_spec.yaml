@@ -1,0 +1,48 @@
+screen_name: MainMenuView
+bucket: Menu
+ui_type: View
+namespace: Game.Play.UI.View.Menu
+class_name: MainMenuView
+mockup: UI_Mockups/ig_03a3dfe951245513016a2d0acd3540819180d8cd78ec698754.png
+target_resolution:
+  width: 1080
+  height: 1920
+prefab:
+  path: Assets/Res/UI/Views/Menu/Prefabs/Views/UI_MainMenuView.prefab
+  yoo_key: UI_MainMenuView
+runtime:
+  script_path: Assets/Scripts/Game/Play/Runtime/UI/View/Menu/MainMenuView.cs
+  data_type: MainMenuData
+  refresh_method: Render
+sprites:
+  - name: Menu_MainBackground
+    source: Assets/Res/UI/Views/Menu/Sprites/Menu_MainBackground.png
+    destination: Assets/Res/UI/Views/Menu/Sprites/Menu_MainBackground.png
+    atlas: SA_UI_Menu
+  - name: Menu_TitleLogo
+    source: Assets/Res/UI/Views/Menu/Sprites/Menu_TitleLogo.png
+    destination: Assets/Res/UI/Views/Menu/Sprites/Menu_TitleLogo.png
+    atlas: SA_UI_Menu
+  - name: Menu_SubtitleBanner
+    source: Assets/Res/UI/Views/Menu/Sprites/Menu_SubtitleBanner.png
+    destination: Assets/Res/UI/Views/Menu/Sprites/Menu_SubtitleBanner.png
+    atlas: SA_UI_Menu
+  - name: Menu_BattleCore
+    source: Assets/Res/UI/Views/Menu/Sprites/Menu_BattleCore.png
+    destination: Assets/Res/UI/Views/Menu/Sprites/Menu_BattleCore.png
+    atlas: SA_UI_Menu
+  - name: Menu_ButtonStart
+    source: Assets/Res/UI/Views/Menu/Sprites/Menu_ButtonStart.png
+    destination: Assets/Res/UI/Views/Menu/Sprites/Menu_ButtonStart.png
+    atlas: SA_UI_Menu
+bindings:
+  - name: BtnStart
+    component: Button
+    access: private
+    purpose: start battle entry
+buttons:
+  - binding: BtnStart
+    handler: OnClickStart
+acceptance_screenshots:
+  - mockup: UI_Mockups/ig_03a3dfe951245513016a2d0acd3540819180d8cd78ec698754.png
+    viewport: 1080x1920

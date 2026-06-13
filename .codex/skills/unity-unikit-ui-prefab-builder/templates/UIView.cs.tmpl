@@ -1,0 +1,24 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UniKit.UI.Core;
+using UniKit.UI.Core.Interfaces;
+using UniKit.UI.Core.Wrappers;
+using Game.Play;
+
+namespace {{namespace}}
+{
+    public partial class {{class_name}} : UIView
+    {
+        protected override void OnInit()
+        {
+{{button_handlers}}
+        }
+
+        public void {{refresh_method}}({{data_type}} data)
+        {
+{{refresh_body}}
+        }
+
+{{handler_methods}}
+    }
+}

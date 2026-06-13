@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db675a5667228d94b99f256dce32a038, type: 3}
+  m_Name: TestBattleScenario
+  m_EditorClassIdentifier: 
+  scenarioName: Test Battle Scenario
+  logicStepMs: 50
+  gridMin: {x: -10, y: -10}
+  gridWidth: 20
+  gridHeight: 30
+  cellSize: 1
+  boundaryEnabled: 1
+  boundaryRectWidth: 15
+  boundaryRectHeight: 25
+  boundaryRectCenterOffset: {x: 0, y: 9.98}
+  autoStart: 1
+  defaultRunSeconds: 10
+  useNullRenderWorld: 0
+  spawnMultiplierPreset: 0
+  customSpawnMultiplier: 5
+  playerUnits:
+  - enabled: 1
+    label: Player
+    unitCfgId: 1002
+    spawnCount: 80
+    spawnSpacing: 0.05
+    camp: 1
+    position: {x: -6.419846, y: 17.576763}
+    overrideRadius: 0
+    radius: 0
+    overrideLayer: 0
+    layer: 0
+    renderKey: 
+    skillIds: 
+    attrs: []
+  - enabled: 1
+    label: Player 2
+    unitCfgId: 1002
+    spawnCount: 80
+    spawnSpacing: 0.05
+    camp: 1
+    position: {x: -0.07613914, y: 18.771399}
+    overrideRadius: 0
+    radius: 0
+    overrideLayer: 0
+    layer: 0
+    renderKey: 
+    skillIds: 
+    attrs: []
+  - enabled: 1
+    label: Player 3
+    unitCfgId: 1002
+    spawnCount: 80
+    spawnSpacing: 0.05
+    camp: 1
+    position: {x: 6.770194, y: 17.564697}
+    overrideRadius: 0
+    radius: 0
+    overrideLayer: 0
+    layer: 0
+    renderKey: 
+    skillIds: 
+    attrs: []
+  enemyUnits:
+  - enabled: 1
+    label: Enemy
+    unitCfgId: 1001
+    spawnCount: 50
+    spawnSpacing: 0.26
+    camp: 2
+    position: {x: -0.16872837, y: 0.26787692}
+    overrideRadius: 0
+    radius: 0
+    overrideLayer: 0
+    layer: 0
+    renderKey: 
+    skillIds: 
+    attrs: []
+  - enabled: 1
+    label: Enemy 2
+    unitCfgId: 1002
+    spawnCount: 10
+    spawnSpacing: 0.16
+    camp: 2
+    position: {x: -0.0059186225, y: 10.147931}
+    overrideRadius: 0
+    radius: 0
+    overrideLayer: 0
+    layer: 0
+    renderKey: 
+    skillIds: 
+    attrs: []
+  units: []

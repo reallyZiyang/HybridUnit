@@ -1,0 +1,17 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UniKit.UI.Core;
+using UniKit.UI.Core.Data;
+using Game.Play;
+
+namespace {{namespace}}
+{
+    public partial class {{class_name}} : UINode
+    {
+        [UIDataReceiver]
+        public void {{refresh_method}}({{data_type}} data)
+        {
+{{refresh_body}}
+        }
+    }
+}

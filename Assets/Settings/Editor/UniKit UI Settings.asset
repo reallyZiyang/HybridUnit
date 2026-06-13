@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 059241c624e4b1f409cf8cc45b7a79c6, type: 3}
+  m_Name: UniKit UI Settings
+  m_EditorClassIdentifier: 
+  outputBindingName: Bindings.cs
+  outputPaths:
+  - source: Assets/Res/UI
+    target: Assets/Scripts/Game/Play/Runtime/UI/View
+    nameSpace: Game.Play.UI.View
+  components:
+  - isCollection: 0
+    type: Text
+    nameSpace: 
+    prefix: Txt
+    suffix: 
+  - isCollection: 0
+    type: TextMeshProUGUI
+    nameSpace: TMPro
+    prefix: Txt
+    suffix: 
+  - isCollection: 0
+    type: Button
+    nameSpace: 
+    prefix: Btn
+    suffix: 
+  - isCollection: 0
+    type: Toggle
+    nameSpace: 
+    prefix: Tog
+    suffix: 
+  - isCollection: 0
+    type: Slider
+    nameSpace: 
+    prefix: Sld
+    suffix: 
+  - isCollection: 0
+    type: InputField
+    nameSpace: 
+    prefix: Input
+    suffix: 
+  - isCollection: 0
+    type: TMP_InputField
+    nameSpace: TMPro
+    prefix: Input
+    suffix: 
+  - isCollection: 0
+    type: Image
+    nameSpace: 
+    prefix: Img
+    suffix: 
+  - isCollection: 0
+    type: Dropdown
+    nameSpace: 
+    prefix: Ddl
+    suffix: 
+  - isCollection: 0
+    type: ListItems
+    nameSpace: UniKit.UI.Core.Wrappers
+    prefix: 
+    suffix: 
+  - isCollection: 0
+    type: ListView
+    nameSpace: UniKit.UI.Core.Wrappers
+    prefix: List
+    suffix: 
+  - isCollection: 0
+    type: ScrollView
+    nameSpace: UniKit.UI.Core.Wrappers
+    prefix: Scroll
+    suffix: 
+  - isCollection: 0
+    type: InfiniteScrollView
+    nameSpace: UniKit.UI.Core.Wrappers
+    prefix: Scroll
+    suffix: 
+  viewReferences: []

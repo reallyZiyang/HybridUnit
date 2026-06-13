@@ -1,0 +1,7 @@
+interface:
+  display_name: "UniKit UI Prefab Builder"
+  short_description: "Build UniKit UI prefabs from mockups."
+  default_prompt: "Use $unity-unikit-ui-prefab-builder to create a UniKit UI prefab from the provided effect image and place all prefab, sprite, font, material, and runtime code assets in the correct project paths."
+
+policy:
+  allow_implicit_invocation: true

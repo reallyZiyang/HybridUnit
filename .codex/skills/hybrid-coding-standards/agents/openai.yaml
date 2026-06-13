@@ -1,0 +1,7 @@
+interface:
+  display_name: "Hybrid Coding Standards"
+  short_description: "Hybrid Unity/UniKit coding workflow guardrails."
+  default_prompt: "Use $hybrid-coding-standards to implement this Hybrid Unity change with repository-first exploration, minimal edits, and clear validation."
+
+policy:
+  allow_implicit_invocation: false

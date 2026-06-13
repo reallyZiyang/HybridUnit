@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TMP_Result_LabelDark
+  m_Shader: {fileID: 4800000, guid: 6931cf4c7f3dd8b4f94eb0f9f6d979ea, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 238097190282950135, guid: e4a4dd3c603534348b2271d0d681a9b4, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _GradientScale: 3
+    - _TextureWidth: 2048
+    - _TextureHeight: 2048
+    - _WeightNormal: 0
+    - _WeightBold: 0.75
+    - _OutlineWidth: 0
+    - _OutlineSoftness: 0
+    - _FaceDilate: 0
+    - _UnderlayOffsetX: 0
+    - _UnderlayOffsetY: 0
+    - _UnderlaySoftness: 0
+    - _UnderlayDilate: 0.08
+    - _ScaleRatioA: 0.6666667
+    - _ScaleRatioB: 0.5416667
+    - _ScaleRatioC: 0.5416667
+    - _StencilComp: 8
+    - _Stencil: 0
+    - _StencilOp: 0
+    - _StencilWriteMask: 255
+    - _StencilReadMask: 255
+    - _ColorMask: 15
+    - _CullMode: 0
+    m_Colors:
+    - _FaceColor: {r: 0.180392, g: 0.160784, b: 0.121569, a: 1}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 0}
+    - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0}
+    - _GlowColor: {r: 0, g: 1, b: 0, a: 0.5}
+    - _ClipRect: {r: -32767, g: -32767, b: 32767, a: 32767}
+  m_BuildTextureStacks: []

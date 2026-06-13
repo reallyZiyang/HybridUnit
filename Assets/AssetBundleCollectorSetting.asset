@@ -25,13 +25,105 @@ MonoBehaviour:
     AutoCollectShaders: 1
     IgnoreRuleName: NormalIgnoreRule
     Groups:
-    - GroupName: Default Group
+    - GroupName: Config
       GroupDesc: 
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
-      - CollectPath: Assets/Res
-        CollectorGUID: f9adbd9738287274d9a808a212c72a2b
+      - CollectPath: Assets/Res/Data
+        CollectorGUID: b9d70081fd8b39544bc88d4178358484
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+    - GroupName: Render
+      GroupDesc: 
+      AssetTags: 
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/Res/Render
+        CollectorGUID: 7ffc3063ad7ade141a9ca27402bdce18
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+    - GroupName: Shader
+      GroupDesc: 
+      AssetTags: 
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/Res/Shader
+        CollectorGUID: cf778a1a45f00ce4fa83faff8a4c4b2a
+        CollectorType: 1
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+    - GroupName: UI
+      GroupDesc: 
+      AssetTags: 
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/Res/UI/Atlas
+        CollectorGUID: 9511e1195dbf828498c8617a219c6041
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+      - CollectPath: Assets/Res/UI/Views
+        CollectorGUID: 851f20f359f1fe040b208ad6529edc2f
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectPrefab
+        AssetTags: 
+        UserData: 
+      - CollectPath: Assets/Res/UI/Common
+        CollectorGUID: 0a7a8e906b4e75f4a91dd11a169e6ae7
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectPrefab
+        AssetTags: 
+        UserData: 
+      - CollectPath: Assets/Res/UI/Common/Font
+        CollectorGUID: 4b7b1511513aad74688767015fa577fd
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+      - CollectPath: Assets/Res/UI/Common/Material
+        CollectorGUID: 51a735a665235d74bb0101f0c82c4319
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+      - CollectPath: Assets/Res/UI/Common/Shader
+        CollectorGUID: 1ef2bdb46e49b3246a8f8c797121eddc
+        CollectorType: 1
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
+    - GroupName: Battle
+      GroupDesc: 
+      AssetTags: 
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/Res/Battle
+        CollectorGUID: 8ebade74094c44c4d8c8c76e248e0282
         CollectorType: 0
         AddressRuleName: AddressByFileName
         PackRuleName: PackDirectory
