@@ -61,125 +61,17 @@ namespace Game.Data.Configs.Sys
         /// </summary>
         Main = 100,
         /// <summary>
-        /// 主界面菜单
+        /// 战斗
         /// </summary>
-        MainMenu = 10001,
+        Battle = 200,
         /// <summary>
-        /// 玩家信息
+        /// 结算
         /// </summary>
-        Player = 10101,
+        BattleResult = 20001,
         /// <summary>
-        /// 玩家兑换码
+        /// 三选一
         /// </summary>
-        PlayerCDK = 1010101,
-        /// <summary>
-        /// 玩家黑名单
-        /// </summary>
-        PlayerBlacklist = 1010102,
-        /// <summary>
-        /// 玩家改名
-        /// </summary>
-        PlayerRename = 1010103,
-        /// <summary>
-        /// 玩家晋升
-        /// </summary>
-        PlayerAdvance = 1010104,
-        /// <summary>
-        /// 背包
-        /// </summary>
-        ItemBackpack = 10102,
-        /// <summary>
-        /// 道具
-        /// </summary>
-        ItemMisc = 1010201,
-        /// <summary>
-        /// 合成
-        /// </summary>
-        ItemCrafting = 1010202,
-        /// <summary>
-        /// 衣柜
-        /// </summary>
-        Wardrobe = 10103,
-        /// <summary>
-        /// 时装
-        /// </summary>
-        Fashion = 10110301,
-        /// <summary>
-        /// 幻铠
-        /// </summary>
-        Armor = 10110302,
-        /// <summary>
-        /// 载具
-        /// </summary>
-        Mounts = 10110303,
-        /// <summary>
-        /// 头像
-        /// </summary>
-        Avatar = 10110304,
-        /// <summary>
-        /// 称号
-        /// </summary>
-        Title = 10110305,
-        /// <summary>
-        /// 邮件
-        /// </summary>
-        Mail = 10104,
-        /// <summary>
-        /// 图鉴
-        /// </summary>
-        Illustrations = 10105,
-        /// <summary>
-        /// 任务
-        /// </summary>
-        Quest = 10106,
-        /// <summary>
-        /// 自动设置
-        /// </summary>
-        AutoSettings = 10107,
-        /// <summary>
-        /// 冒险关卡
-        /// </summary>
-        AdventureLevel = 10108,
-        /// <summary>
-        /// 阵地晋升
-        /// </summary>
-        ChestLvl = 10109,
-        /// <summary>
-        /// 背饰
-        /// </summary>
-        Back = 10110,
-        /// <summary>
-        /// 公会
-        /// </summary>
-        Guild = 200,
-        /// <summary>
-        /// 领地
-        /// </summary>
-        Territory = 300,
-        /// <summary>
-        /// 商店
-        /// </summary>
-        Shop = 400,
-        /// <summary>
-        /// 挑战
-        /// </summary>
-        Challenge = 500,
-        /// <summary>
-        /// 副本
-        /// </summary>
-        Dungeon = 600,
-        /// <summary>
-        /// 战斗副本
-        /// </summary>
-        Battle = 10000,
-        /// <summary>
-        /// 冒险战斗副本
-        /// </summary>
-        AdventureBattle = 1000001,
-        /// <summary>
-        /// 调试战斗副本
-        /// </summary>
-        DebugBattle = 1000002,
+        RougueChoosen = 20002,
     }
 
 } 

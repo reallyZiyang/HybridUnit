@@ -1,0 +1,106 @@
+[
+  {
+    "id": 10,
+    "name": "通用",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 11,
+    "name": "通用进度加载",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 12,
+    "name": "通用弹出信息",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 13,
+    "name": "通用弹出提示",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 14,
+    "name": "通用系统介绍",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 20,
+    "name": "登录",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 21,
+    "name": "登录服务器列表",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 22,
+    "name": "适龄提示",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 23,
+    "name": "公告",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 100,
+    "name": "主界面",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 200,
+    "name": "战斗",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 20001,
+    "name": "结算",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  },
+  {
+    "id": 20002,
+    "name": "三选一",
+    "icon": "",
+    "unlockCondition": [],
+    "unlockPopup": false,
+    "group": 0
+  }
+]

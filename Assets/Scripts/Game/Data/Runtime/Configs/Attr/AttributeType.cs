@@ -14,6 +14,7 @@ namespace Game.Data.Configs.Attr
     /// <summary>
     /// 属性类型
     /// </summary>
+    [System.Flags]
     public enum AttributeType
     {
         /// <summary>

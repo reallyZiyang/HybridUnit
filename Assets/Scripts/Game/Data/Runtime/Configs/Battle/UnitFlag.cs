@@ -14,6 +14,7 @@ namespace Game.Data.Configs.Battle
     /// <summary>
     /// 单位运行时标记
     /// </summary>
+    [System.Flags]
     public enum UnitFlag
     {
         /// <summary>

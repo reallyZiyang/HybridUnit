@@ -16,6 +16,7 @@ public partial class Tables
 {
     public Global.TbGlobal TbGlobal {get; }
     public Global.TbLocalization TbLocalization {get; }
+    public Sys.TbSystem TbSystem {get; }
     public Animal.TbAnimal TbAnimal {get; }
     public Battle.TbUnit TbUnit {get; }
     public Battle.TbSkill TbSkill {get; }
@@ -31,6 +32,7 @@ public partial class Tables
     {
         TbGlobal = new Global.TbGlobal(loader("global_tbglobal"));
         TbLocalization = new Global.TbLocalization(loader("global_tblocalization"));
+        TbSystem = new Sys.TbSystem(loader("sys_tbsystem"));
         TbAnimal = new Animal.TbAnimal(loader("animal_tbanimal"));
         TbUnit = new Battle.TbUnit(loader("battle_tbunit"));
         TbSkill = new Battle.TbSkill(loader("battle_tbskill"));
@@ -48,6 +50,7 @@ public partial class Tables
     {
         TbGlobal.ResolveRef(this);
         TbLocalization.ResolveRef(this);
+        TbSystem.ResolveRef(this);
         TbAnimal.ResolveRef(this);
         TbUnit.ResolveRef(this);
         TbSkill.ResolveRef(this);

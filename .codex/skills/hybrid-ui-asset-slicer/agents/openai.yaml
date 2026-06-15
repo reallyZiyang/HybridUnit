@@ -1,7 +1,7 @@
 interface:
   display_name: "Hybrid UI Asset Slicer"
-  short_description: "Generate and slice textless prototype UI and battle sprites."
-  default_prompt: "Use $hybrid-ui-asset-slicer to generate a chroma-green textless asset sheet from the provided reference mockup, slice transparent PNGs into UI_Mockups/AssetSlices_Prototype, split progress bars into bg/fill layers, reject unintended baked text, and validate the output. Use Unity TMP for normal UI text; only explicit title-art exceptions may contain lettering. Put outputs with either dimension greater than 1024px under Assets/Res/UI/Common/Sprites/Large/."
+  short_description: "Generate effect-first Hybrid UI mockups and matching slices by view."
+  default_prompt: "Use $hybrid-ui-asset-slicer to generate one view at a time under UI_Mockups/UI. Generate the final 1080x1920 *_Effect.png directly and treat it as the visual source of truth; never use a combined A/B/C/D four-panel mockup as the target or reference. Then generate strongly constrained chroma-green source sheets from the matching effect mockup and A V2 base style, requiring each asset to copy the effect element's silhouette, proportions, palette, border thickness, material, highlight style, and facing direction. Slice by true bounds into UI_Mockups/UI/素材/{Common/基础风格|Menu|Battle|Result|Loading}, save sources in {View}_source, and create {View}_preview.png. Use Unity TMP for normal UI text; only explicit title/logo/ribbon/banner title-art exceptions may contain lettering. Do not write Assets/Res/UI or generate .meta files."
 
 policy:
   allow_implicit_invocation: true

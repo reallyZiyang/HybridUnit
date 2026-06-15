@@ -14,6 +14,7 @@ namespace Game.Data.Configs.Battle
     /// <summary>
     /// 单位定位标记
     /// </summary>
+    [System.Flags]
     public enum UnitRoleFlag
     {
         /// <summary>

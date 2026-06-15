@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+"""Legacy fixed-output prototype slicer.
+
+This script predates the current Hybrid mockup asset workflow. It writes the
+old hard-coded `UI_Mockups/AssetSlices_Prototype` output and should not be used
+for the current `UI_Mockups/UI/素材/{Common/基础风格|Menu|Battle|Result}`
+deliverables unless the user explicitly asks for the legacy prototype output.
+
+Use `slice_asset_sheet.py` with a manifest of true asset bounds for the current
+workflow.
+"""
 from __future__ import annotations
 
 import argparse

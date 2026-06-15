@@ -1,133 +1,157 @@
 ---
 name: hybrid-ui-asset-slicer
-description: Generate and slice prototype Unity UI and 2D battle sprites for the Hybrid project from a reference effect image. Use when producing transparent PNG cutouts for roguelike battle UI, hero/monster sprites, skill icons, textless buttons, panels, cards, settings icons, title-art exceptions, or split progress bars under UI_Mockups/AssetSlices_Prototype. Enforce that normal UI text is made in Unity TMP, not baked into cutout PNGs.
+description: Generate effect-first Hybrid UI 1080x1920 mockups and strongly constrained transparent PNG slices under UI_Mockups/UI. Use when producing per-view Menu, Battle, Result, Loading, upgrade-selection mockups, base-style common UI, title-art exceptions, textless buttons/panels/cards/bars/icons, chibi battle sprites, effects, source sheets, or preview sheets from references. Enforce one view per effect image, effect mockup as visual source of truth, regenerated cutout sheets that closely match the effect, and Unity TMP for normal UI text.
 ---
 
 # Hybrid UI Asset Slicer
 
-## Purpose
+## Core Rule
 
-Use this project-local skill to turn a polished reference mockup into reusable prototype PNG assets for the Hybrid Unity project.
+Use this skill to create mockup-slice assets, not Unity runtime resources.
 
-Hard text rule:
+- Write final assets under `UI_Mockups/UI/素材`.
+- Do not write to `Assets/Res/UI`, do not create `.meta`, do not configure atlases, and do not edit prefabs.
+- Do not generate new A/B/C/D four-panel combined effect mockups. Old four-panel images may be used only as historical references, not as deliverables or direct cutting targets.
+- Do not directly crop effect mockups for final assets. Regenerate clean source sheets with `imagegen`, then mechanically key, trim, pad, validate, and preview.
+- Treat the final single-screen effect mockup as the visual source of truth. Slice assets are regenerated from strong references to that effect mockup; they are not allowed to redesign the object.
+- Keep ordinary UI controls textless. Unity TMP owns labels, numbers, descriptions, button text, stats, percentages, panel/card titles, and runtime-localized copy.
+- Allow baked text only for explicit title-art exceptions such as main logo, subtitle ribbon, result title, or victory banner. Name these as title/logo/ribbon/banner assets.
 
-- Do not bake ordinary UI text into generated cutouts. Unity TMP owns labels, numbers, descriptions, button text, stats, percentages, panel/card titles, and all runtime-localized copy.
-- Buttons, panels, upgrade cards, skill icons, progress bars, hero/monster sprites, settings icons, and battle sprites must be textless.
-- The only allowed text-bearing cutouts are explicit title-art exceptions requested by the user, such as a main logo or decorative subtitle ribbon. Treat these as art assets, not normal UI labels.
-- If an imagegen sheet contains unintended letters, Chinese characters, numbers, or pseudo-text on a non-exception asset, reject that sheet and regenerate before slicing.
+## Effect Mockup Rule
 
-The stable workflow is:
+Generate interface effect mockups as separate full-screen images and use them as the visual source of truth:
 
-1. Use `imagegen` to create a single 4x4 asset sheet on pure chroma green.
-2. Copy the generated sheet to `UI_Mockups/generated_asset_sheet_source.png`.
-3. Run `scripts/generate_asset_slices.py <project-root>`.
-4. Review `UI_Mockups/AssetSlices_Prototype/preview_asset_sheet.png` and `preview_in_context.png`.
+- Each effect mockup must be exactly one interface, vertical, `1080x1920`.
+- Do not combine multiple interfaces into one image. Do not add A/B/C/D markers, quadrant labels, panel dividers, or four-panel borders.
+- Save single-screen effect mockups here:
+  - `UI_Mockups/UI/效果图/Menu/Menu_Effect.png`
+  - `UI_Mockups/UI/效果图/Battle/Battle_Effect.png`
+  - `UI_Mockups/UI/效果图/Battle/Battle_UpgradeSelect_Effect.png`
+  - `UI_Mockups/UI/效果图/Result/Result_Effect.png`
+  - `UI_Mockups/UI/效果图/Loading/Loading_Effect.png`
+  - `UI_Mockups/UI/效果图/通用/BaseStyle_ComponentBoard_A_v2_source.png`
+- Use the matching single-screen effect mockup as the semantic and appearance reference when generating a view's cutout sheet. Do not use a combined four-panel mockup as the semantic reference for Menu, Battle, Result, or Loading slices.
 
-Do not directly crop the original mockup/effect image for final assets. Original mockups usually have baked backgrounds, occlusion, shadows, and incomplete elements.
+Effect-first consistency rule:
 
-Generation responsibility rule:
+- Generate the final effect mockup directly with imagegen at `1080x1920`. It should be visually polished enough to present by itself.
+- Treat the effect mockup as the source of truth for object shape, proportions, colors, outlines, material, orientation, and UI control appearance.
+- When regenerating or extending a view effect mockup, use the matching existing `*_Effect.png` as the layout/content standard and `通用/BaseStyle_ComponentBoard_A_v2_source.png` as the base-style component standard.
+- Use `UI_Mockups/UI/效果图/preview_effect_screens.png` only for human review of the standard set. Do not use that preview sheet as an imagegen reference because it combines multiple screens.
+- If a new effect mockup replaces one of the standard files, validate it is still one screen at `1080x1920`, has no A/B/C/D labels, and does not drift from the corresponding standard layout unless the user explicitly requested a layout change.
+- Do not directly crop effect mockups for final assets. Generate clean chroma-key source sheets that strongly match the effect mockup, then mechanically key, trim, pad, validate, and preview.
+- In asset-sheet prompts, explicitly require each asset to copy the effect mockup element's silhouette, proportions, color palette, border thickness, material, highlight style, and facing direction. Do not merely ask for the same concept.
+- Generate large or high-risk assets at low density, ideally one asset or 2x2 per sheet. Use 4x4 only for small icons, effects, or simple decorations.
+- Keep concrete visual assets separate when they may need independent placement: core, heroes, monsters, skill icons, special decorations, title art, and major interactable objects. Do not merge three heroes into one group unless the requested final asset is explicitly a grouped foreground.
+- Ordinary UI controls may be reused from `Common/基础风格`; view-specific concrete assets belong in the matching view folder.
 
-- Use `imagegen` for visual creation: mockups, title/logo art, decorative subtitle banners, backgrounds, characters, monsters, skill icons, and complex UI art direction.
-- Use Python only for mechanical processing: green-screen removal, crop/fit/padding, progress bg/fill separation, deterministic simple bars, preview composition, and validation.
-- Do not use Python/PIL to recreate complex title lettering, Chinese art text, logos, painterly backgrounds, characters, or fantasy UI style. If the output needs to look like the reference art, generate it with `imagegen` first and then only process it mechanically.
-- All final visual cutouts must originate from an `imagegen` output or an approved existing art asset. Python/PIL must not draw final panel, button, card, icon, character, ribbon, or fantasy UI artwork from primitives as a substitute for generated art.
-- For stretchable UI art such as panels, buttons, stat tiles, and bar slots, generate assets with clean corners, straight edges, and enough interior area for 9-slice use. Record the intended border size when moving the asset into Unity.
-- Title-art exceptions should usually be generated as direct transparent PNGs, not as part of the standard textless control sheet, unless the user explicitly asks for a title-art sheet.
+## Output Routing
 
-Encoding rule:
+Mirror the mockup-library organization that matches the project view names:
 
-- Avoid putting Chinese text directly into inline PowerShell-to-Python heredocs. On some Windows shells this can arrive in Python as `????`, which makes previews misleading even when Unity prefab text is correct.
-- For preview-only Chinese text, read strings from a UTF-8 file or use Python Unicode escapes such as `\u5f00\u59cb\u6218\u6597`.
-- Do not use Python preview text rendering as proof that TMP is correct. Validate real UI text in the prefab YAML and in Unity/TMP.
-- Do not bake fallback Chinese preview text into final cutouts; ordinary labels must remain Unity TMP text.
+- `UI_Mockups/UI/素材/Common/基础风格`: reusable base-style components only.
+- `UI_Mockups/UI/素材/Menu`: Menu-view-specific background, title art, and menu-only decorations.
+- `UI_Mockups/UI/素材/Battle`: Battle view assets, including upgrade-selection assets because the Unity project has `Views/Battle`.
+- `UI_Mockups/UI/素材/Result`: Result view assets.
+- `UI_Mockups/UI/素材/Loading`: global loading-screen assets used for hot update, first entry, and scene switching mockups.
+- `UI_Mockups/UI/素材/{View}_source`: copies of generated source sheets/backgrounds used for that view.
+- `UI_Mockups/UI/素材/{View}_preview.png`: contact-sheet preview for manual inspection.
+- `UI_Mockups/UI/素材/{View}_source`: generated source sheets/backgrounds used for that view.
 
-Large asset placement rule:
+Do not put view-specific assets in `Common`. Do not put gameplay, Menu, Battle, or Result assets into `Common/基础风格`.
 
-- If either output dimension is greater than `1024px`, place the PNG under `Assets/Res/UI/Common/Sprites/Large/`.
-- Keep smaller UI-control and battle-sprite outputs in the relevant view-specific or common sprite directory.
-- Preserve `.meta` GUIDs when moving an existing large sprite, and update prefab references only when a new sprite GUID is introduced.
+## Generation Workflow
 
-## Imagegen Prompt
+1. Generate or select the final single-screen effect mockup first. The effect mockup is the visual source of truth and must be a direct, polished `1080x1920` image.
+2. Use the matching effect mockup plus `BaseStyle_ComponentBoard_A_v2_source.png` as strong references for cutout source sheets.
+3. Generate transparent-ready source sheets on pure `#00ff00` chroma green. Generate full-screen backgrounds separately without UI overlays when requested.
+4. Generate concrete assets as independent PNGs when they need independent placement: heroes, monsters, core, icons, special decorations, title art, and major interactable objects.
+5. Choose sheet density by asset type:
+   - Use 2x2 or other low-density sheets for large panels, cards, long banners, buttons, and title-art.
+   - Use 3x3 or 4x4 only for smaller icons, sprites, effects, or simple decorations with generous spacing.
+6. Copy generated sources into the matching `{View}_source` folder. Leave the original imagegen output in place.
+7. Slice with real asset bounds: use connected-component analysis or hand-entered source boxes from visual inspection. Treat grid cells only as a generation guide; never trust fixed grid slicing blindly.
+8. Remove chroma key only as mechanical processing. Do not redraw final UI art, title lettering, characters, fantasy panels, or icons in Python.
+9. Crop to non-transparent pixels, add transparent padding, generate a preview sheet, and run validation.
+10. Manually inspect the asset preview against the effect mockup. Reject source sheets where assets are redesigned, noticeably drift in silhouette/proportion/color, contain text unexpectedly, include green background residue, or are cut off.
 
-Read `references/asset-sheet-prompt.md` and adapt only the reference-image wording or requested asset list. Keep these constraints:
+## Prompt Reference
 
-- Pure chroma green background: `#00ff00`.
-- 4 columns x 4 rows.
-- One centered asset per cell, no overlap, generous margin.
-- No text, labels, Chinese characters, numbers, Latin letters, pseudo-glyphs, or scenery on ordinary assets.
-- Keep UI controls textless because Unity TMP renders all labels at prefab/runtime level.
-- Include title-art text only when the user explicitly asks for named title/logo/banner slices; do not include it in the standard sheet.
-- Thick dark outline, glossy cartoon UI, Q-version fantasy style.
-- Progress bg/frame and fill visuals must come from imagegen or approved existing art. Scripts may only split, crop, fit, pad, remove chroma key, and validate them.
+Read `references/asset-sheet-prompt.md` before generating a new source sheet. Adapt the view name, asset list, and title-art exceptions. Keep:
 
-After imagegen returns a sheet, copy the chosen PNG into:
-
-`UI_Mockups/generated_asset_sheet_source.png`
-
-Leave the original generated image in place.
+- pure `#00ff00` background for cutout sheets,
+- single-screen effect mockups are not chroma-key sheets and must remain normal full-scene `1080x1920` images,
+- one complete asset per requested cell/area,
+- generous margins,
+- no ordinary text, numbers, labels, Latin letters, Chinese characters, or pseudo-glyphs,
+- exact text only for named title-art exceptions,
+- A V2 base style: light beige panels, thick black outline, grey metal corners, flat colors, simplified highlights.
 
 ## Script Usage
 
-Run from the project root:
+Use `scripts/slice_asset_sheet.py` for the current workflow when you have a generated sheet and a JSON manifest of true crop boxes:
 
 ```powershell
-python .codex/skills/hybrid-ui-asset-slicer/scripts/generate_asset_slices.py .
+python .codex/skills/hybrid-ui-asset-slicer/scripts/slice_asset_sheet.py `
+  --sheet UI_Mockups/UI/素材/Battle_source/Battle_Generated_Sheet.png `
+  --manifest UI_Mockups/UI/素材/Battle_source/Battle_manifest.json `
+  --out-dir UI_Mockups/UI/素材/Battle `
+  --preview UI_Mockups/UI/素材/Battle_preview.png
 ```
 
-If no argument is provided, the script may infer the project root from its location, but passing `.` is preferred.
+Manifest shape:
 
-The script writes:
+```json
+{
+  "assets": [
+    { "name": "Battle_HudPanelBase.png", "box": [18, 80, 400, 245], "pad": 24 },
+    { "name": "Battle_UpgradeTitle.png", "box": [22, 955, 405, 1095], "pad": 24, "title_art": true }
+  ]
+}
+```
 
-- `UI_Mockups/AssetSlices_Prototype/*.png`
-- `UI_Mockups/AssetSlices_Prototype/preview_asset_sheet.png`
-- `UI_Mockups/AssetSlices_Prototype/preview_in_context.png`
+The legacy `scripts/generate_asset_slices.py` is the old hard-coded prototype slicer for `UI_Mockups/AssetSlices_Prototype`; do not use it for the current `UI_Mockups/UI/素材` workflow unless a user explicitly asks for the old prototype output.
 
-The project may also keep a copy at `UI_Mockups/generate_asset_slices.py`; the skill script is the canonical workflow source.
+`scripts/compose_effect_from_manifest.py` is optional and only for alignment previews or debugging. Do not use it to create final effect mockups unless the user explicitly asks for a composed preview:
 
-## Required Outputs
+```powershell
+python .codex/skills/hybrid-ui-asset-slicer/scripts/compose_effect_from_manifest.py `
+  --manifest UI_Mockups/UI/素材/Menu_source/Menu_layout_manifest.json `
+  --out UI_Mockups/UI/效果图/Menu/Menu_Effect.png `
+  --project-root .
+```
 
-The standard output set is:
+Optional preview manifest shape:
 
-- `battle_core_256.png`
-- `hero_ranger_idle_256.png`
-- `hero_knight_idle_256.png`
-- `hero_axe_idle_256.png`
-- `monster_goblin_idle_128.png`
-- `skill_arrow_rain_128.png`
-- `skill_fireball_128.png`
-- `skill_guard_aura_128.png`
-- `ui_button_orange_512x160.png`
-- `ui_button_blue_512x160.png`
-- `ui_button_purple_360x120.png`
-- `ui_panel_result_720x640.png`
-- `ui_card_upgrade_300x560.png`
-- `ui_icon_settings_128.png`
-- `ui_bar_hp_bg_512x48.png`
-- `ui_bar_hp_fill_512x48.png`
-- `ui_bar_exp_bg_512x48.png`
-- `ui_bar_exp_fill_512x48.png`
-
-All standard outputs must be textless. If a task needs title art, add explicit optional outputs such as `ui_title_logo_*.png` or `ui_subtitle_banner_*.png`; do not put normal button/card/panel text into these standard assets.
+```json
+{
+  "canvas": [1080, 1920],
+  "background": { "path": "UI_Mockups/UI/素材/Menu/Menu_Background.png" },
+  "layers": [
+    { "path": "UI_Mockups/UI/素材/Menu/Menu_CoreCrystal.png", "x": 360, "y": 575, "scale": 1.0, "zOrder": 20 },
+    { "path": "UI_Mockups/UI/素材/Common/基础风格/Base_ButtonOrange.png", "x": 120, "y": 1510, "size": [840, 220], "nineSlice": [92, 64, 92, 64], "zOrder": 40 },
+    { "type": "text", "text": "开始战斗", "x": 540, "y": 1710, "anchor": "center", "fontSize": 86, "zOrder": 90 }
+  ]
+}
+```
 
 ## Validation Rules
 
-Always run the script validation and treat failures as blocking:
+Treat validation failures as blocking:
 
-- Every expected PNG exists and matches its filename size.
-- Every non-preview PNG has transparent corners.
-- No non-preview PNG has alpha pixels on the canvas edge.
-- Progress `*_bg` images contain frame/slot only, no bright fill.
-- Progress `*_fill` images contain fill/highlight only, no dark frame or slot.
-- Standard cutouts contain no baked text, labels, numbers, Chinese characters, Latin letters, or pseudo-text. Manually inspect `preview_asset_sheet.png`; automatic validation does not replace this check.
-- Title-art exceptions are only valid when explicitly requested and must be named as title/logo/banner art.
-- Any output with width or height greater than `1024px` is stored under `Assets/Res/UI/Common/Sprites/Large/`.
-- The script must not read `CharacterPrefabs`, old GUI assets, or directly crop the original four-panel mockup.
-- Generated UI surfaces that will be stretched in Unity must include an explicit suggested 9-slice border and must be validated with transparent edges and intact corners.
-
-If a cutout is incomplete, expand the source crop box and/or add output padding. Do not accept edge alpha.
+- Output directory contains only assets for that view/category.
+- Every interface effect mockup is `1080x1920`, contains one view only, and has no A/B/C/D labels or four-panel dividers.
+- Final effect mockups are directly generated images unless the user explicitly asked for a composed preview.
+- Effect mockups are the visual source of truth for matching slice assets.
+- Slice assets visibly match the corresponding effect mockup element's silhouette, proportions, color palette, border thickness, material, highlight style, and facing direction.
+- If a generated asset sheet drifts noticeably from the effect mockup, regenerate that asset alone or in a lower-density sheet; do not accept a poor batch sheet.
+- Every transparent PNG is non-empty, has transparent corners, has no alpha pixels on the canvas edge, and keeps at least 8px transparent margin.
+- No obvious pure chroma-green background remains on cutouts.
+- Ordinary controls contain no baked text, numbers, labels, Chinese characters, Latin letters, or pseudo-text.
+- Progress bar slots and fills are separated when separate assets are requested.
+- Preview shows no adjacent asset fragments, cropped corners, broken outlines, missing limbs, or title-art truncation.
+- Title-art exceptions are readable and match the requested text exactly.
 
 ## Unity Notes
 
-These are prototype PNGs for Canvas `Image` or `SpriteRenderer`. This skill does not create Unity `.meta`, SpriteAtlas, 9-slice metadata, pressed/disabled button states, or animation frames.
-
-Use TMP for all normal Unity UI text. When composing prefabs, place TMP labels over the textless button/panel/card sprites instead of generating new text-bearing PNGs.
+These outputs are mockup-library PNGs for later Unity work. When building prefabs, place TMP labels over textless sprites instead of generating text-bearing normal UI PNGs.

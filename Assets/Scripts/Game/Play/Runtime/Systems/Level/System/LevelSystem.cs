@@ -1,7 +1,9 @@
 using Cysharp.Threading.Tasks;
+using Game.Data.Configs.Sys;
 using Game.Play.Adapters;
 using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Tester;
+using Game.Play.Systems.Common.Navigator;
 using Game.Play.Systems.Level.Interface;
 using Game.Play.Systems.Level.Model;
 using Game.Play.Systems.SkillEnhancement.Interface;
@@ -142,14 +144,14 @@ namespace Game.Play.Systems.Level.System
             model.BattleOutcome.Value = outcome;
             model.FlowState.Value = LevelFlowState.BattleFinished;
             StopLevel();
-            UIManager.Instance.Open<BattleResultView>();
+            this.Open(SystemType.BattleResult);
         }
 
         private void ReturnToMainMenu()
         {
             StopLevel();
             model.FlowState.Value = LevelFlowState.MainMenu;
-            UIManager.Instance.Open<MainMenuView>();
+            this.Open(SystemType.Main);
         }
 
         private static void CountAlive(BattleRuntimeDriverSnapshot snapshot, out int players, out int enemies)
