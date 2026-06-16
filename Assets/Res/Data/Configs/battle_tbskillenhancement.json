@@ -8,6 +8,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -50,6 +51,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -92,6 +94,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -137,6 +140,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -179,6 +183,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -221,6 +226,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -261,6 +267,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -304,6 +311,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -346,6 +354,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -388,6 +397,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -431,6 +441,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {
@@ -473,6 +484,7 @@
       "forbiddenUnitFlags": 0,
       "requiredRoleFlags": 0,
       "forbiddenRoleFlags": 0,
+      "campType": 0,
       "unitCfgIds": []
     },
     "skillSelector": {

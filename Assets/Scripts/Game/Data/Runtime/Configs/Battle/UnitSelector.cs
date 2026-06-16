@@ -24,6 +24,7 @@ public sealed partial class UnitSelector : Luban.BeanBase
         { if(!_buf["forbiddenUnitFlags"].IsNumber) { throw new SerializationException(); }  ForbiddenUnitFlags = (Battle.UnitFlag)_buf["forbiddenUnitFlags"].AsInt; }
         { if(!_buf["requiredRoleFlags"].IsNumber) { throw new SerializationException(); }  RequiredRoleFlags = (Battle.UnitRoleFlag)_buf["requiredRoleFlags"].AsInt; }
         { if(!_buf["forbiddenRoleFlags"].IsNumber) { throw new SerializationException(); }  ForbiddenRoleFlags = (Battle.UnitRoleFlag)_buf["forbiddenRoleFlags"].AsInt; }
+        { if(!_buf["campType"].IsNumber) { throw new SerializationException(); }  CampType = (Battle.ModifierCampType)_buf["campType"].AsInt; }
         { var __json0 = _buf["unitCfgIds"]; if(!__json0.IsArray) { throw new SerializationException(); } int _n0 = __json0.Count; UnitCfgIds = new int[_n0]; int __index0=0; foreach(JSONNode __e0 in __json0.Children) { int __v0;  { if(!__e0.IsNumber) { throw new SerializationException(); }  __v0 = __e0; }  UnitCfgIds[__index0++] = __v0; }   }
     }
 
@@ -49,6 +50,10 @@ public sealed partial class UnitSelector : Luban.BeanBase
     /// </summary>
     public readonly Battle.UnitRoleFlag ForbiddenRoleFlags;
     /// <summary>
+    /// 阵营筛选，默认玩家阵营
+    /// </summary>
+    public readonly Battle.ModifierCampType CampType;
+    /// <summary>
     /// 允许的单位配置id
     /// </summary>
     public readonly int[] UnitCfgIds;
@@ -67,6 +72,7 @@ public sealed partial class UnitSelector : Luban.BeanBase
         + "forbiddenUnitFlags:" + ForbiddenUnitFlags + ","
         + "requiredRoleFlags:" + RequiredRoleFlags + ","
         + "forbiddenRoleFlags:" + ForbiddenRoleFlags + ","
+        + "campType:" + CampType + ","
         + "unitCfgIds:" + Luban.StringUtil.CollectionToString(UnitCfgIds) + ","
         + "}";
     }

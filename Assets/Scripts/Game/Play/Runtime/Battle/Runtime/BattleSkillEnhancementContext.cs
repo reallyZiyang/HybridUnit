@@ -670,6 +670,7 @@ namespace Game.Play.Battle.Runtime
             public readonly int SourceId;
             public readonly BattleUnitHandle SpecificUnit;
             public readonly int Stack;
+            public readonly ConfigBattle.ModifierCampType CampType;
             public readonly int RequiredUnitFlags;
             public readonly int ForbiddenUnitFlags;
             public readonly int RequiredRoleFlags;
@@ -693,6 +694,7 @@ namespace Game.Play.Battle.Runtime
                 int sourceId,
                 BattleUnitHandle specificUnit,
                 int stack,
+                ConfigBattle.ModifierCampType campType,
                 int requiredUnitFlags,
                 int forbiddenUnitFlags,
                 int requiredRoleFlags,
@@ -715,6 +717,7 @@ namespace Game.Play.Battle.Runtime
                 SourceId = sourceId;
                 SpecificUnit = specificUnit;
                 Stack = Mathf.Max(1, stack);
+                CampType = campType;
                 RequiredUnitFlags = requiredUnitFlags;
                 ForbiddenUnitFlags = forbiddenUnitFlags;
                 RequiredRoleFlags = requiredRoleFlags;
@@ -744,6 +747,7 @@ namespace Game.Play.Battle.Runtime
                     config.Id,
                     BattleUnitHandle.Invalid,
                     stack,
+                    unitSelector?.CampType ?? ConfigBattle.ModifierCampType.Player,
                     (int)(unitSelector?.RequiredUnitFlags ?? ConfigBattle.UnitFlag.None),
                     (int)(unitSelector?.ForbiddenUnitFlags ?? ConfigBattle.UnitFlag.None),
                     (int)(unitSelector?.RequiredRoleFlags ?? ConfigBattle.UnitRoleFlag.None),
@@ -776,6 +780,7 @@ namespace Game.Play.Battle.Runtime
                     sourceId,
                     specificUnit,
                     stack,
+                    ConfigBattle.ModifierCampType.Any,
                     0,
                     0,
                     0,
@@ -852,7 +857,15 @@ namespace Game.Play.Battle.Runtime
 
                 if (units == null || !units.IsValid(owner))
                 {
-                    return RequiredUnitFlags == 0 && RequiredRoleFlags == 0 && UnitCfgIds.Length == 0;
+                    return CampType == ConfigBattle.ModifierCampType.Any
+                        && RequiredUnitFlags == 0
+                        && RequiredRoleFlags == 0
+                        && UnitCfgIds.Length == 0;
+                }
+
+                if (!MatchCamp(units.GetCamp(owner)))
+                {
+                    return false;
                 }
 
                 int unitFlags = units.GetUnitFlags(owner);
@@ -892,6 +905,17 @@ namespace Game.Play.Battle.Runtime
                 }
 
                 return false;
+            }
+
+            private bool MatchCamp(int camp)
+            {
+                return CampType switch
+                {
+                    ConfigBattle.ModifierCampType.Player => camp == 1,
+                    ConfigBattle.ModifierCampType.Enemy => camp == 2,
+                    ConfigBattle.ModifierCampType.Any => true,
+                    _ => false
+                };
             }
 
             private static BattleEffectRef ToRuntimeEffect(ConfigBattle.EffectRef effect)

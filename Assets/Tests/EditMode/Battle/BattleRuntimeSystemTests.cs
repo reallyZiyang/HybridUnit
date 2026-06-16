@@ -548,6 +548,44 @@ namespace Game.Play.Tests.Battle
         }
 
         [Test]
+        public void SkillEnhancement_UnitSelectorCampTypeFiltersPlayerEnemyAndAny()
+        {
+            Tables tables = LoadTables();
+            BattleSkillEnhancementContext enhancements = new();
+            enhancements.AddOrUpdate(CreateUnitAtkModifier(
+                9111,
+                ConfigBattle.UnitFlag.None,
+                ConfigBattle.UnitRoleFlag.None,
+                new[] { 1002 },
+                10,
+                ConfigAttr.ValueType.Int,
+                ConfigBattle.ModifierCampType.Player), 1);
+            enhancements.AddOrUpdate(CreateUnitAtkModifier(
+                9112,
+                ConfigBattle.UnitFlag.None,
+                ConfigBattle.UnitRoleFlag.None,
+                new[] { 1002 },
+                20,
+                ConfigAttr.ValueType.Int,
+                ConfigBattle.ModifierCampType.Enemy), 1);
+            enhancements.AddOrUpdate(CreateUnitAtkModifier(
+                9113,
+                ConfigBattle.UnitFlag.None,
+                ConfigBattle.UnitRoleFlag.None,
+                new[] { 1002 },
+                5,
+                ConfigAttr.ValueType.Int,
+                ConfigBattle.ModifierCampType.Any), 1);
+            BattleRuntimeSystem battle = CreateBattle(tables, skillEnhancementContext: enhancements);
+
+            BattleUnitHandle playerBarbarian = SpawnSelectorTestUnit(battle, 1002, ConfigBattle.UnitFlag.Placed, ConfigBattle.UnitRoleFlag.Melee, 1);
+            BattleUnitHandle enemyBarbarian = SpawnSelectorTestUnit(battle, 1002, ConfigBattle.UnitFlag.Placed, ConfigBattle.UnitRoleFlag.Melee, 2);
+
+            Assert.AreEqual(115, battle.UnitManager.GetAttr(playerBarbarian, AttributeType.Atk));
+            Assert.AreEqual(125, battle.UnitManager.GetAttr(enemyBarbarian, AttributeType.Atk));
+        }
+
+        [Test]
         public void SkillEnhancement_RatioUnitModifierStacksFromBaseAttribute()
         {
             Tables tables = LoadTables();
@@ -737,7 +775,8 @@ namespace Game.Play.Tests.Battle
             ConfigBattle.UnitRoleFlag requiredRoleFlags,
             int[] unitCfgIds,
             int value,
-            ConfigAttr.ValueType valueType = ConfigAttr.ValueType.Int)
+            ConfigAttr.ValueType valueType = ConfigAttr.ValueType.Int,
+            ConfigBattle.ModifierCampType campType = ConfigBattle.ModifierCampType.Player)
         {
             string unitCfgIdJson = unitCfgIds != null && unitCfgIds.Length > 0
                 ? string.Join(",", unitCfgIds)
@@ -752,6 +791,7 @@ namespace Game.Play.Tests.Battle
                 + "\"forbiddenUnitFlags\":0,"
                 + $"\"requiredRoleFlags\":{(int)requiredRoleFlags},"
                 + "\"forbiddenRoleFlags\":0,"
+                + $"\"campType\":{(int)campType},"
                 + $"\"unitCfgIds\":[{unitCfgIdJson}]"
                 + "},"
                 + "\"skillSelector\":{\"slotIndex\":-1,\"skillIds\":[]},"
@@ -793,14 +833,15 @@ namespace Game.Play.Tests.Battle
             BattleRuntimeSystem battle,
             int unitCfgId,
             ConfigBattle.UnitFlag unitFlags,
-            ConfigBattle.UnitRoleFlag roleFlags)
+            ConfigBattle.UnitRoleFlag roleFlags,
+            int camp = 1)
         {
             return battle.SpawnUnit(
                 unitCfgId,
                 Vector2.zero,
                 new BattleUnitSpawnOverrides(
                     hasCamp: true,
-                    camp: 1,
+                    camp: camp,
                     hasUnitFlags: true,
                     unitFlags: unitFlags,
                     hasRoleFlags: true,
