@@ -39,6 +39,7 @@ namespace Game.Play.Editor.Battle
         private void OnDisable()
         {
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
+            UnregisterRogueChoiceCallback();
             ClearRuntimeView();
         }
 
@@ -115,6 +116,11 @@ namespace Game.Play.Editor.Battle
                     StepTick();
                 }
 
+                if (GUILayout.Button("获得三选一", EditorStyles.toolbarButton, GUILayout.Width(86f)))
+                {
+                    OpenRogueChoice();
+                }
+
                 if (GUILayout.Button("Stop", EditorStyles.toolbarButton, GUILayout.Width(50f)))
                 {
                     StopBattle();
@@ -137,7 +143,7 @@ namespace Game.Play.Editor.Battle
             if (state == PlayModeStateChange.EnteredPlayMode)
             {
                 playModeChanging = false;
-                RefreshDriverReference();
+                SampleStatus();
             }
 
             if (state == PlayModeStateChange.ExitingPlayMode)
@@ -157,18 +163,12 @@ namespace Game.Play.Editor.Battle
         {
             if (!CanRun)
             {
-                if (driver != null && !EditorApplication.isPlaying)
+                if (!EditorApplication.isPlaying)
                 {
                     ClearRuntimeView();
                 }
 
                 return;
-            }
-
-            if (driver == null)
-            {
-                driver = FindObjectOfType<BattleRuntimeDriver>();
-                createdDriver = IsTemporaryDriver(driver);
             }
         }
     }

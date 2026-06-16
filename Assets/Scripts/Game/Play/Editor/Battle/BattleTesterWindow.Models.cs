@@ -49,14 +49,15 @@ namespace Game.Play.Editor.Battle
         private string[] unitConfigLabels = System.Array.Empty<string>();
         private string unitConfigCacheStatus = "Unit configs not loaded";
         private Tables tables;
-        private BattleRuntimeDriver driver;
-        private bool createdDriver;
+        private bool levelStartPending;
         private bool playModeChanging;
         private Vector2 leftScroll;
         private Vector2 rightScroll;
         private Vector2 statusScroll;
         private bool draggingTemplate;
         private bool panningPreview;
+        private bool rogueChoiceWasPaused;
+        private bool rogueChoiceAwaitingSelection;
         private int draggingTemplateSide;
         private int draggingTemplateIndex;
         private Vector2 dragTemplateOffset;
@@ -67,7 +68,7 @@ namespace Game.Play.Editor.Battle
         private float elapsedSeconds;
 
         private bool CanRun => EditorApplication.isPlaying && !playModeChanging;
-        private bool IsRunning => driver != null && driver.IsRunning;
-        private bool IsPaused => driver != null && driver.IsPaused;
+        private bool IsRunning => levelStartPending || TryGetLevelSystem()?.IsRunning == true;
+        private bool IsPaused => TryGetLevelSystem()?.IsPaused == true;
     }
 }

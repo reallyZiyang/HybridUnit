@@ -19,7 +19,7 @@ MonoBehaviour:
   gridHeight: 30
   cellSize: 1
   boundaryEnabled: 1
-  boundaryRectWidth: 15
+  boundaryRectWidth: 12
   boundaryRectHeight: 25
   boundaryRectCenterOffset: {x: 0, y: 9.98}
   autoStart: 1
@@ -31,24 +31,10 @@ MonoBehaviour:
   - enabled: 1
     label: Player
     unitCfgId: 1002
-    spawnCount: 80
-    spawnSpacing: 0.05
+    spawnCount: 20
+    spawnSpacing: 0.57
     camp: 1
-    position: {x: -6.419846, y: 17.576763}
-    overrideRadius: 0
-    radius: 0
-    overrideLayer: 0
-    layer: 0
-    renderKey: 
-    skillIds: 
-    attrs: []
-  - enabled: 1
-    label: Player 2
-    unitCfgId: 1002
-    spawnCount: 80
-    spawnSpacing: 0.05
-    camp: 1
-    position: {x: -0.07613914, y: 18.771399}
+    position: {x: -0.029314322, y: 5.712857}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0
@@ -58,11 +44,25 @@ MonoBehaviour:
     attrs: []
   - enabled: 1
     label: Player 3
-    unitCfgId: 1002
-    spawnCount: 80
-    spawnSpacing: 0.05
+    unitCfgId: 1001
+    spawnCount: 3
+    spawnSpacing: 1.39
     camp: 1
-    position: {x: 6.770194, y: 17.564697}
+    position: {x: -2.8747761, y: 1.5883666}
+    overrideRadius: 0
+    radius: 0
+    overrideLayer: 0
+    layer: 0
+    renderKey: 
+    skillIds: 
+    attrs: []
+  - enabled: 1
+    label: Player 3 Copy
+    unitCfgId: 1001
+    spawnCount: 3
+    spawnSpacing: 1.39
+    camp: 1
+    position: {x: 3.8974152, y: 1.5883666}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0
@@ -72,26 +72,12 @@ MonoBehaviour:
     attrs: []
   enemyUnits:
   - enabled: 1
-    label: Enemy
-    unitCfgId: 1001
-    spawnCount: 50
-    spawnSpacing: 0.26
-    camp: 2
-    position: {x: -0.16872837, y: 0.26787692}
-    overrideRadius: 0
-    radius: 0
-    overrideLayer: 0
-    layer: 0
-    renderKey: 
-    skillIds: 
-    attrs: []
-  - enabled: 1
     label: Enemy 2
     unitCfgId: 1002
-    spawnCount: 10
-    spawnSpacing: 0.16
+    spawnCount: 100
+    spawnSpacing: 0.18
     camp: 2
-    position: {x: -0.0059186225, y: 10.147931}
+    position: {x: 0.17159833, y: 16.508879}
     overrideRadius: 0
     radius: 0
     overrideLayer: 0

@@ -1,0 +1,8 @@
+{
+  "background_source": "UI_Mockups/UI/素材/Menu/Menu_Background.png",
+  "core_source": "UI_Mockups/UI/素材/Menu/Menu_CoreCrystal.png",
+  "sparkles_source": "UI_Mockups/UI/素材/Menu/Menu_DecorCrystalSparkles.png",
+  "bar_bg_source": "UI_Mockups/UI/素材/Common/基础风格/Base_BarSlotDark.png",
+  "bar_fill_source": "UI_Mockups/UI/素材/Common/基础风格/Base_BarFillBlue.png",
+  "panel_source": "UI_Mockups/UI/素材/Common/基础风格/Base_PanelNarrow.png"
+}

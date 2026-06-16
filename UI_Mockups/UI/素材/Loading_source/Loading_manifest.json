@@ -1,0 +1,54 @@
+{
+  "assets": [
+    {
+      "name": "Loading_CoreCrystal.png",
+      "box": [
+        52,
+        85,
+        442,
+        548
+      ],
+      "pad": 24
+    },
+    {
+      "name": "Loading_StatusPanel.png",
+      "box": [
+        500,
+        260,
+        998,
+        480
+      ],
+      "pad": 24
+    },
+    {
+      "name": "Loading_BarBg.png",
+      "box": [
+        40,
+        760,
+        490,
+        890
+      ],
+      "pad": 24
+    },
+    {
+      "name": "Loading_BarFill.png",
+      "box": [
+        548,
+        768,
+        960,
+        885
+      ],
+      "pad": 24
+    },
+    {
+      "name": "Loading_Sparkles.png",
+      "box": [
+        115,
+        1020,
+        390,
+        1358
+      ],
+      "pad": 24
+    }
+  ]
+}

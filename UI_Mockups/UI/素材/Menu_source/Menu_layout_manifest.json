@@ -1,0 +1,72 @@
+{
+  "canvas": [
+    1080,
+    1920
+  ],
+  "background": {
+    "path": "UI_Mockups/UI/素材/Menu/Menu_Background.png"
+  },
+  "layers": [
+    {
+      "path": "UI_Mockups/UI/素材/Menu/Menu_TitleLogo.png",
+      "x": 129,
+      "y": 46,
+      "scale": 1.95,
+      "zOrder": 10
+    },
+    {
+      "path": "UI_Mockups/UI/素材/Menu/Menu_SubtitleRibbon.png",
+      "x": 196,
+      "y": 326,
+      "scale": 1.7,
+      "zOrder": 11
+    },
+    {
+      "path": "UI_Mockups/UI/素材/Menu/Menu_CoreCrystal.png",
+      "x": 337,
+      "y": 520,
+      "scale": 1.25,
+      "zOrder": 20
+    },
+    {
+      "path": "UI_Mockups/UI/素材/Menu/Menu_ForegroundHeroGroup.png",
+      "x": 178,
+      "y": 1008,
+      "scale": 1.38,
+      "zOrder": 40
+    },
+    {
+      "path": "UI_Mockups/UI/素材/Menu/Menu_ButtonStartBase.png",
+      "x": 120,
+      "y": 1510,
+      "scale": 2.2,
+      "zOrder": 50
+    },
+    {
+      "type": "text",
+      "text": "开始战斗",
+      "x": 540,
+      "y": 1695,
+      "anchor": "center",
+      "fontSize": 92,
+      "fill": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "strokeFill": [
+        95,
+        50,
+        20,
+        255
+      ],
+      "strokeWidth": 6,
+      "zOrder": 60
+    }
+  ],
+  "notes": [
+    "Menu_ForegroundHeroGroup.png is currently kept as an explicit grouped foreground because the source characters overlap; do not split it mechanically.",
+    "Generate Menu_HeroRanger/Menu_HeroKnight/Menu_HeroAxe from a new independent hero source sheet before switching the manifest to separate hero layers."
+  ]
+}

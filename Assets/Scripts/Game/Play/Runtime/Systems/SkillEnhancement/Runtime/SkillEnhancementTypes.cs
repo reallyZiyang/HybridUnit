@@ -28,4 +28,14 @@ namespace Game.Play.Systems.SkillEnhancement.Runtime
             this.stack = Math.Max(1, stack);
         }
     }
+
+    public static class BattleTesterRogueChoiceBridge
+    {
+        public static event Action<int> ChoiceApplied;
+
+        public static void NotifyChoiceApplied(int enhancementId)
+        {
+            ChoiceApplied?.Invoke(enhancementId);
+        }
+    }
 }

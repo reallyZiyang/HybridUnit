@@ -1,8 +1,11 @@
 using System;
-using Game.Data.Configs;
+using Game.Data.Configs.Sys;
 using Game.Play.Adapters;
-using Game.Play.Battle.Rendering;
 using Game.Play.Battle.Tester;
+using Game.Play.Systems.Common.Navigator.Interface;
+using Game.Play.Systems.Level.Interface;
+using Game.Play.Systems.SkillEnhancement.Command;
+using Game.Play.Systems.SkillEnhancement.Runtime;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,7 +24,7 @@ namespace Game.Play.Editor.Battle
             AddEvent(configStatus);
         }
 
-        private void StartBattle()
+        private async void StartBattle()
         {
             if (!CanRun)
             {
@@ -29,54 +32,67 @@ namespace Game.Play.Editor.Battle
                 return;
             }
 
-            EnsureScenario();
-            CopyWindowToScenario();
-            if (tables == null)
+            ILevelSystem levelSystem = TryGetLevelSystem(true);
+            if (levelSystem == null)
             {
-                LoadConfig();
-            }
-
-            StopBattle();
-            BattleRuntimeDriver targetDriver = FindOrCreateDriver();
-            if (targetDriver == null)
-            {
-                runtimeStatus = "No driver";
-                AddEvent("Battle driver unavailable");
+                runtimeStatus = "Level system unavailable";
+                AddEvent("Level system unavailable");
                 return;
             }
 
-            IBattleRenderWorld renderWorld = useNullRenderWorld
-                ? new NullBattleRenderWorld()
-                : new DrawMeshBattleRenderWorld();
-            if (!targetDriver.StartBattle(tables, scenario, renderWorld))
+            EnsureScenario();
+            CopyWindowToScenario();
+
+            levelStartPending = true;
+            runtimeStatus = "Starting";
+            AddEvent("Start level battle");
+            try
             {
+                await levelSystem.StartLevelAsync(scenario);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
                 runtimeStatus = "Start failed";
                 AddEvent("Start battle failed");
                 return;
             }
+            finally
+            {
+                levelStartPending = false;
+            }
 
-            driver = targetDriver;
             selectedUnitIndex = 0;
             SampleStatus();
-            runtimeStatus = driver.IsPaused ? "Started, paused" : "Running";
-            AddEvent($"Start battle: {unitStatus.Count} units");
+            if (levelSystem.IsRunning)
+            {
+                runtimeStatus = levelSystem.IsPaused ? "Started, paused" : "Running";
+                AddEvent($"Start battle: {unitStatus.Count} units");
+            }
+            else
+            {
+                runtimeStatus = "Start failed";
+            }
+
+            Repaint();
         }
 
         private void TogglePause()
         {
-            if (!CanRun || driver == null || !driver.IsRunning)
+            ILevelSystem levelSystem = TryGetLevelSystem();
+            if (!CanRun || levelSystem == null || !levelSystem.IsRunning)
             {
                 return;
             }
 
-            if (driver.IsPaused)
+            if (levelSystem.IsPaused)
             {
-                driver.Resume();
+                levelSystem.ResumeLevel();
                 runtimeStatus = "Running";
             }
             else
             {
-                driver.Pause();
+                levelSystem.PauseLevel();
                 runtimeStatus = "Paused";
             }
 
@@ -85,26 +101,28 @@ namespace Game.Play.Editor.Battle
 
         private void StepTick()
         {
-            if (!CanRun || driver == null || !driver.IsRunning)
+            ILevelSystem levelSystem = TryGetLevelSystem();
+            if (!CanRun || levelSystem == null || !levelSystem.IsRunning)
             {
                 return;
             }
 
-            driver.StepTick();
+            levelSystem.StepBattle();
             SampleStatus();
-            runtimeStatus = driver.IsPaused ? "Paused" : "Running";
+            runtimeStatus = levelSystem.IsPaused ? "Paused" : "Running";
             AddEvent($"Tick +{Mathf.Max(1, logicStepMs)}ms");
             Repaint();
         }
 
         private void CastManualSkill()
         {
-            if (!CanRun || driver == null || !driver.IsRunning)
+            ILevelSystem levelSystem = TryGetLevelSystem();
+            if (!CanRun || levelSystem == null || !levelSystem.IsRunning)
             {
                 return;
             }
 
-            if (driver.CastSkill(selectedUnitIndex, manualSkillId))
+            if (levelSystem.CastSkill(selectedUnitIndex, manualSkillId))
             {
                 AddEvent($"Cast skill {manualSkillId} by unit {selectedUnitIndex}");
             }
@@ -114,23 +132,12 @@ namespace Game.Play.Editor.Battle
 
         private void StopBattle()
         {
-            bool hadBattle = driver != null && driver.IsRunning;
-            if (driver != null)
-            {
-                driver.StopBattle();
-                if (createdDriver && driver.gameObject != null)
-                {
-                    if (Application.isPlaying)
-                    {
-                        Destroy(driver.gameObject);
-                    }
-                    else
-                    {
-                        DestroyImmediate(driver.gameObject);
-                    }
-                }
-            }
-
+            ILevelSystem levelSystem = TryGetLevelSystem();
+            bool hadBattle = levelSystem != null && levelSystem.IsRunning;
+            levelSystem?.StopLevel();
+            UnregisterRogueChoiceCallback();
+            levelStartPending = false;
+            rogueChoiceAwaitingSelection = false;
             ClearRuntimeView();
             if (hadBattle)
             {
@@ -138,53 +145,18 @@ namespace Game.Play.Editor.Battle
             }
         }
 
-        private BattleRuntimeDriver FindOrCreateDriver()
-        {
-            if (!CanRun)
-            {
-                return null;
-            }
-
-            if (driver != null)
-            {
-                return driver;
-            }
-
-            driver = FindObjectOfType<BattleRuntimeDriver>();
-            createdDriver = IsTemporaryDriver(driver);
-            if (driver != null)
-            {
-                return driver;
-            }
-
-            GameObject go = new("Battle Runtime Driver")
-            {
-                hideFlags = HideFlags.DontSave
-            };
-            driver = go.AddComponent<BattleRuntimeDriver>();
-            createdDriver = true;
-            return driver;
-        }
-
-        private static bool IsTemporaryDriver(BattleRuntimeDriver targetDriver)
-        {
-            return targetDriver != null
-                && targetDriver.gameObject != null
-                && targetDriver.gameObject.name == "Battle Runtime Driver"
-                && (targetDriver.gameObject.hideFlags & HideFlags.DontSave) != 0;
-        }
-
         private void SampleStatus()
         {
             unitStatus.Clear();
-            if (driver == null)
+            ILevelSystem levelSystem = TryGetLevelSystem();
+            if (levelSystem == null)
             {
                 elapsedSeconds = 0f;
                 runtimeStatus = CanRun ? "Stopped" : "Edit only";
                 return;
             }
 
-            BattleRuntimeDriverSnapshot snapshot = driver.GetRuntimeSnapshot();
+            BattleRuntimeDriverSnapshot snapshot = levelSystem.GetRuntimeSnapshot();
             elapsedSeconds = snapshot.elapsedSeconds;
             for (int i = 0; i < snapshot.units.Length; i++)
             {
@@ -198,8 +170,6 @@ namespace Game.Play.Editor.Battle
 
         private void ClearRuntimeView()
         {
-            driver = null;
-            createdDriver = false;
             elapsedSeconds = 0f;
             runtimeStatus = CanRun ? "Stopped" : "Edit only";
             unitStatus.Clear();
@@ -239,6 +209,85 @@ namespace Game.Play.Editor.Battle
             {
                 eventLog.RemoveAt(0);
             }
+        }
+
+        private void OpenRogueChoice()
+        {
+            ILevelSystem levelSystem = TryGetLevelSystem();
+            if (!CanRun || levelSystem == null || !levelSystem.IsRunning)
+            {
+                return;
+            }
+
+            GameContext context = GameContext.Instance;
+            if (!context.Initialized)
+            {
+                AddEvent("Game context not initialized");
+                return;
+            }
+
+            rogueChoiceWasPaused = levelSystem.IsPaused;
+            rogueChoiceAwaitingSelection = true;
+            UnregisterRogueChoiceCallback();
+            BattleTesterRogueChoiceBridge.ChoiceApplied += OnRogueChoiceApplied;
+
+            if (!levelSystem.IsPaused)
+            {
+                levelSystem.PauseLevel();
+            }
+
+            context.SendCommand(new OpenSkillEnhancementChoiceCommand());
+            context.GetSystem<INavigatorSystem>().NavigateTo(SystemType.RougueChoosen);
+            runtimeStatus = "Choosing enhancement";
+            AddEvent("Open rogue choice");
+        }
+
+        private ILevelSystem TryGetLevelSystem(bool logError = false)
+        {
+            GameContext context = GameContext.Instance;
+            if (!context.Initialized)
+            {
+                return null;
+            }
+
+            try
+            {
+                return context.GetSystem<ILevelSystem>();
+            }
+            catch (Exception e)
+            {
+                if (logError)
+                {
+                    Debug.LogError(e);
+                }
+
+                return null;
+            }
+        }
+
+        private void OnRogueChoiceApplied(int enhancementId)
+        {
+            UnregisterRogueChoiceCallback();
+            if (!rogueChoiceAwaitingSelection)
+            {
+                return;
+            }
+
+            rogueChoiceAwaitingSelection = false;
+            ILevelSystem levelSystem = TryGetLevelSystem();
+            if (levelSystem != null && levelSystem.IsRunning && !rogueChoiceWasPaused)
+            {
+                levelSystem.ResumeLevel();
+            }
+
+            SampleStatus();
+            AddEvent($"Pick enhancement {enhancementId}");
+            Repaint();
+        }
+
+        private void UnregisterRogueChoiceCallback()
+        {
+            BattleTesterRogueChoiceBridge.ChoiceApplied -= OnRogueChoiceApplied;
         }
     }
 }

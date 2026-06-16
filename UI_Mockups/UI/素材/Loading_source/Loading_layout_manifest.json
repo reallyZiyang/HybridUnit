@@ -1,0 +1,143 @@
+{
+  "canvas": [
+    1080,
+    1920
+  ],
+  "background": {
+    "path": "UI_Mockups/UI/素材/Loading/Loading_Background.png"
+  },
+  "layers": [
+    {
+      "path": "UI_Mockups/UI/素材/Loading/Loading_Sparkles.png",
+      "x": 278,
+      "y": 505,
+      "scale": 1.55,
+      "zOrder": 10
+    },
+    {
+      "path": "UI_Mockups/UI/素材/Loading/Loading_CoreCrystal.png",
+      "x": 350,
+      "y": 500,
+      "scale": 1.18,
+      "zOrder": 20
+    },
+    {
+      "path": "UI_Mockups/UI/素材/Loading/Loading_StatusPanel.png",
+      "x": 140,
+      "y": 1288,
+      "zOrder": 30,
+      "size": [
+        800,
+        190
+      ],
+      "nineSlice": [
+        90,
+        62,
+        90,
+        62
+      ]
+    },
+    {
+      "type": "text",
+      "text": "正在准备冒险",
+      "x": 540,
+      "y": 1345,
+      "anchor": "center",
+      "fontSize": 50,
+      "fill": [
+        70,
+        45,
+        24,
+        255
+      ],
+      "strokeFill": [
+        255,
+        245,
+        218,
+        255
+      ],
+      "strokeWidth": 2,
+      "zOrder": 35
+    },
+    {
+      "path": "UI_Mockups/UI/素材/Loading/Loading_BarBg.png",
+      "x": 150,
+      "y": 1452,
+      "zOrder": 40,
+      "size": [
+        780,
+        92
+      ],
+      "nineSlice": [
+        64,
+        38,
+        64,
+        38
+      ]
+    },
+    {
+      "path": "UI_Mockups/UI/素材/Loading/Loading_BarFill.png",
+      "x": 184,
+      "y": 1475,
+      "zOrder": 41,
+      "size": [
+        530,
+        46
+      ],
+      "nineSlice": [
+        42,
+        20,
+        42,
+        20
+      ]
+    },
+    {
+      "type": "text",
+      "text": "资源加载中...",
+      "x": 540,
+      "y": 1432,
+      "anchor": "center",
+      "fontSize": 42,
+      "fill": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "strokeFill": [
+        72,
+        44,
+        18,
+        255
+      ],
+      "strokeWidth": 4,
+      "zOrder": 45
+    },
+    {
+      "type": "text",
+      "text": "68%",
+      "x": 540,
+      "y": 1546,
+      "anchor": "center",
+      "fontSize": 42,
+      "fill": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "strokeFill": [
+        38,
+        53,
+        61,
+        255
+      ],
+      "strokeWidth": 3,
+      "zOrder": 46
+    }
+  ],
+  "notes": [
+    "Asset-first Loading composition. Normal loading text is preview-only and should be recreated with Unity TMP.",
+    "Loading assets are derived from confirmed Menu/Common A V2 assets to avoid imagegen drift."
+  ]
+}
